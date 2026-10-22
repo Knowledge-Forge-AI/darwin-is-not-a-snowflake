@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd)"
+
+# shellcheck source=/dev/null
+source "$repo_dir/shell/sh_config/common/003_nvm"
+# shellcheck source=/dev/null
+source "$repo_dir/shell/sh_config/bash/nvm_completion"

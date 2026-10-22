@@ -1,0 +1,4 @@
+alias ff='fastfetch'
+alias nvm-node='nvm exec --silent default node'
+alias pyenv-python='PYENV_VERSION=$(pyenv global) pyenv exec python'
+alias rbenv-ruby='RBENV_VERSION=$(rbenv global) rbenv exec ruby'

@@ -1,0 +1,141 @@
+#!/usr/bin/env zunit
+# nix-darwin-test-source-target: tools/bootstrap/bootstrap-macos
+
+@setup {
+  test_tmp_root="$(mktemp -d)"
+  fake_bin="$test_tmp_root/bin"
+  fake_home="$test_tmp_root/home"
+  fake_flake="$test_tmp_root/flake"
+  fake_local="$test_tmp_root/local"
+  fake_git_root="$test_tmp_root/nix-git"
+  command_log="$test_tmp_root/commands.log"
+  repo_dir="$(cd "$testdir/../../../.." && pwd)"
+  bootstrap_script="$repo_dir/tools/bootstrap/bootstrap-macos"
+  base_path="/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
+  mkdir -p "$fake_bin" "$fake_home" "$fake_flake" "$fake_git_root/bin"
+  print '{ outputs = { self }: { }; }' > "$fake_flake/flake.nix"
+  : > "$command_log"
+
+  write_fake_command() {
+    local command_path="$1"
+    local command_body="$2"
+    {
+      print -r -- '#!/usr/bin/env zsh'
+      print -r -- 'set -e'
+      print -r -- "$command_body"
+    } > "$command_path"
+    chmod +x "$command_path"
+  }
+
+  write_fake_commands() {
+    write_fake_command "$fake_bin/uname" 'print Darwin'
+    write_fake_command "$fake_bin/id" 'if [[ "${1:-}" == -u ]]; then print 501; else print operator; fi'
+    write_fake_command "$fake_bin/xcode-select" 'exit 0'
+    write_fake_command "$fake_bin/nix" 'print -r -- "nix $*" >> "$BOOTSTRAP_TEST_LOG"
+print -r -- "$BOOTSTRAP_FAKE_GIT_ROOT"'
+    write_fake_command "$fake_git_root/bin/git" 'print -r -- "git $*" >> "$BOOTSTRAP_TEST_LOG"
+if [[ "${1:-}" == clone ]]; then
+  url="$3"
+  destination="$4"
+  mkdir -p "$destination/.git"
+  print -r -- "$url" > "$destination/.git/origin"
+elif [[ "${1:-}" == -C && "${3:-}" == remote && "${4:-}" == get-url && "${5:-}" == origin ]]; then
+  cat "$2/.git/origin"
+fi'
+  }
+
+  run_bootstrap() {
+    write_fake_commands
+    PATH="$fake_bin:$base_path" \
+      HOME="$fake_home" \
+      NIX_DARWIN_LOCAL="$fake_local" \
+      BOOTSTRAP_TEST_LOG="$command_log" \
+      BOOTSTRAP_FAKE_GIT_ROOT="$fake_git_root" \
+      BOOTSTRAP_SKIP_NIX_ENV=1 \
+      "$bootstrap_script" --flake-dir "$fake_flake" "$@"
+  }
+}
+
+@teardown {
+  rm -rf "$test_tmp_root"
+}
+
+@test 'bootstrap creates the quiescent control file and clones only public composition' {
+  output="$(run_bootstrap)"
+  exit_code="$?"
+
+  assert "$exit_code" equals 0
+  assert "$fake_local/config/nix-darwin.toml" is_file
+  assert "$(head -n 1 "$fake_local/config/nix-darwin.toml")" same_as '[flake]'
+  assert "$(tail -n 1 "$fake_local/config/nix-darwin.toml")" same_as 'active = ""'
+  assert "$fake_local/composition-nd/.git" is_dir
+  assert "$(cat "$fake_local/composition-nd/.git/origin")" same_as 'git@github.com:Knowledge-Forge-AI/composition_dinas.git'
+  assert "$output" contains 'Bootstrap foundation complete.'
+  assert "$(cat "$command_log")" contains 'legacyPackages.aarch64-darwin.git'
+  assert "$(grep -c 'darwinConfigurations' "$command_log" || true)" equals 0
+  assert "$(grep -c 'darwin-rebuild' "$command_log" || true)" equals 0
+  assert "$(grep -c ' switch' "$command_log" || true)" equals 0
+}
+
+@test 'bootstrap preserves existing control and matching dirty checkout without updating it' {
+  mkdir -p "$fake_local/config" "$fake_local/composition-nd/.git"
+  print -r -- $'[flake]\nactive = "~/chosen"' > "$fake_local/config/nix-darwin.toml"
+  print -r -- 'git@github.com:Knowledge-Forge-AI/composition_dinas.git' > "$fake_local/composition-nd/.git/origin"
+  print -r -- 'operator work' > "$fake_local/composition-nd/untracked-work"
+
+  run_bootstrap >/dev/null
+
+  assert "$(head -n 1 "$fake_local/config/nix-darwin.toml")" same_as '[flake]'
+  assert "$(tail -n 1 "$fake_local/config/nix-darwin.toml")" same_as 'active = "~/chosen"'
+  assert "$(cat "$fake_local/composition-nd/untracked-work")" same_as 'operator work'
+  assert "$(grep -c '^git clone ' "$command_log" || true)" equals 0
+  assert "$(grep -c ' pull' "$command_log" || true)" equals 0
+  assert "$(grep -c ' reset' "$command_log" || true)" equals 0
+}
+
+@test 'bootstrap rejects a present non-Git composition target' {
+  mkdir -p "$fake_local/composition-nd"
+
+  exit_code=0
+  output="$(run_bootstrap 2>&1)" || exit_code="$?"
+
+  assert "$exit_code" equals 1
+  assert "$output" contains 'existing composition checkout is not a Git repository'
+}
+
+@test 'bootstrap rejects a composition checkout with the wrong origin' {
+  mkdir -p "$fake_local/composition-nd/.git"
+  print -r -- 'git@example.invalid:other/repository.git' > "$fake_local/composition-nd/.git/origin"
+
+  exit_code=0
+  output="$(run_bootstrap 2>&1)" || exit_code="$?"
+
+  assert "$exit_code" equals 1
+  assert "$output" contains 'existing composition checkout has an unexpected origin'
+}
+
+@test 'bootstrap help exposes a non-activating foundation contract' {
+  output="$($bootstrap_script --help)"
+
+  assert "$output" contains 'Establish the nix-darwin bootstrap foundation.'
+  assert "$output" contains '--local-root PATH'
+  assert "$(print -r -- "$output" | grep -c -- '--config' || true)" equals 0
+  assert "$(print -r -- "$output" | grep -c -- '--build-jobs' || true)" equals 0
+  assert "$(print -r -- "$output" | grep -c -- '--skip-homebrew' || true)" equals 0
+  assert "$(print -r -- "$output" | grep -c -- '--skip-ssh-key' || true)" equals 0
+}
+
+@test 'bootstrap requires a non-root Darwin caller and a valid core checkout' {
+  write_fake_commands
+  write_fake_command "$fake_bin/uname" 'print Linux'
+  exit_code=0
+  output="$(PATH="$fake_bin:$base_path" HOME="$fake_home" "$bootstrap_script" --flake-dir "$fake_flake" 2>&1)" || exit_code="$?"
+  assert "$exit_code" equals 1
+  assert "$output" contains 'this bootstrap script is for macOS only'
+
+  write_fake_command "$fake_bin/uname" 'print Darwin'
+  exit_code=0
+  output="$(PATH="$fake_bin:$base_path" HOME="$fake_home" "$bootstrap_script" --flake-dir "$test_tmp_root/missing" 2>&1)" || exit_code="$?"
+  assert "$exit_code" equals 1
+  assert "$output" contains 'flake.nix not found'
+}

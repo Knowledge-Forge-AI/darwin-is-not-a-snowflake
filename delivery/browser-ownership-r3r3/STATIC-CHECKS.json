@@ -1,0 +1,82 @@
+{
+  "records": [
+    {
+      "kind": "Nix syntax",
+      "path": "modules/browsers.nix",
+      "status": "PASS"
+    },
+    {
+      "kind": "Nix syntax",
+      "path": "lib/browser-extension-ownership.nix",
+      "status": "PASS"
+    },
+    {
+      "kind": "Nix syntax",
+      "path": "config/browser/proton-vpn-r3r3.nix",
+      "status": "PASS"
+    },
+    {
+      "kind": "Nix syntax",
+      "path": "delivery/browser-ownership-r3r3/source-fixture.nix",
+      "status": "PASS"
+    },
+    {
+      "kind": "Nix syntax",
+      "path": "delivery/browser-ownership-r3r3/readback.nix",
+      "status": "PASS"
+    },
+    {
+      "kind": "Nix syntax",
+      "path": "patched-owner/tests/roles-r3.nix",
+      "status": "PASS"
+    },
+    {
+      "kind": "Nix syntax",
+      "path": "patched-owner/modules/roles-r3.nix",
+      "status": "PASS"
+    },
+    {
+      "kind": "Nix syntax",
+      "path": "patched-owner/config/browser/roles-r3.nix",
+      "status": "PASS"
+    },
+    {
+      "kind": "Nix syntax",
+      "path": "patched-owner/config/browser/extension-contributions-r3r3.nix",
+      "status": "PASS"
+    },
+    {
+      "kind": "Python syntax",
+      "path": "libexec/browser-extension-delivery/readback.py",
+      "status": "PASS"
+    },
+    {
+      "kind": "Python syntax",
+      "path": "src/test/unit/python/browser_proton_vpn_r3r3.unit.test.py",
+      "status": "PASS"
+    },
+    {
+      "kind": "Python syntax",
+      "path": "delivery/browser-ownership-r3r3/identity-readback.py",
+      "status": "PASS"
+    },
+    {
+      "kind": "Python syntax",
+      "path": "delivery/browser-ownership-r3r3/verify-source.py",
+      "status": "PASS"
+    },
+    {
+      "kind": "Python syntax",
+      "path": "delivery/browser-ownership-r3r3/native-readback.py",
+      "status": "PASS"
+    },
+    {
+      "kind": "Python syntax",
+      "path": "delivery/browser-ownership-r3r3/prepare-readback.py",
+      "status": "PASS"
+    }
+  ],
+  "jsonFiles": "PARSED",
+  "buildOrBrowserRun": false,
+  "gitDiffCheck": "PASS"
+}

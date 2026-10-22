@@ -1,0 +1,254 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+interval="${MONITOR_TEMP_INTERVAL:-60}"
+count="${MONITOR_TEMP_COUNT:-0}"
+bell="${MONITOR_TEMP_BELL:-1}"
+bell_pressure="${MONITOR_TEMP_BELL_PRESSURE:-moderate}"
+color="${MONITOR_TEMP_COLOR:-auto}"
+timestamp_format="${MONITOR_TEMP_TIMESTAMP_FORMAT:-%H:%M:%S}"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+monitor_temp_libexec="${MONITOR_TEMP_LIBEXEC:-$script_dir/../libexec/monitor-temp}"
+
+usage() {
+  cat <<'USAGE'
+Usage: monitor-temp [--interval seconds] [--count samples]
+                    [--bell-pressure level] [--no-bell] [--no-color]
+
+Monitor macOS thermal pressure, power, and temperature fields exposed by built-
+in tools. Output is intentionally kept under a standard 80-column terminal line:
+
+  HH:MM:SS - P:Nominal B:31.8C W:4.2W
+
+Pressure colors are green/cyan/yellow/red/magenta. A terminal bell sounds when
+pressure crosses the configured threshold, which defaults to moderate.
+
+Set count to 0 for an endless monitor.
+
+Environment:
+  MONITOR_TEMP_INTERVAL=seconds
+  MONITOR_TEMP_COUNT=samples
+  MONITOR_TEMP_BELL=0|1
+  MONITOR_TEMP_BELL_PRESSURE=nominal|light|moderate|heavy|trapping
+  MONITOR_TEMP_COLOR=auto|always|never
+  MONITOR_TEMP_TIMESTAMP_FORMAT=strftime-format
+USAGE
+}
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --interval)
+      [ "$#" -ge 2 ] || {
+        echo "monitor-temp: --interval requires a value" >&2
+        exit 2
+      }
+      interval="$2"
+      shift 2
+      ;;
+    --count)
+      [ "$#" -ge 2 ] || {
+        echo "monitor-temp: --count requires a value" >&2
+        exit 2
+      }
+      count="$2"
+      shift 2
+      ;;
+    --bell-pressure)
+      [ "$#" -ge 2 ] || {
+        echo "monitor-temp: --bell-pressure requires a value" >&2
+        exit 2
+      }
+      bell_pressure="$2"
+      shift 2
+      ;;
+    --no-bell)
+      bell=0
+      shift
+      ;;
+    --no-color)
+      color=never
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "monitor-temp: unknown argument: $1" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+if [ "$(uname -s)" != "Darwin" ]; then
+  echo "monitor-temp: this script uses macOS powermetrics/ioreg" >&2
+  exit 1
+fi
+
+pressure_rank() {
+  case "$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')" in
+    nominal|normal) printf '0' ;;
+    light) printf '1' ;;
+    moderate) printf '2' ;;
+    heavy) printf '3' ;;
+    trap*|critical) printf '4' ;;
+    *) printf -- '-1' ;;
+  esac
+}
+
+bell_pressure_rank="$(pressure_rank "$bell_pressure")"
+if [ "$bell_pressure_rank" -lt 0 ]; then
+  echo "monitor-temp: unknown bell pressure: $bell_pressure" >&2
+  usage >&2
+  exit 2
+fi
+
+use_color=0
+case "$color" in
+  always)
+    use_color=1
+    ;;
+  auto)
+    if [ -t 1 ] && [ -z "${NO_COLOR:-}" ]; then
+      use_color=1
+    fi
+    ;;
+  never)
+    ;;
+  *)
+    echo "monitor-temp: MONITOR_TEMP_COLOR must be auto, always, or never" >&2
+    exit 2
+    ;;
+esac
+
+if [ "$use_color" = "1" ]; then
+  c_dim=$'\033[2m'
+  c_green=$'\033[32m'
+  c_cyan=$'\033[36m'
+  c_yellow=$'\033[33m'
+  c_red=$'\033[31m'
+  c_magenta=$'\033[35m'
+  c_reset=$'\033[0m'
+else
+  c_dim=
+  c_green=
+  c_cyan=
+  c_yellow=
+  c_red=
+  c_magenta=
+  c_reset=
+fi
+
+pressure_color() {
+  case "$(pressure_rank "$1")" in
+    0) printf '%s' "$c_green" ;;
+    1) printf '%s' "$c_cyan" ;;
+    2) printf '%s' "$c_yellow" ;;
+    3) printf '%s' "$c_red" ;;
+    4) printf '%s' "$c_magenta" ;;
+    *) printf '%s' "$c_dim" ;;
+  esac
+}
+
+power_watts() {
+  awk -v raw="$1" -f "$monitor_temp_libexec/power-watts.awk"
+}
+
+power_color() {
+  local whole_watts="${1%%.*}"
+
+  case "$whole_watts" in
+    ''|*[!0-9]*)
+      whole_watts=0
+      ;;
+  esac
+
+  if [ "$whole_watts" -ge 20 ]; then
+    printf '%s' "$c_red"
+  elif [ "$whole_watts" -ge 10 ]; then
+    printf '%s' "$c_yellow"
+  else
+    printf '%s' "$c_cyan"
+  fi
+}
+
+sample_powermetrics() {
+  sudo powermetrics --samplers thermal,cpu_power,gpu_power,ane_power -n 1 -i 1000 2>/dev/null
+}
+
+battery_temperature_c() {
+  ioreg -r -c AppleSmartBattery 2>/dev/null |
+    awk -F'= ' -v field=Temperature -f "$monitor_temp_libexec/battery-temperature-c.awk"
+}
+
+virtual_battery_temperature_c() {
+  ioreg -r -c AppleSmartBattery 2>/dev/null |
+    awk -F'= ' -v field=VirtualTemperature -f "$monitor_temp_libexec/battery-temperature-c.awk"
+}
+
+print_sample() {
+  output="$1"
+  timestamp="$(date "+$timestamp_format")"
+
+  pressure="$(printf '%s\n' "$output" | awk -F': ' '/Current pressure level:/ { print $2; exit }')"
+  combined_power="$(printf '%s\n' "$output" | awk -F': ' '/^Combined Power/ { print $2; exit }')"
+
+  battery_temp="$(battery_temperature_c || true)"
+  virtual_battery_temp="$(virtual_battery_temperature_c || true)"
+  pressure="${pressure:-unknown}"
+  current_pressure_rank="$(pressure_rank "$pressure")"
+
+  temp_label="T"
+  if [ -n "$battery_temp" ]; then
+    temp_label="B"
+    temp_value="${battery_temp}C"
+  elif [ -n "$virtual_battery_temp" ]; then
+    temp_label="VB"
+    temp_value="${virtual_battery_temp}C"
+  else
+    temp_value="?"
+  fi
+
+  watts="$(power_watts "${combined_power:-}" || true)"
+  if [ -n "$watts" ]; then
+    power_value="${watts}W"
+  else
+    power_value="${combined_power:-?}"
+  fi
+
+  marker="${markers:$(( (sample_number - 1) % ${#markers} )):1}"
+  bell_prefix=
+  if [ "$bell" = "1" ] &&
+    [ "$previous_pressure_rank" -ge 0 ] &&
+    [ "$current_pressure_rank" -ge "$bell_pressure_rank" ] &&
+    [ "$previous_pressure_rank" -lt "$bell_pressure_rank" ]; then
+    bell_prefix=$'\a'
+  fi
+
+  printf '%b%s%s%s %s %sP:%s%s %s%s:%s%s %sW:%s%s\n' \
+    "$bell_prefix" \
+    "$c_dim" "$timestamp" "$c_reset" \
+    "$marker" \
+    "$(pressure_color "$pressure")" "$pressure" "$c_reset" \
+    "$c_green" "$temp_label" "$temp_value" "$c_reset" \
+    "$(power_color "${watts:-0}")" "$power_value" "$c_reset"
+
+  previous_pressure_rank="$current_pressure_rank"
+}
+
+sudo true
+
+sample_number=0
+previous_pressure_rank=-1
+markers='-\|/'
+while :; do
+  sample_number=$((sample_number + 1))
+  print_sample "$(sample_powermetrics)"
+
+  if [ "$count" != "0" ] && [ "$sample_number" -ge "$count" ]; then
+    break
+  fi
+
+  sleep "$interval"
+done

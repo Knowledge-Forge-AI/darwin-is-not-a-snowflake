@@ -1,0 +1,47 @@
+Temporary local compatibility patch for Arq 7 Tree v4 node metadata.
+Drop this when upstream arqbackup/arq_restore reads these fields itself.
+
+diff --git a/arq7restore/Arq7Node.m b/arq7restore/Arq7Node.m
+index 7b384c7..b184820 100644
+--- a/arq7restore/Arq7Node.m
++++ b/arq7restore/Arq7Node.m
+@@ -317,6 +317,39 @@ - (instancetype)initWithBufferedInputStream:(BufferedInputStream *)bis
+                 return nil;
+             }
+         }
++        if (theTreeVersion >= 4) {
++            int64_t addedTime_sec = 0;
++            int64_t addedTime_nsec = 0;
++            uint32_t documentId = 0;
++            BOOL hasDocumentId = NO;
++            BOOL isSparse = NO;
++            uint64_t sparseLogicalSize = 0;
++            uint64_t holeCount = 0;
++
++            if (![IntegerIO readInt64:&addedTime_sec from:bis error:error]
++                || ![IntegerIO readInt64:&addedTime_nsec from:bis error:error]
++                || ![IntegerIO readUInt32:&documentId from:bis error:error]
++                || ![BooleanIO read:&hasDocumentId from:bis error:error]
++                || ![BooleanIO read:&isSparse from:bis error:error]
++                || ![IntegerIO readUInt64:&sparseLogicalSize from:bis error:error]
++                || ![IntegerIO readUInt64:&holeCount from:bis error:error]) {
++                return nil;
++            }
++
++            if (holeCount > 1000000) {
++                SETNSERROR([self errorDomain], -1, @"absurd hole count value in Arq7Node");
++                return nil;
++            }
++
++            for (uint64_t i = 0; i < holeCount; i++) {
++                uint64_t holeOffset = 0;
++                uint64_t holeLength = 0;
++                if (![IntegerIO readUInt64:&holeOffset from:bis error:error]
++                    || ![IntegerIO readUInt64:&holeLength from:bis error:error]) {
++                    return nil;
++                }
++            }
++        }
+         _userName = userName;
+         _groupName = groupName;
+         _deleted = deleted;

@@ -1,0 +1,141 @@
+{
+  "schema": "core-browser-ownership-v1",
+  "owner": "core",
+  "chrome": {
+    "bundleId": "com.google.Chrome",
+    "package": "google-chrome",
+    "minimumMajor": 129,
+    "mcpClients": [
+      "codex",
+      "antigravity"
+    ],
+    "mcpClientsAbsent": [
+      "claude"
+    ],
+    "policies": {
+      "UrlKeyedAnonymizedDataCollectionEnabled": false,
+      "SearchSuggestEnabled": false,
+      "NetworkPredictionOptions": 2,
+      "SafeBrowsingProtectionLevel": 1,
+      "HttpsOnlyMode": "force_balanced_enabled",
+      "ExtensionSettings": {
+        "*": {
+          "installation_mode": "allowed"
+        },
+        "ddkjiahejlhfcafbddmgiahcphecmpfh": {
+          "installation_mode": "force_installed",
+          "update_url": "https://clients2.google.com/service/update2/crx"
+        }
+      }
+    },
+    "requiredExtension": {
+      "id": "ddkjiahejlhfcafbddmgiahcphecmpfh",
+      "name": "uBlock Origin Lite",
+      "filteringMode": "optimal",
+      "rulesets": "built-in-defaults",
+      "qualification": "enabled extension, effective site access and filtering readback required"
+    },
+    "metrics": {
+      "desiredEnabled": false,
+      "delivery": "attended-ui",
+      "reason": "MetricsReportingEnabled requires MDM, MCX or Chrome Enterprise Core enrollment on macOS; standalone delivery is not qualified"
+    },
+    "adPrivacy": {
+      "delivery": "attended-ui-if-present",
+      "desiredEnabled": false,
+      "reason": "PrivacySandbox ad policies deprecated since Chrome 144 and removed at 150; do not emit them"
+    },
+    "cleanTestBaseline": "framework-managed Chromium in a disposable context; normal Chrome inherits device policy"
+  },
+  "safari": {
+    "bundleId": "com.apple.Safari",
+    "delivery": "attended-ui-intent",
+    "managedPreferences": {},
+    "searchEngine": "DuckDuckGo",
+    "privateSearchEngine": "DuckDuckGo",
+    "protections": {
+      "preventCrossSiteTracking": true,
+      "hideIPAddress": "trackers",
+      "fraudulentWebsiteWarning": true,
+      "preserveOtherEnabledProtections": true
+    },
+    "wipr": {
+      "bundleId": "site.kaylees.Wipr2",
+      "appStoreId": "1662217862",
+      "acquisition": "preserve-existing-purchased-app",
+      "extensionNames": [
+        "Blocklist 1",
+        "Blocklist 2",
+        "Blocklist 3",
+        "Blocklist 4",
+        "Wipr Extra"
+      ],
+      "approval": "attended Safari UI only; preserve existing approvals and permissions",
+      "desiredState": {
+        "Blocklist 1": {
+          "enabled": true
+        },
+        "Blocklist 2": {
+          "enabled": true
+        },
+        "Blocklist 3": {
+          "enabled": true
+        },
+        "Blocklist 4": {
+          "enabled": true
+        },
+        "Wipr Extra": {
+          "enabled": true,
+          "privateBrowsing": true,
+          "otherWebsites": "Allow"
+        }
+      },
+      "desiredStateBasis": "Wipr Extra private browsing has explicit operator approval; Other Websites Allow preserves its existing website access",
+      "enforcement": "attended-ui-readback-only",
+      "unattendedSupport": "UNSUPPORTED_WITHOUT_SUPERVISED_MDM"
+    }
+  },
+  "stock": {
+    "brave": {
+      "package": "brave",
+      "provider": "nix",
+      "bundleId": "com.brave.Browser",
+      "managedPolicies": false
+    },
+    "librewolf": {
+      "package": "librewolf",
+      "provider": "homebrew-cask",
+      "bundleId": "io.gitlab.librewolf-community",
+      "managedPolicies": false
+    }
+  },
+  "preserve": [
+    "Firefox",
+    "Vivaldi",
+    "Floorp",
+    "Brave YouTube",
+    "Apple Keychain",
+    "Safari personal data",
+    "existing browser profiles",
+    "unrelated source pins"
+  ],
+  "deployment": {
+    "status": "held",
+    "release": "subsequent reviewed source change; no option or checklist bypass",
+    "requiredBeforeRelease": [
+      "Qualified preserving Chrome forced-extension/storage and KeePassXC transition with separate user decision; no deletion authorized",
+      "Qualified Clear New Tab durable-state replacement or demonstrated preserved source for clear-new-tab-sync and cnt-wallpaper-gallery, including Brave YouTube wallpaper data",
+      "Native composed option graph and unique physical writer qualification for both configured hosts",
+      "Actual host LibreWolf cask availability and acquisition plan"
+    ],
+    "clearNewTabDependency": {
+      "extensionId": "felphkbfjadmcejnibcmcncimlappdde",
+      "consumers": [
+        "clear-new-tab-sync",
+        "cnt-wallpaper-gallery"
+      ],
+      "source": "normal Chrome extension and IndexedDB",
+      "affectedWorkflow": "Brave YouTube wallpaper synchronization"
+    }
+  }
+}

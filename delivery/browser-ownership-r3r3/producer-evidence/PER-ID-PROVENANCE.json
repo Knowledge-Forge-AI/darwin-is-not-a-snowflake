@@ -1,0 +1,317 @@
+{
+  "schema": "browser-per-id-provenance-r3r3-v1",
+  "records": [
+    {
+      "role": "brave-daily",
+      "id": "ckkdlimhmcjmikdlpkmbgfkaikojcbjk",
+      "semanticOwner": "browser-ux",
+      "source": "config/browser/extension-contributions-r3r3.nix in exact Browser UX patch",
+      "retainedProvenance": "config/browser/extension-policy.nix in Browser UX",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "brave-daily",
+      "id": "efaidnbmnnnibpcajpcglclefindmkaj",
+      "semanticOwner": "browser-ux",
+      "source": "config/browser/extension-contributions-r3r3.nix in exact Browser UX patch",
+      "retainedProvenance": "config/browser/extension-policy.nix in Browser UX",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "brave-daily",
+      "id": "efknglbfhoddmmfabeihlemgekhhnabb",
+      "semanticOwner": "browser-ux",
+      "source": "config/browser/extension-contributions-r3r3.nix in exact Browser UX patch",
+      "retainedProvenance": "config/browser/extension-policy.nix in Browser UX",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "brave-daily",
+      "id": "felphkbfjadmcejnibcmcncimlappdde",
+      "semanticOwner": "browser-ux",
+      "source": "config/browser/extension-contributions-r3r3.nix in exact Browser UX patch",
+      "retainedProvenance": "config/browser/extension-policy.nix in Browser UX",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "brave-daily",
+      "id": "hlkenndednhfkekhgcdicdfddnkalmdm",
+      "semanticOwner": "browser-ux",
+      "source": "config/browser/extension-contributions-r3r3.nix in exact Browser UX patch",
+      "retainedProvenance": "config/browser/extension-policy.nix in Browser UX",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "brave-daily",
+      "id": "hoombieeljmmljlkjmnheibnpciblicm",
+      "semanticOwner": "browser-ux",
+      "source": "config/browser/extension-contributions-r3r3.nix in exact Browser UX patch",
+      "retainedProvenance": "config/browser/extension-policy.nix in Browser UX",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "brave-daily",
+      "id": "jplgfhpmjnbigmhklmmbgecoobifkmpa",
+      "semanticOwner": "core",
+      "source": "config/browser/proton-vpn-r3r3.nix",
+      "retainedProvenance": "official Proton store listing",
+      "updateUrl": "https://clients2.google.com/service/update2/crx",
+      "storeUrl": "https://chromewebstore.google.com/detail/proton-vpn-fast-secure/jplgfhpmjnbigmhklmmbgecoobifkmpa",
+      "currentIdentity": "OFFICIAL_WEB_STORE_ID; runtime presence unobserved"
+    },
+    {
+      "role": "brave-daily",
+      "id": "lmjnegcaeklhafolokijcfjliaokphfk",
+      "semanticOwner": "browser-ux",
+      "source": "config/browser/extension-contributions-r3r3.nix in exact Browser UX patch",
+      "retainedProvenance": "config/browser/extension-policy.nix in Browser UX",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "brave-daily",
+      "id": "pejdijmoenmkgeppbflobdenhhabjlaj",
+      "semanticOwner": "core",
+      "source": "config/browser/proton-vpn-r3r3.nix",
+      "retainedProvenance": "config/browser/roles-r3.json",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "brave-youtube",
+      "id": "jplgfhpmjnbigmhklmmbgecoobifkmpa",
+      "semanticOwner": "core",
+      "source": "config/browser/proton-vpn-r3r3.nix",
+      "retainedProvenance": "official Proton store listing",
+      "updateUrl": "https://clients2.google.com/service/update2/crx",
+      "storeUrl": "https://chromewebstore.google.com/detail/proton-vpn-fast-secure/jplgfhpmjnbigmhklmmbgecoobifkmpa",
+      "currentIdentity": "OFFICIAL_WEB_STORE_ID; runtime presence unobserved"
+    },
+    {
+      "role": "floorp",
+      "id": "clear-new-tab@loftyshaky",
+      "semanticOwner": "browser-ux",
+      "source": "config/browser/extension-contributions-r3r3.nix in exact Browser UX patch",
+      "retainedProvenance": "config/browser/extension-policy.nix in Browser UX",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "floorp",
+      "id": "markdown-viewer@outofindex.com",
+      "semanticOwner": "browser-ux",
+      "source": "config/browser/extension-contributions-r3r3.nix in exact Browser UX patch",
+      "retainedProvenance": "config/browser/extension-policy.nix in Browser UX",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "floorp",
+      "id": "password-manager-firefox-extension@apple.com",
+      "semanticOwner": "browser-ux",
+      "source": "config/browser/extension-contributions-r3r3.nix in exact Browser UX patch",
+      "retainedProvenance": "config/browser/extension-policy.nix in Browser UX",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "floorp",
+      "id": "uBlock0@raymondhill.net",
+      "semanticOwner": "browser-ux",
+      "source": "config/browser/extension-contributions-r3r3.nix in exact Browser UX patch",
+      "retainedProvenance": "config/browser/extension-policy.nix in Browser UX",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "floorp",
+      "id": "vpn@proton.ch",
+      "semanticOwner": "browser-ux",
+      "source": "config/browser/extension-contributions-r3r3.nix in exact Browser UX patch",
+      "retainedProvenance": "config/browser/extension-policy.nix in Browser UX",
+      "updateUrl": "https://addons.mozilla.org/firefox/downloads/latest/proton-vpn-firefox-extension/latest.xpi",
+      "storeUrl": "https://addons.mozilla.org/en-US/firefox/addon/proton-vpn-firefox-extension/",
+      "currentIdentity": "PENDING_FRESH_AMO_XPI_AND_BROWSER_SIGNATURE"
+    },
+    {
+      "role": "floorp",
+      "id": "{b9db16a4-6edc-47ec-a1f4-b86292ed211d}",
+      "semanticOwner": "browser-ux",
+      "source": "config/browser/extension-contributions-r3r3.nix in exact Browser UX patch",
+      "retainedProvenance": "config/browser/extension-policy.nix in Browser UX",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "floorp",
+      "id": "{c3c10168-4186-445c-9c5b-63f12b8e2c87}",
+      "semanticOwner": "browser-ux",
+      "source": "config/browser/extension-contributions-r3r3.nix in exact Browser UX patch",
+      "retainedProvenance": "config/browser/extension-policy.nix in Browser UX",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "librewolf",
+      "id": "clear-new-tab@loftyshaky",
+      "semanticOwner": "browser-ux",
+      "source": "config/browser/extension-contributions-r3r3.nix in exact Browser UX patch",
+      "retainedProvenance": "config/browser/extension-policy.nix in Browser UX",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "librewolf",
+      "id": "password-manager-firefox-extension@apple.com",
+      "semanticOwner": "core",
+      "source": "config/browser/proton-vpn-r3r3.nix",
+      "retainedProvenance": "config/browser/roles-r3.json",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "librewolf",
+      "id": "uBlock0@raymondhill.net",
+      "semanticOwner": "core",
+      "source": "config/browser/proton-vpn-r3r3.nix",
+      "retainedProvenance": "config/browser/roles-r3.json",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "librewolf",
+      "id": "vpn@proton.ch",
+      "semanticOwner": "core",
+      "source": "config/browser/proton-vpn-r3r3.nix",
+      "retainedProvenance": "official Proton store listing",
+      "updateUrl": "https://addons.mozilla.org/firefox/downloads/latest/proton-vpn-firefox-extension/latest.xpi",
+      "storeUrl": "https://addons.mozilla.org/en-US/firefox/addon/proton-vpn-firefox-extension/",
+      "currentIdentity": "PENDING_FRESH_AMO_XPI_AND_BROWSER_SIGNATURE"
+    },
+    {
+      "role": "orion",
+      "id": "ckkdlimhmcjmikdlpkmbgfkaikojcbjk",
+      "semanticOwner": "browser-ux",
+      "source": "config/browser/extension-contributions-r3r3.nix in exact Browser UX patch",
+      "retainedProvenance": "config/browser/extension-policy.nix in Browser UX",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "orion",
+      "id": "efaidnbmnnnibpcajpcglclefindmkaj",
+      "semanticOwner": "browser-ux",
+      "source": "config/browser/extension-contributions-r3r3.nix in exact Browser UX patch",
+      "retainedProvenance": "config/browser/extension-policy.nix in Browser UX",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "orion",
+      "id": "efknglbfhoddmmfabeihlemgekhhnabb",
+      "semanticOwner": "browser-ux",
+      "source": "config/browser/extension-contributions-r3r3.nix in exact Browser UX patch",
+      "retainedProvenance": "config/browser/extension-policy.nix in Browser UX",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "orion",
+      "id": "felphkbfjadmcejnibcmcncimlappdde",
+      "semanticOwner": "browser-ux",
+      "source": "config/browser/extension-contributions-r3r3.nix in exact Browser UX patch",
+      "retainedProvenance": "config/browser/extension-policy.nix in Browser UX",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "orion",
+      "id": "hlkenndednhfkekhgcdicdfddnkalmdm",
+      "semanticOwner": "browser-ux",
+      "source": "config/browser/extension-contributions-r3r3.nix in exact Browser UX patch",
+      "retainedProvenance": "config/browser/extension-policy.nix in Browser UX",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "orion",
+      "id": "hoombieeljmmljlkjmnheibnpciblicm",
+      "semanticOwner": "browser-ux",
+      "source": "config/browser/extension-contributions-r3r3.nix in exact Browser UX patch",
+      "retainedProvenance": "config/browser/extension-policy.nix in Browser UX",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "orion",
+      "id": "jplgfhpmjnbigmhklmmbgecoobifkmpa",
+      "semanticOwner": "core",
+      "source": "config/browser/proton-vpn-r3r3.nix",
+      "retainedProvenance": "official Proton store listing",
+      "updateUrl": "https://clients2.google.com/service/update2/crx",
+      "storeUrl": "https://chromewebstore.google.com/detail/proton-vpn-fast-secure/jplgfhpmjnbigmhklmmbgecoobifkmpa",
+      "currentIdentity": "OFFICIAL_WEB_STORE_ID; runtime presence unobserved"
+    },
+    {
+      "role": "orion",
+      "id": "lmjnegcaeklhafolokijcfjliaokphfk",
+      "semanticOwner": "browser-ux",
+      "source": "config/browser/extension-contributions-r3r3.nix in exact Browser UX patch",
+      "retainedProvenance": "config/browser/extension-policy.nix in Browser UX",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "orion",
+      "id": "pejdijmoenmkgeppbflobdenhhabjlaj",
+      "semanticOwner": "core",
+      "source": "config/browser/proton-vpn-r3r3.nix",
+      "retainedProvenance": "config/browser/roles-r3.json",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    },
+    {
+      "role": "orion",
+      "id": "uBlock0@raymondhill.net",
+      "semanticOwner": "core",
+      "source": "config/browser/proton-vpn-r3r3.nix",
+      "retainedProvenance": "config/browser/roles-r3.json",
+      "updateUrl": null,
+      "storeUrl": null,
+      "currentIdentity": "RETAINED_SOURCE_INTENT_NOT_FRESH_PACKAGE_ATTESTATION"
+    }
+  ],
+  "identityEvidence": "IDENTITY-EVIDENCE.json",
+  "mutableUpdateRouteIsIdentityProof": false
+}

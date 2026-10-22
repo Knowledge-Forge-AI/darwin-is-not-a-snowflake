@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  printf '%s\n' 'Usage: toggle-link-lock [-c] LINK'
+}
+
+json_escape() {
+  local value="$1"
+
+  value=${value//\\/\\\\}
+  value=${value//\"/\\\"}
+  value=${value//$'\n'/\\n}
+  value=${value//$'\r'/\\r}
+  value=${value//$'\t'/\\t}
+  value=${value//$'\b'/\\b}
+  value=${value//$'\f'/\\f}
+  printf '%s' "$value"
+}
+
+link_is_locked() {
+  [[ "$(/usr/bin/stat -f '%Sf' "$1")" == *uchg* ]]
+}
+
+emit_transition() {
+  local status="$1"
+  local link="$2"
+  local from_state="$3"
+  local to_state="$4"
+  local escaped_link
+
+  escaped_link="$(json_escape "$link")"
+  printf '{"status": "%s", "path": "%s", "from": "%s", "to": "%s"}\n' \
+    "$status" "$escaped_link" "$from_state" "$to_state"
+}
+
+emit_non_link_error() {
+  local escaped_link
+
+  escaped_link="$(json_escape "$1")"
+  printf '{"error": "Target is not a symbolic link", "path": "%s"}\n' \
+    "$escaped_link" >&2
+}
+
+main() {
+  local commit="false"
+
+  if [[ $# -gt 0 && "$1" == "-c" ]]; then
+    commit="true"
+    shift
+  fi
+
+  if [[ $# -eq 1 && "$1" == "--help" ]]; then
+    usage
+    return 0
+  fi
+
+  if [[ $# -ne 1 ]]; then
+    usage >&2
+    return 2
+  fi
+
+  local link="$1"
+
+  if [[ ! -L "$link" ]]; then
+    emit_non_link_error "$link"
+    return 1
+  fi
+
+  local from_state="unlocked"
+  local to_state="locked"
+  local target_flag="uchg"
+
+  if link_is_locked "$link"; then
+    from_state="locked"
+    to_state="unlocked"
+    target_flag="nouchg"
+  fi
+
+  if [[ "$commit" == "true" ]]; then
+    /usr/bin/chflags -h "$target_flag" "$link"
+    emit_transition "committed" "$link" "$from_state" "$to_state"
+  else
+    emit_transition "dry-run" "$link" "$from_state" "$to_state"
+  fi
+}
+
+main "$@"

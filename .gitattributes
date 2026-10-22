@@ -1,0 +1,9 @@
+# Repository-local Serena state is not product archive content.
+.serena export-ignore
+.serena/** export-ignore
+
+# Transferred, unpackaged operator pointer; preserve it in Git and the checkout.
+bin/codex-tooling-self-heal export-ignore
+
+# Unified patch context lines may intentionally consist of a single space.
+*.patch -whitespace

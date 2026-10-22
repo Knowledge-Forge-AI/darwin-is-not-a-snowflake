@@ -1,0 +1,2228 @@
+#!/run/current-system/sw/bin/bash
+
+managed_bash=/run/current-system/sw/bin/bash
+if [ "${BASH:-}" != "$managed_bash" ]; then
+  if [ ! -x "$managed_bash" ]; then
+    echo "nix-darwin-test: managed Bash is unavailable: $managed_bash" >&2
+    exit 127
+  fi
+  exec "$managed_bash" "$0" "$@"
+fi
+
+set -euo pipefail
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+repo_dir="${NIX_DARWIN_TEST_ROOT:-$(cd "$script_dir/../.." && pwd -P)}"
+test_source="${NIX_DARWIN_TEST_SOURCE:-git}"
+case "$test_source" in
+  git) flake_ref="$repo_dir" ;;
+  worktree) flake_ref="path:$repo_dir" ;;
+  *)
+    echo "nix-darwin-test: NIX_DARWIN_TEST_SOURCE must be git or worktree" >&2
+    exit 2
+    ;;
+esac
+python_pycache_prefix="${PYTHONPYCACHEPREFIX:-$HOME/.cache/python/__pycache__}"
+mode="all"
+full=0
+report=0
+jobs="${NIX_DARWIN_TEST_JOBS:-1}"
+if [ "${NIX_DARWIN_TEST_JOBS+x}" = x ]; then
+  jobs="$NIX_DARWIN_TEST_JOBS"
+fi
+build_jobs="${NIX_DARWIN_BUILD_JOBS:-}"
+flake_options=()
+report_root="${NIX_DARWIN_TEST_REPORT_ROOT:-$repo_dir/.test-reports}"
+report_dir=""
+summary_file=""
+summary_metric_dir=""
+suite_status=0
+kcov_bash_wrapper="$script_dir/kcov-bash-wrapper"
+test_report_libexec="$repo_dir/libexec/test-report"
+parallel_step_pids=()
+parallel_step_labels=()
+parallel_step_logs=()
+parallel_step_log_dir=""
+parallel_step_index=0
+parallel_step_failed=0
+current_report_lane_status=0
+runner_dir=""
+runner_steps_file=""
+runner_failures_file=""
+runner_execution_file=""
+runner_step_index=0
+runner_failure_sequence=0
+
+usage() {
+  cat <<USAGE
+Usage: $(basename "$0") [all|unit|int] [--full] [--report] [-j N]
+
+Run nix-darwin tests.
+
+Modes:
+  all      Run all language test lanes.
+  unit     Run fast unit test lanes.
+  int      Run integration test lanes.
+
+Options:
+  --full   Include the Darwin system build for all/int modes.
+  --report Write detailed test and coverage reports under .test-reports.
+  --report-root PATH
+           Write report artifacts beneath this exact absolute root.
+  -j, --jobs N
+           Set the maximum test jobs. --jobs 1 is the sequential baseline.
+  --flake-option VALUE
+           Append one exact argument to source-owned Nix flake check/build commands.
+  -h, --help
+           Show this help.
+
+Environment:
+  NIX_DARWIN_TEST_JOBS
+           Default jobs value when -j/--jobs is not provided.
+  NIX_DARWIN_BUILD_JOBS
+           Optional positive Nix build/check job count passed as --max-jobs.
+  NIX_DARWIN_TEST_SOURCE
+           Use git (default) for tracked-source purity or worktree for an
+           unstaged dispatcher candidate.
+USAGE
+}
+
+fail() {
+  echo "nix-darwin-test: $*" >&2
+  exit 1
+}
+
+validate_jobs() {
+  if [ -z "$jobs" ]; then
+    fail "jobs must be a positive integer: empty value"
+  fi
+
+  case "$jobs" in
+    *[!0-9]*)
+      fail "jobs must be a positive integer: $jobs"
+      ;;
+  esac
+
+  if [ "$jobs" -le 0 ]; then
+    fail "jobs must be a positive integer: $jobs"
+  fi
+}
+
+validate_build_jobs() {
+  [ -n "$build_jobs" ] || return 0
+
+  case "$build_jobs" in
+    *[!0-9]*)
+      fail "NIX_DARWIN_BUILD_JOBS must be a positive integer: $build_jobs"
+      ;;
+  esac
+
+  if [ "$build_jobs" -le 0 ]; then
+    fail "NIX_DARWIN_BUILD_JOBS must be a positive integer: $build_jobs"
+  fi
+}
+
+parallel_enabled() {
+  [ "$jobs" -gt 1 ]
+}
+
+run_step() {
+  local label="$1"
+  local status
+
+  shift
+  printf '\n==> %s\n' "$label"
+  if [ "$report" -eq 1 ]; then
+    if "$@"; then
+      return 0
+    else
+      status="$?"
+    fi
+    if [ "$suite_status" -eq 0 ]; then
+      suite_status="$status"
+    fi
+    if [ "$current_report_lane_status" -eq 0 ]; then
+      current_report_lane_status="$status"
+    fi
+    printf 'nix-darwin-test: %s failed with exit code %s\n' "$label" "$status" >&2
+    return 0
+  fi
+
+  "$@"
+}
+
+runner_step_slug() {
+  printf '%s' "$1" | tr '[:upper:] ' '[:lower:]-' | tr -cd 'a-z0-9-'
+}
+
+record_execution_failure() {
+  local label="$1"
+  local status="$2"
+
+  [ "$report" -eq 1 ] || return 0
+  runner_failure_sequence=$((runner_failure_sequence + 1))
+  printf '%s\t%s\t%s\n' "$runner_failure_sequence" "$label" "$status" >> "$runner_failures_file"
+}
+
+write_execution_status() {
+  local status="pass"
+  local output_file
+
+  [ "$report" -eq 1 ] || return 0
+  if [ "$suite_status" -ne 0 ]; then
+    status="fail"
+  fi
+  output_file="$runner_execution_file.tmp"
+  printf 'status\texit_code\n%s\t%s\n' "$status" "$suite_status" > "$output_file"
+  mv "$output_file" "$runner_execution_file"
+}
+
+run_suite_step() {
+  local label="$1"
+  local slug
+  local step_dir
+  local output_file
+  local relative_output
+  local command_status
+  local capture_status
+  local statuses=()
+  local status
+
+  shift
+  if [ "$report" -eq 0 ]; then
+    run_step "$label" "$@"
+    return
+  fi
+
+  [ -n "$runner_steps_file" ] || fail "runner report artifacts were not initialized"
+  runner_step_index=$((runner_step_index + 1))
+  slug="$(runner_step_slug "$label")"
+  step_dir="$runner_dir/$(printf '%03d' "$runner_step_index")-$slug"
+  output_file="$step_dir/output.txt"
+  relative_output="runner/$(basename "$step_dir")/output.txt"
+  mkdir -p "$step_dir"
+
+  printf '\n==> %s\n' "$label"
+  set +e
+  "$@" 2>&1 | tee "$output_file"
+  statuses=("${PIPESTATUS[@]}")
+  set -e
+  command_status="${statuses[0]}"
+  capture_status="${statuses[1]}"
+  status="$command_status"
+  if [ "$capture_status" -ne 0 ]; then
+    printf 'nix-darwin-test: could not capture %s output (tee exit %s)\n' "$label" "$capture_status" >&2
+    [ "$status" -ne 0 ] || status="$capture_status"
+  fi
+
+  if [ "$status" -eq 0 ]; then
+    printf '%s\t%s\tpass\t0\t%s\n' "$runner_step_index" "$label" "$relative_output" >> "$runner_steps_file"
+    return 0
+  fi
+
+  printf '%s\t%s\tfail\t%s\t%s\n' "$runner_step_index" "$label" "$status" "$relative_output" >> "$runner_steps_file"
+  record_execution_failure "$label" "$status"
+  if [ "$suite_status" -eq 0 ]; then
+    suite_status="$status"
+  fi
+  printf 'nix-darwin-test: %s failed with exit code %s\n' "$label" "$status" >&2
+  return 0
+}
+
+reset_parallel_batch() {
+  parallel_step_pids=()
+  parallel_step_labels=()
+  parallel_step_logs=()
+}
+
+start_parallel_step() {
+  local label="$1"
+  local log_file
+
+  shift
+  parallel_step_index=$((parallel_step_index + 1))
+  log_file="$parallel_step_log_dir/$(printf '%03d' "$parallel_step_index").log"
+  printf '\n==> %s\n' "$label"
+  ( "$@" ) > "$log_file" 2>&1 &
+  parallel_step_pids+=("$!")
+  parallel_step_labels+=("$label")
+  parallel_step_logs+=("$log_file")
+}
+
+wait_parallel_batch() {
+  local index
+  local pid
+  local label
+  local log_file
+  local status
+
+  for index in "${!parallel_step_pids[@]}"; do
+    pid="${parallel_step_pids[$index]}"
+    label="${parallel_step_labels[$index]}"
+    log_file="${parallel_step_logs[$index]}"
+
+    if wait "$pid"; then
+      cat "$log_file"
+    else
+      status="$?"
+      if [ "$report" -eq 1 ]; then
+        [ "$parallel_step_failed" -ne 0 ] || parallel_step_failed="$status"
+        record_execution_failure "$label" "$status"
+        if [ "$suite_status" -eq 0 ]; then
+          suite_status="$status"
+        fi
+      else
+        parallel_step_failed=1
+      fi
+      printf 'nix-darwin-test: %s failed with exit code %s\n' "$label" "$status" >&2
+      printf 'nix-darwin-test: captured log for %s:\n' "$label" >&2
+      cat "$log_file" >&2
+    fi
+  done
+
+  reset_parallel_batch
+}
+
+run_parallel_steps() {
+  local max_jobs="$1"
+  local label
+  local status
+  local command=()
+
+  shift
+  if [ "$max_jobs" -le 1 ]; then
+    while [ "$#" -gt 0 ]; do
+      label="$1"
+      shift
+      command=()
+      while [ "$#" -gt 0 ] && [ "$1" != ":::" ]; do
+        command+=("$1")
+        shift
+      done
+      [ "$#" -eq 0 ] || shift
+      run_step "$label" "${command[@]}"
+    done
+    return 0
+  fi
+
+  parallel_step_log_dir="$(mktemp -d "${TMPDIR:-/tmp}/nix-darwin-test-parallel.XXXXXX")" \
+    || fail "could not create parallel test log directory"
+  parallel_step_index=0
+  parallel_step_failed=0
+  reset_parallel_batch
+
+  while [ "$#" -gt 0 ]; do
+    label="$1"
+    shift
+    command=()
+    while [ "$#" -gt 0 ] && [ "$1" != ":::" ]; do
+      command+=("$1")
+      shift
+    done
+    [ "$#" -eq 0 ] || shift
+    start_parallel_step "$label" "${command[@]}"
+    if [ "${#parallel_step_pids[@]}" -ge "$max_jobs" ]; then
+      wait_parallel_batch
+    fi
+  done
+
+  if [ "${#parallel_step_pids[@]}" -gt 0 ]; then
+    wait_parallel_batch
+  fi
+
+  status="$parallel_step_failed"
+  rm -rf "$parallel_step_log_dir"
+  parallel_step_log_dir=""
+  return "$status"
+}
+
+run_report_command() {
+  local output_file="$1"
+  local status
+
+  shift
+  mkdir -p "$(dirname "$output_file")"
+  set +e
+  "$@" > "$output_file" 2>&1
+  status="$?"
+  set -e
+  if [ "$status" -ne 0 ]; then
+    printf 'nix-darwin-test: raw command output captured at %s\n' "$output_file" >&2
+  fi
+  return "$status"
+}
+
+prepare_report() {
+  [ "$report" -eq 1 ] || return 0
+
+  report_dir="$report_root/$mode/latest"
+  rm -rf "$report_dir"
+  mkdir -p "$report_dir"
+  summary_file="$report_dir/summary.tsv"
+  summary_metric_dir="$report_dir/summary.d"
+  runner_dir="$report_dir/runner"
+  runner_steps_file="$runner_dir/steps.tsv"
+  runner_failures_file="$runner_dir/failures.tsv"
+  runner_execution_file="$runner_dir/execution.tsv"
+  runner_step_index=0
+  runner_failure_sequence=0
+  mkdir -p "$summary_metric_dir" "$runner_dir"
+  printf 'scope\tlanguage\tmetric\tvalue\n' > "$summary_file"
+  printf 'ordinal\tlabel\tstatus\texit_code\toutput_log\n' > "$runner_steps_file"
+  printf 'sequence\tlabel\texit_code\n' > "$runner_failures_file"
+}
+
+report_language_dir() {
+  local scope="$1"
+  local language="$2"
+
+  printf '%s/%s/%s' "$report_dir" "$scope" "$language"
+}
+
+scope_label() {
+  case "$1" in
+    int)
+      printf 'integration'
+      ;;
+    *)
+      printf '%s' "$1"
+      ;;
+  esac
+}
+
+record_report_metric() {
+  local scope="$1"
+  local language="$2"
+  local metric="$3"
+  local value="$4"
+
+  [ "$report" -eq 1 ] || return 0
+  printf '%s\t%s\t%s\t%s\n' "$scope" "$language" "$metric" "$value" >> "$summary_file"
+}
+
+report_metric_file() {
+  local scope="$1"
+  local language="$2"
+
+  printf '%s/%s-%s.tsv' "$summary_metric_dir" "$scope" "$language"
+}
+
+record_report_metric_to_file() {
+  local output_file="$1"
+  local scope="$2"
+  local language="$3"
+  local metric="$4"
+  local value="$5"
+
+  [ "$report" -eq 1 ] || return 0
+  mkdir -p "$(dirname "$output_file")"
+  printf '%s\t%s\t%s\t%s\n' "$scope" "$language" "$metric" "$value" >> "$output_file"
+}
+
+merge_report_metric_files() {
+  local metric_file
+
+  [ "$report" -eq 1 ] || return 0
+  [ -d "$summary_metric_dir" ] || return 0
+
+  while IFS= read -r metric_file; do
+    cat "$metric_file" >> "$summary_file"
+  done < <(find "$summary_metric_dir" -type f -name '*.tsv' | sort)
+}
+
+run_report_python() {
+  mkdir -p "$python_pycache_prefix"
+  if command -v python3 >/dev/null 2>&1 &&
+    env PYTHONPYCACHEPREFIX="$python_pycache_prefix" python3 -c 'import html, json, xml.etree.ElementTree' >/dev/null 2>&1; then
+    env PYTHONPYCACHEPREFIX="$python_pycache_prefix" python3 "$@"
+    return
+  fi
+
+  local system="${NIX_DARWIN_TEST_SYSTEM:-aarch64-darwin}"
+  env PYTHONPYCACHEPREFIX="$python_pycache_prefix" \
+    nix shell "$flake_ref#nixDarwinTestPython" -c python3 "$@"
+}
+
+render_test_report() {
+  [ "$report" -eq 1 ] || return 0
+
+  run_report_python "$script_dir/report/render.py" \
+    --report-dir "$report_dir" \
+    --summary-file "$summary_file" \
+    --repo-root "$repo_dir" \
+    --render-only
+}
+
+summarize_test_report() {
+  [ "$report" -eq 1 ] || return 0
+
+  run_report_python "$script_dir/report/render.py" \
+    --report-dir "$report_dir" \
+    --summary-file "$summary_file" \
+    --repo-root "$repo_dir" \
+    --summary-only
+}
+
+coverage_percent_from_xml() {
+  local coverage_xml="$1"
+  local rate_attribute="${2:-line-rate}"
+  local coverage_rate
+
+  coverage_rate="$(sed -n "s/.*$rate_attribute=\"\\([^\"]*\\)\".*/\\1/p" "$coverage_xml" | head -n 1)"
+  [ -n "$coverage_rate" ] || return 1
+  awk -v rate="$coverage_rate" 'BEGIN { printf "%g%%", rate * 100 }'
+}
+
+coverage_percent_from_json() {
+  local coverage_json="$1"
+  local covered_percent
+
+  covered_percent="$(sed -n 's/.*"percent_covered":[[:space:]]*"\{0,1\}\([0-9.][0-9.]*\)"\{0,1\}.*/\1/p' "$coverage_json" | tail -n 1)"
+  [ -n "$covered_percent" ] || return 1
+  printf '%s%%' "$covered_percent"
+}
+
+ruby_coverage_percent() {
+  local coverage_json="$1"
+  local coverage_kind="${2:-line}"
+  local covered_percent
+
+  covered_percent="$(sed -n "s/.*\"$coverage_kind\":[[:space:]]*\\([0-9.][0-9.]*\\).*/\\1/p" "$coverage_json" | head -n 1)"
+  if [ -z "$covered_percent" ] && [ "$coverage_kind" = "line" ]; then
+    covered_percent="$(sed -n 's/.*"covered_percent":[[:space:]]*\([0-9.][0-9.]*\).*/\1/p' "$coverage_json" | head -n 1)"
+  fi
+  [ -n "$covered_percent" ] || return 1
+  printf '%s%%' "$covered_percent"
+}
+
+line_count() {
+  local file="$1"
+
+  /usr/bin/awk -f "$test_report_libexec/line-count.awk" "$file"
+}
+
+format_coverage_ratio() {
+  local covered="$1"
+  local total="$2"
+
+  /usr/bin/awk -v covered="$covered" -v total="$total" \
+    -f "$test_report_libexec/format-coverage-ratio.awk"
+}
+
+discover_nix_source_targets() {
+  find "$repo_dir" \
+    \( -path "$repo_dir/.git" -o -path "$repo_dir/.test-reports" -o -path "$repo_dir/src/test" \) -prune \
+    -o -type f -name '*.nix' -print |
+    /usr/bin/awk -v prefix="$repo_dir/" -f "$test_report_libexec/relative-paths.awk" |
+    sort -u
+}
+
+is_bash_source_file() {
+  local file="$1"
+  local first_line
+
+  case "$file" in
+    "$repo_dir"/src/test/*|"$repo_dir"/tools/test/*|"$repo_dir"/.test-reports/*)
+      return 1
+      ;;
+    "$repo_dir"/bin/nix-test|"$repo_dir"/bin/nix-unit-test|"$repo_dir"/bin/nix-int-test|"$repo_dir"/scripts/test-all.sh)
+      return 1
+      ;;
+    "$repo_dir"/shell/sh_config/zsh/*|"$repo_dir"/shell/oh-my-zsh-custom/*|"$repo_dir"/shell/zshrc)
+      return 1
+      ;;
+  esac
+
+  first_line="$(sed -n '1p' "$file" 2>/dev/null || true)"
+  case "$first_line" in
+    *bash*)
+      return 0
+      ;;
+  esac
+
+  case "$file" in
+    "$repo_dir"/scripts/*.sh|\
+    "$repo_dir"/libexec/*/*.sh|\
+    "$repo_dir"/tools/bootstrap/*.sh|\
+    "$repo_dir"/shell/bash_profile|\
+    "$repo_dir"/shell/bashrc|\
+    "$repo_dir"/shell/sh_config/bash/*|\
+    "$repo_dir"/shell/sh_config/common/*)
+      return 0
+      ;;
+  esac
+
+  return 1
+}
+
+discover_bash_source_files() {
+  {
+    [ -d "$repo_dir/bin" ] && find "$repo_dir/bin" -maxdepth 1 -type f
+    [ -d "$repo_dir/scripts" ] && find "$repo_dir/scripts" -maxdepth 1 -type f
+    [ -d "$repo_dir/libexec" ] && find "$repo_dir/libexec" -mindepth 2 -maxdepth 2 -type f -name '*.sh'
+    [ -d "$repo_dir/tools/bootstrap" ] && find "$repo_dir/tools/bootstrap" -maxdepth 1 -type f -name '*.sh'
+    [ -f "$repo_dir/shell/bash_profile" ] && printf '%s\n' "$repo_dir/shell/bash_profile"
+    [ -f "$repo_dir/shell/bashrc" ] && printf '%s\n' "$repo_dir/shell/bashrc"
+    [ -d "$repo_dir/shell/sh_config/bash" ] && find "$repo_dir/shell/sh_config/bash" -maxdepth 1 -type f
+    [ -d "$repo_dir/shell/sh_config/common" ] && find "$repo_dir/shell/sh_config/common" -maxdepth 1 -type f
+  } |
+    while IFS= read -r file; do
+      if is_bash_source_file "$file"; then
+        printf '%s\n' "$file"
+      fi
+    done |
+    sort -u
+}
+
+join_lines_by_comma() {
+  /usr/bin/awk -f "$test_report_libexec/join-lines-by-comma.awk"
+}
+
+parent_dirs_from_files() {
+  sed 's#/[^/]*$##' | sort -u
+}
+
+bats_language_extension() {
+  case "$1" in
+    awk)
+      printf 'awk'
+      ;;
+    applescript)
+      printf 'applescript'
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+discover_bats_language_source_targets() {
+  local language="$1"
+  local extension
+
+  extension="$(bats_language_extension "$language")" || return 1
+  [ -d "$repo_dir/libexec" ] || return 0
+  find "$repo_dir/libexec" -type f -name "*.$extension" -print |
+    /usr/bin/awk -v prefix="$repo_dir/" -f "$test_report_libexec/relative-paths.awk" |
+    sort -u
+}
+
+bats_language_has_tests() {
+  local language="$1"
+  local scope
+  local test_dir
+
+  shift
+  for scope in "$@"; do
+    test_dir="$repo_dir/src/test/$scope/$language"
+    [ -d "$test_dir" ] || continue
+    if find "$test_dir" -type f -name '*.bats' -print -quit | grep -q .; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+declared_bats_language_source_targets() {
+  local language="$1"
+  local extension
+  local scope
+  local test_dir
+  local test_file
+
+  shift
+  extension="$(bats_language_extension "$language")" || return 1
+
+  for scope in "$@"; do
+    test_dir="$repo_dir/src/test/$scope/$language"
+    [ -d "$test_dir" ] || continue
+    while IFS= read -r test_file; do
+      sed -n "s#.*\\\$repo_dir/\\([^\"'[:space:]]*\\.$extension\\).*#\\1#p" "$test_file"
+    done < <(find "$test_dir" -type f -name '*.bats' | sort)
+  done |
+    sed 's/[[:space:]]*$//' |
+    /usr/bin/awk -f "$test_report_libexec/nonblank-lines.awk" |
+    sort -u
+}
+
+statement_line_count() {
+  local language="$1"
+  local file="$2"
+
+  /usr/bin/awk -v language="$language" -f "$test_report_libexec/statement-line-count.awk" "$file"
+}
+
+declared_nix_source_targets() {
+  local scope
+  local test_dir
+  local test_file
+
+  for scope in "$@"; do
+    test_dir="$repo_dir/src/test/$scope/nix"
+    [ -d "$test_dir" ] || continue
+    while IFS= read -r test_file; do
+      /usr/bin/awk -f "$test_report_libexec/header-source-targets.awk" "$test_file"
+    done < <(find "$test_dir" -type f -name '*.nix' | sort)
+  done |
+    sed 's/[[:space:]]*$//' |
+    /usr/bin/awk -f "$test_report_libexec/nonblank-lines.awk" |
+    sort -u
+}
+
+declared_python_source_targets() {
+  local scope
+  local test_dir
+  local test_file
+
+  for scope in "$@"; do
+    test_dir="$repo_dir/src/test/$scope/python"
+    [ -d "$test_dir" ] || continue
+    while IFS= read -r test_file; do
+      /usr/bin/awk -f "$test_report_libexec/header-source-targets.awk" "$test_file"
+    done < <(find "$test_dir" -type f -name '*.test.py' | sort)
+  done |
+    sed 's/[[:space:]]*$//' |
+    /usr/bin/awk -f "$test_report_libexec/nonblank-lines.awk" |
+    sort -u
+}
+
+declared_ruby_source_targets() {
+  local scope
+  local test_dir
+  local test_file
+
+  for scope in "$@"; do
+    test_dir="$repo_dir/src/test/$scope/ruby"
+    [ -d "$test_dir" ] || continue
+    while IFS= read -r test_file; do
+      /usr/bin/awk -f "$test_report_libexec/header-source-targets.awk" "$test_file"
+    done < <(find "$test_dir" -type f -name '*.rb' | sort)
+  done |
+    sed 's/[[:space:]]*$//' |
+    /usr/bin/awk -f "$test_report_libexec/nonblank-lines.awk" |
+    sort -u
+}
+
+declared_bash_source_targets() {
+  local scope
+  local test_dir
+  local test_file
+
+  for scope in "$@"; do
+    test_dir="$repo_dir/src/test/$scope/bash"
+    [ -d "$test_dir" ] || continue
+    while IFS= read -r test_file; do
+      /usr/bin/awk -f "$test_report_libexec/header-source-targets.awk" "$test_file"
+    done < <(find "$test_dir" -type f -name '*.bats' | sort)
+  done |
+    sed 's/[[:space:]]*$//' |
+    /usr/bin/awk -f "$test_report_libexec/nonblank-lines.awk" |
+    sort -u
+}
+
+write_nix_source_target_details() {
+  local all_targets_file="$1"
+  local covered_targets_file="$2"
+  local details_file="$3"
+  local target
+  local status
+
+  printf 'target\tstatus\n' > "$details_file"
+  while IFS= read -r target; do
+    if grep -Fqx "$target" "$covered_targets_file"; then
+      status="covered"
+    else
+      status="missed"
+    fi
+    printf '%s\t%s\n' "$target" "$status" >> "$details_file"
+  done < "$all_targets_file"
+}
+
+record_python_source_target_coverage() {
+  local metric_scope="$1"
+  local python_report_dir
+  local declared_targets_file
+  local invalid_targets_file
+  local details_file
+  local covered_count
+  local total_count
+  local coverage_value
+  local target
+
+  shift
+  [ "$report" -eq 1 ] || return 0
+
+  python_report_dir="$(report_language_dir "$metric_scope" python)"
+  mkdir -p "$python_report_dir"
+  declared_targets_file="$python_report_dir/source-targets.declared"
+  invalid_targets_file="$python_report_dir/source-targets.invalid"
+  details_file="$python_report_dir/source-target-coverage.tsv"
+
+  declared_python_source_targets "$@" > "$declared_targets_file"
+  [ -s "$declared_targets_file" ] || return 0
+
+  : > "$invalid_targets_file"
+  while IFS= read -r target; do
+    [ -f "$repo_dir/$target" ] || printf '%s\n' "$target" >> "$invalid_targets_file"
+  done < "$declared_targets_file"
+
+  if [ -s "$invalid_targets_file" ]; then
+    printf 'nix-darwin-test: invalid Python source-target declarations for %s:\n' "$metric_scope" >&2
+    sed 's/^/  /' "$invalid_targets_file" >&2
+    return 1
+  fi
+
+  write_nix_source_target_details "$declared_targets_file" "$declared_targets_file" "$details_file"
+  covered_count="$(line_count "$declared_targets_file")"
+  total_count="$covered_count"
+  coverage_value="$(format_coverage_ratio "$covered_count" "$total_count")"
+  record_report_metric "$metric_scope" python "source-target coverage" "$coverage_value"
+}
+
+record_python_source_target_coverage_for_mode() {
+  [ "$report" -eq 1 ] || return 0
+
+  case "$mode" in
+    unit)
+      record_python_source_target_coverage unit unit
+      ;;
+    int)
+      record_python_source_target_coverage int int
+      ;;
+    all)
+      record_python_source_target_coverage unit unit
+      record_python_source_target_coverage int int
+      record_python_source_target_coverage all unit int
+      ;;
+  esac
+}
+
+record_ruby_source_target_coverage() {
+  local metric_scope="$1"
+  local ruby_report_dir
+  local declared_targets_file
+  local invalid_targets_file
+  local details_file
+  local covered_count
+  local total_count
+  local coverage_value
+  local target
+
+  shift
+  [ "$report" -eq 1 ] || return 0
+
+  ruby_report_dir="$(report_language_dir "$metric_scope" ruby)"
+  mkdir -p "$ruby_report_dir"
+  declared_targets_file="$ruby_report_dir/source-targets.declared"
+  invalid_targets_file="$ruby_report_dir/source-targets.invalid"
+  details_file="$ruby_report_dir/source-target-coverage.tsv"
+
+  declared_ruby_source_targets "$@" > "$declared_targets_file"
+  [ -s "$declared_targets_file" ] || return 0
+
+  : > "$invalid_targets_file"
+  while IFS= read -r target; do
+    [ -f "$repo_dir/$target" ] || printf '%s\n' "$target" >> "$invalid_targets_file"
+  done < "$declared_targets_file"
+
+  if [ -s "$invalid_targets_file" ]; then
+    printf 'nix-darwin-test: invalid Ruby source-target declarations for %s:\n' "$metric_scope" >&2
+    sed 's/^/  /' "$invalid_targets_file" >&2
+    return 1
+  fi
+
+  write_nix_source_target_details "$declared_targets_file" "$declared_targets_file" "$details_file"
+  covered_count="$(line_count "$declared_targets_file")"
+  total_count="$covered_count"
+  coverage_value="$(format_coverage_ratio "$covered_count" "$total_count")"
+  record_report_metric "$metric_scope" ruby "source-target coverage" "$coverage_value"
+}
+
+record_ruby_source_target_coverage_for_mode() {
+  [ "$report" -eq 1 ] || return 0
+
+  case "$mode" in
+    unit)
+      record_ruby_source_target_coverage unit unit
+      ;;
+    int)
+      record_ruby_source_target_coverage int int
+      ;;
+    all)
+      record_ruby_source_target_coverage unit unit
+      record_ruby_source_target_coverage int int
+      record_ruby_source_target_coverage all unit int
+      ;;
+  esac
+}
+
+record_bash_source_target_coverage() {
+  local metric_scope="$1"
+  local bash_report_dir
+  local declared_targets_file
+  local invalid_targets_file
+  local details_file
+  local covered_count
+  local total_count
+  local coverage_value
+  local target
+
+  shift
+  [ "$report" -eq 1 ] || return 0
+
+  bash_report_dir="$(report_language_dir "$metric_scope" bash)"
+  mkdir -p "$bash_report_dir"
+  declared_targets_file="$bash_report_dir/source-targets.declared"
+  invalid_targets_file="$bash_report_dir/source-targets.invalid"
+  details_file="$bash_report_dir/source-target-coverage.tsv"
+
+  declared_bash_source_targets "$@" > "$declared_targets_file"
+  [ -s "$declared_targets_file" ] || return 0
+
+  : > "$invalid_targets_file"
+  while IFS= read -r target; do
+    [ -f "$repo_dir/$target" ] || printf '%s\n' "$target" >> "$invalid_targets_file"
+  done < "$declared_targets_file"
+
+  if [ -s "$invalid_targets_file" ]; then
+    printf 'nix-darwin-test: invalid Bash source-target declarations for %s:\n' "$metric_scope" >&2
+    sed 's/^/  /' "$invalid_targets_file" >&2
+    return 1
+  fi
+
+  write_nix_source_target_details "$declared_targets_file" "$declared_targets_file" "$details_file"
+  covered_count="$(line_count "$declared_targets_file")"
+  total_count="$covered_count"
+  coverage_value="$(format_coverage_ratio "$covered_count" "$total_count")"
+  record_report_metric "$metric_scope" bash "source-target coverage" "$coverage_value"
+}
+
+record_bash_source_target_coverage_for_mode() {
+  [ "$report" -eq 1 ] || return 0
+
+  case "$mode" in
+    unit)
+      record_bash_source_target_coverage unit unit
+      ;;
+    int)
+      record_bash_source_target_coverage int int
+      ;;
+    all)
+      record_bash_source_target_coverage unit unit
+      record_bash_source_target_coverage int int
+      record_bash_source_target_coverage all unit int
+      ;;
+  esac
+}
+
+record_nix_source_target_coverage() {
+  local metric_scope="$1"
+  local nix_report_dir
+  local all_targets_file
+  local declared_targets_file
+  local covered_targets_file
+  local invalid_targets_file
+  local details_file
+  local covered_count
+  local total_count
+  local coverage_value
+
+  shift
+  [ "$report" -eq 1 ] || return 0
+
+  nix_report_dir="$(report_language_dir "$metric_scope" nix)"
+  mkdir -p "$nix_report_dir"
+  all_targets_file="$nix_report_dir/source-targets.all"
+  declared_targets_file="$nix_report_dir/source-targets.declared"
+  covered_targets_file="$nix_report_dir/source-targets.covered"
+  invalid_targets_file="$nix_report_dir/source-targets.invalid"
+  details_file="$nix_report_dir/source-target-coverage.tsv"
+
+  discover_nix_source_targets > "$all_targets_file"
+  declared_nix_source_targets "$@" > "$declared_targets_file"
+  comm -23 "$declared_targets_file" "$all_targets_file" > "$invalid_targets_file"
+  if [ -s "$invalid_targets_file" ]; then
+    printf 'nix-darwin-test: invalid Nix source-target declarations for %s:\n' "$metric_scope" >&2
+    sed 's/^/  /' "$invalid_targets_file" >&2
+    return 1
+  fi
+
+  comm -12 "$declared_targets_file" "$all_targets_file" > "$covered_targets_file"
+  covered_count="$(line_count "$covered_targets_file")"
+  total_count="$(line_count "$all_targets_file")"
+  coverage_value="$(format_coverage_ratio "$covered_count" "$total_count")"
+  record_report_metric "$metric_scope" nix "source-target coverage" "$coverage_value"
+  write_nix_source_target_details "$all_targets_file" "$covered_targets_file" "$details_file"
+}
+
+record_nix_source_target_coverage_for_mode() {
+  [ "$report" -eq 1 ] || return 0
+
+  case "$mode" in
+    unit)
+      record_nix_source_target_coverage unit unit
+      ;;
+    int)
+      record_nix_source_target_coverage int int
+      ;;
+    all)
+      record_nix_source_target_coverage unit unit
+      record_nix_source_target_coverage int int
+      record_nix_source_target_coverage all unit int
+      ;;
+  esac
+}
+
+write_statement_coverage_details() {
+  local language="$1"
+  local all_targets_file="$2"
+  local covered_targets_file="$3"
+  local details_file="$4"
+  local target
+  local status
+  local total_statements
+  local covered_statements
+
+  printf 'target\tstatus\tcovered_statements\ttotal_statements\n' > "$details_file"
+  while IFS= read -r target; do
+    total_statements="$(statement_line_count "$language" "$repo_dir/$target")"
+    if grep -Fqx "$target" "$covered_targets_file"; then
+      status="covered"
+      covered_statements="$total_statements"
+    else
+      status="missed"
+      covered_statements=0
+    fi
+    printf '%s\t%s\t%s\t%s\n' "$target" "$status" "$covered_statements" "$total_statements" >> "$details_file"
+  done < "$all_targets_file"
+}
+
+statement_coverage_counts() {
+  local details_file="$1"
+
+  /usr/bin/awk -F '\t' -f "$test_report_libexec/statement-coverage-counts.awk" "$details_file"
+}
+
+write_statement_coverage_html() {
+  local language="$1"
+  local details_file="$2"
+  local html_file="$3"
+
+  run_report_python "$repo_dir/libexec/test-report/statement_coverage.py" \
+    --language "$language" \
+    --details-file "$details_file" \
+    --html-file "$html_file"
+}
+
+record_bats_statement_coverage() {
+  local metric_scope="$1"
+  local language="$2"
+  local language_report_dir
+  local all_targets_file
+  local declared_targets_file
+  local covered_targets_file
+  local invalid_targets_file
+  local details_file
+  local html_file
+  local covered_count
+  local total_count
+  local counts
+  local coverage_value
+
+  shift 2
+  [ "$report" -eq 1 ] || return 0
+  bats_language_has_tests "$language" "$@" || return 0
+
+  language_report_dir="$(report_language_dir "$metric_scope" "$language")"
+  mkdir -p "$language_report_dir"
+  all_targets_file="$language_report_dir/statement-targets.all"
+  declared_targets_file="$language_report_dir/statement-targets.declared"
+  covered_targets_file="$language_report_dir/statement-targets.covered"
+  invalid_targets_file="$language_report_dir/statement-targets.invalid"
+  details_file="$language_report_dir/statement-coverage.tsv"
+  html_file="$language_report_dir/statement-coverage.html"
+
+  discover_bats_language_source_targets "$language" > "$all_targets_file"
+  declared_bats_language_source_targets "$language" "$@" > "$declared_targets_file"
+  comm -23 "$declared_targets_file" "$all_targets_file" > "$invalid_targets_file"
+  if [ -s "$invalid_targets_file" ]; then
+    printf 'nix-darwin-test: invalid %s source-target declarations for %s:\n' "$language" "$metric_scope" >&2
+    sed 's/^/  /' "$invalid_targets_file" >&2
+    return 1
+  fi
+
+  comm -12 "$declared_targets_file" "$all_targets_file" > "$covered_targets_file"
+  write_statement_coverage_details "$language" "$all_targets_file" "$covered_targets_file" "$details_file"
+  write_statement_coverage_html "$language" "$details_file" "$html_file"
+  counts="$(statement_coverage_counts "$details_file")"
+  covered_count="${counts%%$'\t'*}"
+  total_count="${counts##*$'\t'}"
+  coverage_value="$(format_coverage_ratio "$covered_count" "$total_count")"
+  record_report_metric "$metric_scope" "$language" "statement coverage" "$coverage_value"
+}
+
+record_bats_statement_coverage_for_language() {
+  local language="$1"
+
+  [ "$report" -eq 1 ] || return 0
+  case "$mode" in
+    unit)
+      record_bats_statement_coverage unit "$language" unit
+      ;;
+    int)
+      record_bats_statement_coverage int "$language" int
+      ;;
+    all)
+      record_bats_statement_coverage unit "$language" unit
+      record_bats_statement_coverage int "$language" int
+      record_bats_statement_coverage all "$language" unit int
+      ;;
+  esac
+}
+
+record_bats_statement_coverage_for_mode() {
+  [ "$report" -eq 1 ] || return 0
+
+  record_bats_statement_coverage_for_language awk
+  record_bats_statement_coverage_for_language applescript
+}
+
+discover_zsh_source_targets() {
+  find "$repo_dir/bin" "$repo_dir/tools" "$repo_dir/libexec" -type f 2>/dev/null |
+    while IFS= read -r file; do
+      LC_ALL=C grep -Iq . "$file" || continue
+      case "$(sed -n '1p' "$file" 2>/dev/null || true)" in
+        *zsh*)
+          printf '%s\n' "$file"
+          ;;
+      esac
+    done |
+    /usr/bin/awk -v prefix="$repo_dir/" -f "$test_report_libexec/relative-paths.awk" |
+    sort -u
+}
+
+zsh_has_tests() {
+  local scope
+  local test_dir
+
+  for scope in "$@"; do
+    test_dir="$repo_dir/src/test/$scope/zsh"
+    [ -d "$test_dir" ] || continue
+    if find "$test_dir" -type f -name '*.zunit' -print -quit | grep -q .; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+declared_zsh_source_targets() {
+  local scope
+  local test_dir
+  local test_file
+
+  for scope in "$@"; do
+    test_dir="$repo_dir/src/test/$scope/zsh"
+    [ -d "$test_dir" ] || continue
+    while IFS= read -r test_file; do
+      /usr/bin/awk -f "$test_report_libexec/header-source-targets.awk" "$test_file"
+    done < <(find "$test_dir" -type f -name '*.zunit' | sort)
+  done |
+    sed 's/[[:space:]]*$//' |
+    /usr/bin/awk -f "$test_report_libexec/nonblank-lines.awk" |
+    sort -u
+}
+
+record_zsh_statement_coverage() {
+  local metric_scope="$1"
+  local zsh_report_dir
+  local all_targets_file
+  local declared_targets_file
+  local covered_targets_file
+  local invalid_targets_file
+  local details_file
+  local html_file
+  local counts
+  local covered_count
+  local total_count
+  local coverage_value
+
+  shift
+  [ "$report" -eq 1 ] || return 0
+  zsh_has_tests "$@" || return 0
+
+  zsh_report_dir="$(report_language_dir "$metric_scope" zsh)"
+  mkdir -p "$zsh_report_dir"
+  all_targets_file="$zsh_report_dir/statement-targets.all"
+  declared_targets_file="$zsh_report_dir/statement-targets.declared"
+  covered_targets_file="$zsh_report_dir/statement-targets.covered"
+  invalid_targets_file="$zsh_report_dir/statement-targets.invalid"
+  details_file="$zsh_report_dir/statement-coverage.tsv"
+  html_file="$zsh_report_dir/statement-coverage.html"
+
+  discover_zsh_source_targets > "$all_targets_file"
+  declared_zsh_source_targets "$@" > "$declared_targets_file"
+  comm -23 "$declared_targets_file" "$all_targets_file" > "$invalid_targets_file"
+  if [ -s "$invalid_targets_file" ]; then
+    printf 'nix-darwin-test: invalid zsh source-target declarations for %s:\n' "$metric_scope" >&2
+    sed 's/^/  /' "$invalid_targets_file" >&2
+    return 1
+  fi
+
+  comm -12 "$declared_targets_file" "$all_targets_file" > "$covered_targets_file"
+  write_statement_coverage_details zsh "$all_targets_file" "$covered_targets_file" "$details_file"
+  write_statement_coverage_html zsh "$details_file" "$html_file"
+  counts="$(statement_coverage_counts "$details_file")"
+  covered_count="${counts%%$'\t'*}"
+  total_count="${counts##*$'\t'}"
+  coverage_value="$(format_coverage_ratio "$covered_count" "$total_count")"
+  record_report_metric "$metric_scope" zsh "statement coverage" "$coverage_value"
+}
+
+record_zsh_statement_coverage_for_mode() {
+  [ "$report" -eq 1 ] || return 0
+
+  case "$mode" in
+    unit)
+      record_zsh_statement_coverage unit unit
+      ;;
+    int)
+      record_zsh_statement_coverage int int
+      ;;
+    all)
+      record_zsh_statement_coverage unit unit
+      record_zsh_statement_coverage int int
+      record_zsh_statement_coverage all unit int
+      ;;
+  esac
+}
+
+prepare_bash_kcov_environment() {
+  local scope="$1"
+  local kcov_root
+  local source_files
+  local include_patterns
+  local parse_dirs
+  local real_bash
+  local wrapper_dir
+
+  [ "$report" -eq 1 ] || return 1
+  command -v kcov >/dev/null 2>&1 || return 1
+  [ -x "$kcov_bash_wrapper" ] || return 1
+
+  real_bash="$(command -v bash)"
+  [ -x "$real_bash" ] || return 1
+
+  kcov_root="$(report_language_dir "$scope" bash)"
+  source_files="$kcov_root/kcov-source-files.txt"
+  mkdir -p "$kcov_root"
+  discover_bash_source_files > "$source_files"
+  [ -s "$source_files" ] || return 1
+
+  include_patterns="$(join_lines_by_comma < "$source_files")"
+  parse_dirs="$(parent_dirs_from_files < "$source_files" | join_lines_by_comma)"
+  wrapper_dir="$kcov_root/kcov-wrapper"
+  mkdir -p "$wrapper_dir" "$kcov_root/kcov-runs"
+  {
+    printf '#!%s\n' "$real_bash"
+    sed '1d' "$kcov_bash_wrapper"
+  } > "$wrapper_dir/bash"
+  chmod +x "$wrapper_dir/bash"
+
+  NIX_DARWIN_KCOV_PATH="$wrapper_dir:$PATH"
+  NIX_DARWIN_KCOV_RUN_DIR="$kcov_root/kcov-runs"
+  NIX_DARWIN_KCOV_PARSE_DIRS="$parse_dirs"
+  NIX_DARWIN_KCOV_INCLUDE_PATTERNS="$include_patterns"
+  NIX_DARWIN_KCOV_EXCLUDE_PATHS="$repo_dir/src/test,$repo_dir/.test-reports,$repo_dir/tools/test"
+  NIX_DARWIN_KCOV_REAL_BASH="$real_bash"
+  NIX_DARWIN_KCOV_STDERR_FILTER="$test_report_libexec/kcov-stderr-filter.awk"
+  return 0
+}
+
+run_bats_with_optional_bash_kcov() {
+  local scope="$1"
+  local language="$2"
+  local test_file=""
+  shift 2
+  for test_file in "$@"; do
+    :
+  done
+
+  if [ "$language" = bash ] && [ "$(basename "$test_file")" != "test-runner.int.test.bats" ] && prepare_bash_kcov_environment "$scope"; then
+    NIX_DARWIN_TEST_ROOT="$repo_dir" \
+      NIX_DARWIN_TEST_REPORT_ROOT="$report_dir" \
+      NIX_DARWIN_KCOV_REAL_BASH="$NIX_DARWIN_KCOV_REAL_BASH" \
+      NIX_DARWIN_KCOV_RUN_DIR="$NIX_DARWIN_KCOV_RUN_DIR" \
+      NIX_DARWIN_KCOV_PARSE_DIRS="$NIX_DARWIN_KCOV_PARSE_DIRS" \
+      NIX_DARWIN_KCOV_INCLUDE_PATTERNS="$NIX_DARWIN_KCOV_INCLUDE_PATTERNS" \
+      NIX_DARWIN_KCOV_EXCLUDE_PATHS="$NIX_DARWIN_KCOV_EXCLUDE_PATHS" \
+      NIX_DARWIN_KCOV_STDERR_FILTER="$NIX_DARWIN_KCOV_STDERR_FILTER" \
+      PATH="$NIX_DARWIN_KCOV_PATH" \
+      run_bats "$@"
+    return
+  fi
+
+  run_bats "$@"
+}
+
+record_bash_kcov_coverage() {
+  local metric_scope="$1"
+  local kcov_root
+  local runs_dir
+  local output_dir
+  local coverage_json
+  local coverage_percent
+
+  [ "$report" -eq 1 ] || return 0
+  command -v kcov >/dev/null 2>&1 || return 0
+
+  kcov_root="$(report_language_dir "$metric_scope" bash)"
+  runs_dir="$kcov_root/kcov-runs"
+  [ -d "$runs_dir" ] || return 0
+  find "$runs_dir" -mindepth 1 -maxdepth 1 -type d -print -quit | grep -q . || return 0
+
+  output_dir="$kcov_root/kcov"
+  rm -rf "$output_dir"
+  kcov --merge "$output_dir" "$runs_dir"/*
+  coverage_json="$output_dir/kcov-merged/coverage.json"
+  [ -f "$coverage_json" ] || return 0
+
+  coverage_percent="$(coverage_percent_from_json "$coverage_json")"
+  record_report_metric "$metric_scope" bash "statement coverage" "$coverage_percent"
+}
+
+record_bash_kcov_coverage_for_mode() {
+  [ "$report" -eq 1 ] || return 0
+
+  case "$mode" in
+    unit)
+      record_bash_kcov_coverage unit
+      ;;
+    int)
+      record_bash_kcov_coverage int
+      ;;
+    all)
+      record_bash_kcov_coverage unit
+      record_bash_kcov_coverage int
+      merge_bash_kcov_coverage all unit int
+      ;;
+  esac
+}
+
+merge_bash_kcov_coverage() {
+  local metric_scope="$1"
+  local kcov_root
+  local output_dir
+  local coverage_json
+  local coverage_percent
+  local merge_inputs=()
+  local source_scope
+  local source_dir
+
+  shift
+  [ "$report" -eq 1 ] || return 0
+  command -v kcov >/dev/null 2>&1 || return 0
+
+  for source_scope in "$@"; do
+    source_dir="$(report_language_dir "$source_scope" bash)/kcov"
+    [ -d "$source_dir" ] || continue
+    merge_inputs+=("$source_dir")
+  done
+
+  [ "${#merge_inputs[@]}" -gt 0 ] || return 0
+  kcov_root="$(report_language_dir "$metric_scope" bash)"
+  output_dir="$kcov_root/kcov"
+  mkdir -p "$kcov_root"
+  rm -rf "$output_dir"
+  kcov --merge "$output_dir" "${merge_inputs[@]}"
+  coverage_json="$output_dir/kcov-merged/coverage.json"
+  [ -f "$coverage_json" ] || return 0
+
+  coverage_percent="$(coverage_percent_from_json "$coverage_json")"
+  record_report_metric "$metric_scope" bash "statement coverage" "$coverage_percent"
+}
+
+print_report_summary() {
+  local scope
+  local language
+  local metric
+  local value
+
+  [ "$report" -eq 1 ] || return 0
+
+  printf '\nTest Report Summary\n'
+  if [ -f "$summary_file" ]; then
+    while IFS=$'\t' read -r scope language metric value; do
+      [ "$scope" != "scope" ] || continue
+      [ -n "$scope" ] || continue
+      printf '%s %s %s: %s\n' "$(scope_label "$scope")" "$language" "$metric" "$value"
+    done < "$summary_file"
+  fi
+  printf 'Detailed reports: %s\n' "$report_dir"
+}
+
+coverage_gate_failure_count() {
+  local scope
+  local language
+  local metric
+  local value
+  local total=0
+
+  [ "$report" -eq 1 ] || {
+    printf '0\n'
+    return 0
+  }
+  [ -f "$summary_file" ] || {
+    printf '0\n'
+    return 0
+  }
+
+  while IFS=$'\t' read -r scope language metric value; do
+    [ "$scope" != "scope" ] || continue
+    [ "$metric" = "coverage.gate.failures" ] || continue
+    case "$value" in
+      ''|*[!0-9]*)
+        continue
+        ;;
+    esac
+    total=$((total + value))
+  done < "$summary_file"
+  printf '%s\n' "$total"
+}
+
+confirm_coverage_gate_override() {
+  local failure_count="$1"
+  local response
+
+  printf '\n!!! EMERGENCY COVERAGE GATE OVERRIDE REQUESTED !!!\n' >&2
+  printf 'Coverage gates failed with %s failure(s).\n' "$failure_count" >&2
+  printf 'Hard-gate details:\n' >&2
+  while IFS=$'\t' read -r scope language metric value; do
+    case "$metric:$value" in
+      coverage.gate.hard.*:fail\ *)
+        printf '  %s %s %s: %s\n' "$(scope_label "$scope")" "$language" "$metric" "$value" >&2
+        ;;
+    esac
+  done < "$summary_file"
+  printf 'Report root: %s\n' "$report_dir" >&2
+  printf 'Final HTML will be rendered after this decision.\n' >&2
+  printf 'Use this only for exceptional maintenance, not normal updates.\n' >&2
+  printf 'Type yes to continue despite failed coverage gates: ' >&2
+  IFS= read -r response || response=""
+
+  case "$response" in
+    [Yy][Ee][Ss])
+      record_report_metric "$mode" coverage "coverage.gate.override" "used"
+      printf 'nix-darwin-test: coverage gate override confirmed; continuing despite failed gates.\n' >&2
+      return 0
+      ;;
+    *)
+      printf 'nix-darwin-test: coverage gate override declined; exiting.\n' >&2
+      return 1
+      ;;
+  esac
+}
+
+enforce_coverage_gates() {
+  local failure_count
+
+  [ "$report" -eq 1 ] || return 0
+  failure_count="$(coverage_gate_failure_count)"
+  [ "$failure_count" -gt 0 ] || return 0
+
+  if [ "${NIX_DARWIN_SKIP_COVERAGE_GATES:-}" = "1" ]; then
+    confirm_coverage_gate_override "$failure_count"
+    return
+  fi
+
+  printf '\nnix-darwin-test: coverage gates failed (%s failure(s)).\n' "$failure_count" >&2
+  printf 'Set NIX_DARWIN_SKIP_COVERAGE_GATES=1 for the emergency override path.\n' >&2
+  return 1
+}
+
+if [ "$#" -gt 0 ]; then
+  case "$1" in
+    all|unit|int)
+      mode="$1"
+      shift
+      ;;
+  esac
+fi
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --full)
+      full=1
+      ;;
+    --report)
+      report=1
+      ;;
+    --report-root)
+      shift
+      [ "$#" -gt 0 ] || fail "--report-root requires an absolute path"
+      case "$1" in
+        /*) report_root="$1" ;;
+        *) fail "--report-root requires an absolute path" ;;
+      esac
+      ;;
+    -j)
+      shift
+      [ "$#" -gt 0 ] || fail "-j requires a positive integer"
+      jobs="$1"
+      ;;
+    --jobs)
+      shift
+      [ "$#" -gt 0 ] || fail "--jobs requires a positive integer"
+      jobs="$1"
+      ;;
+    --flake-option)
+      shift
+      [ "$#" -gt 0 ] || fail "--flake-option requires a value"
+      flake_options+=("$1")
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      fail "unknown option: $1"
+      ;;
+  esac
+  shift
+done
+
+validate_jobs
+validate_build_jobs
+[ -d "$repo_dir" ] || fail "repo root does not exist: $repo_dir"
+prepare_report
+
+run_shell_syntax_checks() {
+  local shell_dir="$repo_dir/shell"
+  local scripts_dir="$repo_dir/scripts"
+  local file
+  local check_status
+  local syntax_status=0
+
+  if [ -d "$scripts_dir" ]; then
+    while IFS= read -r file; do
+      if bash -n "$file"; then
+        :
+      else
+        check_status="$?"
+        [ "$report" -eq 1 ] || return "$check_status"
+        [ "$syntax_status" -ne 0 ] || syntax_status="$check_status"
+      fi
+    done < <(find "$scripts_dir" -maxdepth 1 -type f -name '*.sh' | sort)
+  fi
+
+  for file in "$shell_dir/bash_profile" "$shell_dir/bashrc"; do
+    [ -f "$file" ] || continue
+    if bash -n "$file"; then
+      :
+    else
+      check_status="$?"
+      [ "$report" -eq 1 ] || return "$check_status"
+      [ "$syntax_status" -ne 0 ] || syntax_status="$check_status"
+    fi
+  done
+
+  for fragment_dir in "$shell_dir/sh_config/bash" "$shell_dir/sh_config/common"; do
+    [ -d "$fragment_dir" ] || continue
+    while IFS= read -r file; do
+      if bash -n "$file"; then
+        :
+      else
+        check_status="$?"
+        [ "$report" -eq 1 ] || return "$check_status"
+        [ "$syntax_status" -ne 0 ] || syntax_status="$check_status"
+      fi
+    done < <(find "$fragment_dir" -maxdepth 1 -type f | sort)
+  done
+
+  if [ -f "$shell_dir/zshrc" ]; then
+    if zsh -n "$shell_dir/zshrc"; then
+      :
+    else
+      check_status="$?"
+      [ "$report" -eq 1 ] || return "$check_status"
+      [ "$syntax_status" -ne 0 ] || syntax_status="$check_status"
+    fi
+  fi
+
+  if [ -d "$repo_dir/tools/bootstrap" ]; then
+    while IFS= read -r file; do
+      case "$(sed -n '1p' "$file" 2>/dev/null || true)" in
+        *zsh*)
+          if zsh -n "$file"; then
+            :
+          else
+            check_status="$?"
+            [ "$report" -eq 1 ] || return "$check_status"
+            [ "$syntax_status" -ne 0 ] || syntax_status="$check_status"
+          fi
+          ;;
+      esac
+    done < <(find "$repo_dir/tools/bootstrap" -maxdepth 1 -type f | sort)
+  fi
+
+  for zsh_source_root in "$repo_dir/bin" "$repo_dir/libexec" "$repo_dir/tools"; do
+    [ -d "$zsh_source_root" ] || continue
+    while IFS= read -r file; do
+      case "$file" in
+        *.pyc) continue ;;
+      esac
+      LC_ALL=C grep -Iq . "$file" || continue
+      case "$(sed -n '1p' "$file" 2>/dev/null || true)" in
+        *zsh*)
+          if zsh -n "$file"; then
+            :
+          else
+            check_status="$?"
+            [ "$report" -eq 1 ] || return "$check_status"
+            [ "$syntax_status" -ne 0 ] || syntax_status="$check_status"
+          fi
+          ;;
+      esac
+    done < <(find "$zsh_source_root" -type f | sort)
+  done
+
+  if [ -d "$shell_dir/oh-my-zsh-custom/themes" ]; then
+    while IFS= read -r file; do
+      if zsh -n "$file"; then
+        :
+      else
+        check_status="$?"
+        [ "$report" -eq 1 ] || return "$check_status"
+        [ "$syntax_status" -ne 0 ] || syntax_status="$check_status"
+      fi
+    done < <(find "$shell_dir/oh-my-zsh-custom/themes" -maxdepth 1 -type f -name '*.zsh-theme' | sort)
+  fi
+
+  for fragment_dir in "$shell_dir/sh_config/zsh" "$shell_dir/sh_config/common"; do
+    [ -d "$fragment_dir" ] || continue
+    while IFS= read -r file; do
+      if zsh -n "$file"; then
+        :
+      else
+        check_status="$?"
+        [ "$report" -eq 1 ] || return "$check_status"
+        [ "$syntax_status" -ne 0 ] || syntax_status="$check_status"
+      fi
+    done < <(find "$fragment_dir" -maxdepth 1 -type f | sort)
+  done
+
+  return "$syntax_status"
+}
+
+run_bats_lane() {
+  local scope="$1"
+  local language="$2"
+  local test_dir="$repo_dir/src/test/$scope/$language"
+  local bats_report_dir
+  local test_file
+  local bats_steps=()
+
+  [ -d "$test_dir" ] || return 0
+
+  while IFS= read -r test_file; do
+    if [ "$report" -eq 1 ]; then
+      bats_report_dir="$(report_language_dir "$scope" "$language")/$(basename "$test_file")"
+      mkdir -p "$bats_report_dir"
+      run_step "$scope/$language/$(basename "$test_file")" run_bats_report "$scope" "$language" "$bats_report_dir" "$test_file"
+    else
+      bats_steps+=("$scope/$language/$(basename "$test_file")" run_bats "$test_file" ":::")
+    fi
+  done < <(find "$test_dir" -type f -name '*.bats' | sort)
+
+  if [ "$report" -eq 0 ] && [ "${#bats_steps[@]}" -gt 0 ]; then
+    run_parallel_steps "$jobs" "${bats_steps[@]}"
+  fi
+  return 0
+}
+
+run_bats_report() {
+  local scope="$1"
+  local language="$2"
+  local output_dir="$3"
+  local test_outputs_dir="$output_dir/test-outputs"
+  shift 3
+
+  rm -rf "$test_outputs_dir"
+  mkdir -p "$test_outputs_dir"
+  run_report_command "$output_dir/output.txt" \
+    run_bats_with_optional_bash_kcov "$scope" "$language" \
+      --report-formatter junit \
+      --output "$output_dir" \
+      --gather-test-outputs-in "$test_outputs_dir" \
+      --show-output-of-passing-tests \
+      --verbose-run \
+      --print-output-on-failure \
+      "$@"
+}
+
+run_bats() {
+  if command -v bats >/dev/null 2>&1; then
+    bats "$@" < /dev/null
+    return
+  fi
+
+  local system="${NIX_DARWIN_TEST_SYSTEM:-aarch64-darwin}"
+  nix shell "$flake_ref#legacyPackages.$system.bats" -c bats "$@" < /dev/null
+}
+
+run_pytest() {
+  local python_pycache_prefix="$1"
+  local python_import_check='import pytest'
+  shift
+
+  if [ "$report" -eq 1 ]; then
+    python_import_check='import pytest, pytest_cov, pytest_jsonreport'
+  elif parallel_enabled; then
+    python_import_check='import pytest, xdist'
+  fi
+
+  if command -v pytest >/dev/null 2>&1 &&
+    command -v python3 >/dev/null 2>&1 &&
+    python3 -c "$python_import_check" >/dev/null 2>&1; then
+    env PYTHONPYCACHEPREFIX="$python_pycache_prefix" pytest "$@"
+    return
+  fi
+
+  local system="${NIX_DARWIN_TEST_SYSTEM:-aarch64-darwin}"
+  env PYTHONPYCACHEPREFIX="$python_pycache_prefix" \
+    nix shell "$flake_ref#nixDarwinTestPython" -c pytest "$@"
+}
+
+run_python_lane() {
+  local scope="$1"
+  local test_dir="$repo_dir/src/test/$scope/python"
+  local python_report_dir
+  local python_coverage_xml
+  local python_metric_file
+  local python_branch_coverage
+  local python_statement_coverage
+  local pytest_args
+
+  [ -d "$test_dir" ] || return 0
+  find "$test_dir" -type f -name '*.test.py' -print -quit | grep -q . || return 0
+
+  mkdir -p "$python_pycache_prefix"
+  pytest_args=()
+
+  if [ "$report" -eq 0 ] && parallel_enabled; then
+    pytest_args+=("-n" "$jobs")
+  fi
+
+  pytest_args+=("$test_dir")
+
+  if [ "$report" -eq 1 ]; then
+    python_report_dir="$(report_language_dir "$scope" python)"
+    python_coverage_xml="$python_report_dir/coverage.xml"
+    mkdir -p "$python_report_dir"
+    pytest_args+=(
+      "--junitxml=$python_report_dir/junit.xml"
+      "--json-report"
+      "--json-report-file=$python_report_dir/report.json"
+      "-o"
+      "junit_logging=all"
+      "-o"
+      "junit_log_passing_tests=true"
+      "--tb=long"
+    )
+    if [ "$scope" = unit ]; then
+      pytest_args+=(
+        "--cov=$repo_dir/libexec"
+        "--cov=$repo_dir/tools/test/report"
+        "--cov-branch"
+        "--cov-report=term-missing"
+        "--cov-report=xml:$python_coverage_xml"
+        "--cov-report=html:$python_report_dir/html"
+      )
+    fi
+  fi
+
+  if [ "$report" -eq 1 ]; then
+    run_step "$scope/python/pytest" run_report_command "$python_report_dir/output.txt" \
+      run_pytest "$python_pycache_prefix" "${pytest_args[@]}"
+  else
+    run_step "$scope/python/pytest" run_pytest "$python_pycache_prefix" "${pytest_args[@]}"
+  fi
+
+  if [ "$report" -eq 1 ] && [ -f "$python_coverage_xml" ]; then
+    python_metric_file="$(report_metric_file "$scope" python)"
+    python_statement_coverage="$(coverage_percent_from_xml "$python_coverage_xml" line-rate)"
+    record_report_metric_to_file "$python_metric_file" "$scope" python "statement coverage" "$python_statement_coverage"
+    if python_branch_coverage="$(coverage_percent_from_xml "$python_coverage_xml" branch-rate)"; then
+      record_report_metric_to_file "$python_metric_file" "$scope" python "branch coverage" "$python_branch_coverage"
+    fi
+  fi
+}
+
+run_zsh_lane() {
+  local scope="$1"
+  local test_dir="$repo_dir/src/test/$scope/zsh"
+  local zsh_report_dir
+  local test_file
+  local zsh_steps=()
+
+  [ -d "$test_dir" ] || return 0
+
+  while IFS= read -r test_file; do
+    if [ "$report" -eq 1 ]; then
+      zsh_report_dir="$(report_language_dir "$scope" zsh)/$(basename "$test_file")"
+      mkdir -p "$zsh_report_dir"
+      run_step "$scope/zsh/$(basename "$test_file")" run_zunit_report "$zsh_report_dir/output.tap" "$test_file"
+    else
+      zsh_steps+=("$scope/zsh/$(basename "$test_file")" run_zunit "$test_file" ":::")
+    fi
+  done < <(find "$test_dir" -type f -name '*.zunit' | sort)
+
+  if [ "$report" -eq 0 ] && [ "${#zsh_steps[@]}" -gt 0 ]; then
+    run_parallel_steps "$jobs" "${zsh_steps[@]}"
+  fi
+}
+
+run_zunit() {
+  if command -v zunit >/dev/null 2>&1; then
+    zunit --tap "$@"
+    return
+  fi
+
+  local system="${NIX_DARWIN_TEST_SYSTEM:-aarch64-darwin}"
+  nix shell "$flake_ref#legacyPackages.$system.zunit" -c zunit --tap "$@"
+}
+
+run_zunit_verbose() {
+  if command -v zunit >/dev/null 2>&1; then
+    zunit --tap --verbose "$@"
+    return
+  fi
+
+  local system="${NIX_DARWIN_TEST_SYSTEM:-aarch64-darwin}"
+  nix shell "$flake_ref#legacyPackages.$system.zunit" -c zunit --tap --verbose "$@"
+}
+
+run_zunit_report() {
+  local output_file="$1"
+
+  shift
+  run_report_command "$output_file" run_zunit_verbose "$@"
+}
+
+run_ruby_lane() {
+  local scope="$1"
+  local test_dir="$repo_dir/src/test/$scope/ruby"
+  local test_file
+  local test_files=()
+  local ruby_steps=()
+  local ruby_report_dir
+  local ruby_result_json
+  local ruby_metric_file
+  local simplecov_prelude="$script_dir/ruby/simplecov-prelude.rb"
+  local ruby_branch_coverage
+  local ruby_statement_coverage
+
+  [ -d "$test_dir" ] || return 0
+
+  while IFS= read -r test_file; do
+    test_files+=("$test_file")
+  done < <(find "$test_dir" -type f -name '*.rb' | sort)
+
+  [ "${#test_files[@]}" -gt 0 ] || return 0
+
+  if [ "$report" -eq 1 ]; then
+    ruby_report_dir="$(report_language_dir "$scope" ruby)"
+    ruby_result_json="$ruby_report_dir/results.json"
+    mkdir -p "$ruby_report_dir"
+    if [ "$scope" = unit ]; then
+      run_step "$scope/ruby/minitest" run_report_command "$ruby_report_dir/output.txt" \
+        run_ruby_with_coverage "$ruby_report_dir" "$ruby_result_json" "$simplecov_prelude" "$script_dir/ruby/minitest-runner.rb" --verbose "${test_files[@]}"
+    else
+      run_step "$scope/ruby/minitest" run_report_command "$ruby_report_dir/output.txt" \
+        run_ruby_with_results "$ruby_result_json" "$script_dir/ruby/minitest-runner.rb" --verbose "${test_files[@]}"
+    fi
+  else
+    for test_file in "${test_files[@]}"; do
+      ruby_steps+=("$scope/ruby/$(basename "$test_file")" ruby "$test_file" ":::")
+    done
+    run_parallel_steps "$jobs" "${ruby_steps[@]}"
+  fi
+
+  if [ "$report" -eq 1 ] && [ -f "$ruby_report_dir/.last_run.json" ]; then
+    ruby_metric_file="$(report_metric_file "$scope" ruby)"
+    ruby_statement_coverage="$(ruby_coverage_percent "$ruby_report_dir/.last_run.json" line)"
+    record_report_metric_to_file "$ruby_metric_file" "$scope" ruby "statement coverage" "$ruby_statement_coverage"
+    if ruby_branch_coverage="$(ruby_coverage_percent "$ruby_report_dir/.last_run.json" branch)"; then
+      record_report_metric_to_file "$ruby_metric_file" "$scope" ruby "branch coverage" "$ruby_branch_coverage"
+    fi
+  fi
+}
+
+run_ruby_with_results() {
+  local ruby_result_json="$1"
+  shift
+
+  if command -v ruby >/dev/null 2>&1; then
+    env \
+      NIX_DARWIN_TEST_RESULT_JSON="$ruby_result_json" \
+      NIX_DARWIN_TEST_ROOT="$repo_dir" \
+      ruby "$@"
+    return
+  fi
+
+  local system="${NIX_DARWIN_TEST_SYSTEM:-aarch64-darwin}"
+  env \
+    NIX_DARWIN_TEST_RESULT_JSON="$ruby_result_json" \
+    NIX_DARWIN_TEST_ROOT="$repo_dir" \
+    nix shell "$flake_ref#nixDarwinTestRuby" -c ruby "$@"
+}
+
+run_ruby_with_coverage() {
+  local ruby_report_dir="$1"
+  local ruby_result_json="$2"
+  local simplecov_prelude="$3"
+  shift 3
+
+  if command -v ruby >/dev/null 2>&1 && ruby -rsimplecov -e 'exit 0' >/dev/null 2>&1; then
+    env \
+      NIX_DARWIN_TEST_COVERAGE_DIR="$ruby_report_dir" \
+      NIX_DARWIN_TEST_RESULT_JSON="$ruby_result_json" \
+      NIX_DARWIN_TEST_ROOT="$repo_dir" \
+      ruby -r "$simplecov_prelude" "$@"
+    return
+  fi
+
+  local system="${NIX_DARWIN_TEST_SYSTEM:-aarch64-darwin}"
+  env \
+    NIX_DARWIN_TEST_COVERAGE_DIR="$ruby_report_dir" \
+    NIX_DARWIN_TEST_RESULT_JSON="$ruby_result_json" \
+    NIX_DARWIN_TEST_ROOT="$repo_dir" \
+    nix shell "$flake_ref#nixDarwinTestRuby" -c ruby -r "$simplecov_prelude" "$@"
+}
+
+run_applescript_lane() {
+  local scope="$1"
+  local test_dir="$repo_dir/src/test/$scope/applescript"
+  local test_file
+  local applescript_steps=()
+
+  [ -d "$test_dir" ] || return 0
+
+  while IFS= read -r test_file; do
+    if [ "$report" -eq 0 ]; then
+      applescript_steps+=("$scope/applescript/$(basename "$test_file")" run_applescript_compile "$test_file" ":::")
+    else
+      run_step "$scope/applescript/$(basename "$test_file")" run_applescript_compile "$test_file"
+    fi
+  done < <(find "$test_dir" -type f -name '*.applescript' | sort)
+
+  if [ "$report" -eq 0 ] && [ "${#applescript_steps[@]}" -gt 0 ]; then
+    run_parallel_steps "$jobs" "${applescript_steps[@]}"
+  fi
+}
+
+run_applescript_compile() {
+  local test_file="$1"
+  local output_file
+  local status
+
+  output_file="$(mktemp "${TMPDIR:-/tmp}/nix-darwin-applescript-test.XXXXXX")" \
+    || fail "could not create AppleScript compile output path"
+  if osacompile -o "$output_file" "$test_file"; then
+    status=0
+  else
+    status="$?"
+  fi
+  rm -f "$output_file"
+  return "$status"
+}
+
+run_nix_unit() (
+  local system="${NIX_DARWIN_TEST_SYSTEM:-aarch64-darwin}"
+  local nix_unit_runtime_dir
+
+  nix_unit_runtime_dir="$(mktemp -d "${TMPDIR:-/tmp}/nix-darwin-nix-unit.XXXXXX")" \
+    || fail "could not create nix-unit runtime directory"
+  trap 'rm -rf "$nix_unit_runtime_dir"' EXIT
+  mkdir -p "$nix_unit_runtime_dir/conf" "$nix_unit_runtime_dir/gc-roots"
+  export NIX_CONF_DIR="$nix_unit_runtime_dir/conf"
+  export NIX_CONFIG="experimental-features = nix-command flakes"
+
+  if command -v nix-unit >/dev/null 2>&1; then
+    nix-unit \
+      --gc-roots-dir "$nix_unit_runtime_dir/gc-roots" \
+      --arg repoRoot "$repo_dir" \
+      --argstr system "$system" \
+      "$@"
+    return
+  fi
+
+  nix shell "$flake_ref#legacyPackages.$system.nix-unit" -c nix-unit \
+    --gc-roots-dir "$nix_unit_runtime_dir/gc-roots" \
+    --arg repoRoot "$repo_dir" \
+    --argstr system "$system" \
+    "$@"
+)
+
+run_nix_lane() {
+  local scope="$1"
+  local test_dir="$repo_dir/src/test/$scope/nix"
+  local nix_report_dir
+  local test_file
+  local nix_steps=()
+
+  [ -d "$test_dir" ] || return 0
+  find "$test_dir" -type f -name '*.nix' -print -quit | grep -q . || return 0
+
+  while IFS= read -r test_file; do
+    if [ "$report" -eq 1 ]; then
+      nix_report_dir="$(report_language_dir "$scope" nix)/$(basename "$test_file")"
+      mkdir -p "$nix_report_dir"
+      run_step "$scope/nix/$(basename "$test_file")" run_nix_unit_report "$nix_report_dir/output.txt" "$test_file"
+    else
+      nix_steps+=("$scope/nix/$(basename "$test_file")" run_nix_unit "$test_file" ":::")
+    fi
+  done < <(find "$test_dir" -type f -name '*.nix' | sort)
+
+  if [ "$report" -eq 0 ] && [ "${#nix_steps[@]}" -gt 0 ]; then
+    run_parallel_steps "$jobs" "${nix_steps[@]}"
+  fi
+}
+
+run_nix_unit_report() {
+  local output_file="$1"
+
+  shift
+  run_report_command "$output_file" run_nix_unit "$@"
+}
+
+run_language_lanes() {
+  local scope="$1"
+
+  run_bats_lane "$scope" bash
+  run_bats_lane "$scope" awk
+  run_bats_lane "$scope" applescript
+  run_python_lane "$scope"
+  run_zsh_lane "$scope"
+  run_ruby_lane "$scope"
+  run_applescript_lane "$scope"
+  run_nix_lane "$scope"
+}
+
+run_language_lanes_parallel() {
+  local scope="$1"
+
+  run_parallel_steps "$jobs" \
+    "$scope/bash" run_bats_lane "$scope" bash ::: \
+    "$scope/awk" run_bats_lane "$scope" awk ::: \
+    "$scope/applescript/bats" run_bats_lane "$scope" applescript ::: \
+    "$scope/python/pytest" run_python_lane "$scope" ::: \
+    "$scope/zsh" run_zsh_lane "$scope" ::: \
+    "$scope/ruby" run_ruby_lane "$scope" ::: \
+    "$scope/applescript/osacompile" run_applescript_lane "$scope" ::: \
+    "$scope/nix" run_nix_lane "$scope" :::
+}
+
+run_report_lane_for_parallel() {
+  current_report_lane_status=0
+  "$@"
+  return "$current_report_lane_status"
+}
+
+run_report_lane_serial() {
+  local label="$1"
+  local status=0
+
+  shift
+  current_report_lane_status=0
+  if "$@"; then
+    status="$current_report_lane_status"
+  else
+    status="$?"
+    [ "$current_report_lane_status" -ne 0 ] || current_report_lane_status="$status"
+  fi
+  status="$current_report_lane_status"
+  if [ "$status" -ne 0 ]; then
+    record_execution_failure "$label" "$status"
+    if [ "$suite_status" -eq 0 ]; then
+      suite_status="$status"
+    fi
+  fi
+}
+
+run_report_language_lanes_serial() {
+  local scope="$1"
+
+  run_report_lane_serial "$scope/bash" run_bats_lane "$scope" bash
+  run_report_lane_serial "$scope/awk" run_bats_lane "$scope" awk
+  run_report_lane_serial "$scope/applescript/bats" run_bats_lane "$scope" applescript
+  run_report_lane_serial "$scope/python/pytest" run_python_lane "$scope"
+  run_report_lane_serial "$scope/zsh" run_zsh_lane "$scope"
+  run_report_lane_serial "$scope/ruby" run_ruby_lane "$scope"
+  run_report_lane_serial "$scope/applescript/osacompile" run_applescript_lane "$scope"
+  run_report_lane_serial "$scope/nix" run_nix_lane "$scope"
+}
+
+run_report_language_lanes_parallel() {
+  local scope="$1"
+
+  run_parallel_steps "$jobs" \
+    "$scope/bash" run_report_lane_for_parallel run_bats_lane "$scope" bash ::: \
+    "$scope/awk" run_report_lane_for_parallel run_bats_lane "$scope" awk ::: \
+    "$scope/applescript/bats" run_report_lane_for_parallel run_bats_lane "$scope" applescript ::: \
+    "$scope/python/pytest" run_report_lane_for_parallel run_python_lane "$scope" ::: \
+    "$scope/zsh" run_report_lane_for_parallel run_zsh_lane "$scope" ::: \
+    "$scope/ruby" run_report_lane_for_parallel run_ruby_lane "$scope" ::: \
+    "$scope/applescript/osacompile" run_report_lane_for_parallel run_applescript_lane "$scope" ::: \
+    "$scope/nix" run_report_lane_for_parallel run_nix_lane "$scope" :::
+}
+
+report_parallel_enabled_for_scope() {
+  local scope="$1"
+
+  [ "$report" -eq 1 ] || return 1
+  parallel_enabled || return 1
+
+  case "$mode:$scope" in
+    unit:unit|int:int|all:unit|all:int)
+      return 0
+      ;;
+  esac
+
+  return 1
+}
+
+run_language_lanes_for_scope() {
+  local scope="$1"
+  local status
+
+  if [ "$report" -eq 0 ] && parallel_enabled; then
+    run_language_lanes_parallel "$scope"
+  elif report_parallel_enabled_for_scope "$scope"; then
+    if run_report_language_lanes_parallel "$scope"; then
+      :
+    else
+      status="$?"
+      if [ "$suite_status" -eq 0 ]; then
+        suite_status="$status"
+      fi
+    fi
+  elif [ "$report" -eq 1 ]; then
+    run_report_language_lanes_serial "$scope"
+  else
+    run_language_lanes "$scope"
+  fi
+}
+
+run_nix_flake_check() {
+  local command=(nix flake check "$flake_ref" --no-update-lock-file --no-write-lock-file)
+
+  if [ "${#flake_options[@]}" -gt 0 ]; then
+    command+=("${flake_options[@]}")
+  fi
+
+  if [ -n "$build_jobs" ]; then
+    command+=(--max-jobs "$build_jobs")
+  fi
+
+  "${command[@]}"
+}
+
+run_darwin_system_build() {
+  local command=(
+    nix build --no-link --no-update-lock-file --no-write-lock-file
+    "$flake_ref#darwinConfigurations.example-primary.system"
+  )
+
+  if [ "${#flake_options[@]}" -gt 0 ]; then
+    command+=("${flake_options[@]}")
+  fi
+
+  if [ -n "$build_jobs" ]; then
+    command+=(--max-jobs "$build_jobs")
+  fi
+
+  "${command[@]}"
+}
+
+case "$mode" in
+  all)
+    run_suite_step "patch hygiene" git --no-pager -C "$repo_dir" diff --check
+    run_suite_step "flake check" run_nix_flake_check
+    run_suite_step "shell syntax" run_shell_syntax_checks
+    run_language_lanes_for_scope unit
+    run_language_lanes_for_scope int
+    ;;
+  unit)
+    run_suite_step "patch hygiene" git --no-pager -C "$repo_dir" diff --check
+    run_suite_step "shell syntax" run_shell_syntax_checks
+    run_language_lanes_for_scope unit
+    ;;
+  int)
+    run_suite_step "flake check" run_nix_flake_check
+    run_language_lanes_for_scope int
+    ;;
+  *)
+    fail "unknown mode: $mode"
+    ;;
+esac
+
+if [ "$full" -eq 1 ]; then
+  case "$mode" in
+    all|int)
+      run_suite_step "Darwin system build" run_darwin_system_build
+      ;;
+    unit)
+      fail "--full is only supported for all and int modes"
+      ;;
+  esac
+fi
+
+record_nix_source_target_coverage_for_mode
+record_python_source_target_coverage_for_mode
+record_ruby_source_target_coverage_for_mode
+record_bash_source_target_coverage_for_mode
+record_bats_statement_coverage_for_mode
+record_zsh_statement_coverage_for_mode
+record_bash_kcov_coverage_for_mode
+merge_report_metric_files
+report_summary_ready=1
+if summarize_test_report; then
+  :
+else
+  status="$?"
+  report_summary_ready=0
+  record_execution_failure "report summary generation" "$status"
+  if [ "$suite_status" -eq 0 ]; then
+    suite_status="$status"
+  fi
+fi
+if [ "$report_summary_ready" -eq 1 ]; then
+  if enforce_coverage_gates; then
+    :
+  else
+    record_execution_failure "coverage gates" 1
+    if [ "$suite_status" -eq 0 ]; then
+      suite_status=1
+    fi
+  fi
+fi
+write_execution_status
+if render_test_report; then
+  :
+else
+  status="$?"
+  record_execution_failure "report rendering" "$status"
+  if [ "$suite_status" -eq 0 ]; then
+    suite_status="$status"
+  fi
+  write_execution_status
+fi
+print_report_summary
+if [ "$suite_status" -ne 0 ]; then
+  printf '\nNix-darwin %s tests failed. See %s for details.\n' "$mode" "$report_dir" >&2
+  exit "$suite_status"
+fi
+
+printf '\nAll nix-darwin %s tests passed.\n' "$mode"

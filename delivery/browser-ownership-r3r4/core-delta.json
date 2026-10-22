@@ -1,0 +1,27 @@
+[
+  {
+    "path": "config/browser/README.md",
+    "before_sha256": "2a1d563dd1fa965f084043f3395b7130395fc81728db13c3a8431276092369ef",
+    "after_sha256": "ada546d02255f5ffbe29a29200f35afd1d08f834e5d04ab99a73b21652c3b99e"
+  },
+  {
+    "path": "config/browser/roles-r3.json",
+    "before_sha256": "84006e49beb70963d5a2ed20d73acb53e77909d6ed06e81ae5babfdca37a921c",
+    "after_sha256": "ed2163c18eb2bd86c812a5f7c43063440b3ce3781e1d6b9dd8aa634fd3efb86f"
+  },
+  {
+    "path": "docs/adr/2026/10/0002-browser-role-ownership-r3.md",
+    "before_sha256": "074631de6448c75cbd0367f049d84b7d77d21cdff7afc5feeacd5555890c16bb",
+    "after_sha256": "3228203ed0be44e43f67c9346d998bf1e5e56ae7f782e7fb7335f21024ed1440"
+  },
+  {
+    "path": "modules/browsers.nix",
+    "before_sha256": "80f0ceba17211e49daef547a454c958ef1495af080b6a2fc35c4389f24cc84ab",
+    "after_sha256": "0d6040719ab6120e63cc8497a184edac460235ff7f757c7ab44f72e85a6f926f"
+  },
+  {
+    "path": "src/test/unit/nix/core-browser-ownership.unit.test.nix",
+    "before_sha256": "0f7fd857e0090bc8de6a9b59a67b421edc6dedf8445cb790cfcde2c102ec6db8",
+    "after_sha256": "9995b43ac726baf53bdf33c172ec7765c83ed87f723b467f030a95a209e6cebc"
+  }
+]

@@ -1,0 +1,52 @@
+[
+  {
+    "path": "config/browser/roles-r3.nix",
+    "before_sha256": "be62e4ff506fb1924c322a0748085b93bfb7a65ab87c8ec26e31bbb969ec9f33",
+    "after_sha256": "d6307a676d5d3c046a98753f7a2c23b2cdef63773956a97c290bf77af588e034"
+  },
+  {
+    "path": "delivery/vivaldi-visual-reference.md",
+    "before_sha256": null,
+    "after_sha256": "633b5eb793c6649aa66fb870339a3f4f19e1c2931710f06ee796cdcca8c9a784"
+  },
+  {
+    "path": "flake.nix",
+    "before_sha256": "d9d4e52a3751053e15f25f3c3259c90832f3e030b42de8def1e9c00a441f92fb",
+    "after_sha256": "0cf6c9389f1346dbf1d42ba8e3093eb28fe1ed91457aa16efa6e5c74c3f26503"
+  },
+  {
+    "path": "lib/application-claims.nix",
+    "before_sha256": "0d090c4e4a9a5683b9b858fd652cb4578abe2108ab4eaf8dc7813d3566cf2325",
+    "after_sha256": "4334e077ff96cca5198ff3b3451f39e25517d54acb76c3ff23efb38bc65e6191"
+  },
+  {
+    "path": "modules/default.nix",
+    "before_sha256": "9986813a9fb228ad5a846f25ffba96a9af53f19d272c7a4c30dd10441e150588",
+    "after_sha256": "c25dfa85bc1f196475e153d5f9c5aa1261b4e24ce6cf88133bbea404f665256b"
+  },
+  {
+    "path": "modules/roles-r3.nix",
+    "before_sha256": "bc5cc6043ce8aa5ffa3c1a31ab879e9552269f24210286a3f67e1d260d16a676",
+    "after_sha256": "dc5723a4c4412f597f2cfa27ae42cd32de74dc8aa875aaa846b549c584322652"
+  },
+  {
+    "path": "tests/contracts.nix",
+    "before_sha256": "7320c4399bfd213fa0d29e2336dbcef4925e0ed84032bab5196a5a3d3c411b97",
+    "after_sha256": "06139d8515d0766bf929bab150769800dc1ecd00a730205c52d32bcad0c12f4b"
+  },
+  {
+    "path": "tests/roles-r3.nix",
+    "before_sha256": "3e17af1904b844a8350ced16a94ae48bdf4fb7de45981327c158556e3885132c",
+    "after_sha256": "9db0b7c12a670dad028ce3295d43936945186523be69ee9fa66e94f90975abb6"
+  },
+  {
+    "path": "tests/roles-r3.test.py",
+    "before_sha256": "13bd5dda0b55147a5d52fddea88dae0c71687a9a820dce7de5b3cdfae4ee1419",
+    "after_sha256": "f0082854bbcc30065098d4918126f375311cbb7ee178083c2df5264cd05133fd"
+  },
+  {
+    "path": "tests/source-only-roster.json",
+    "before_sha256": "987766ac46e511110ee333a184281474b90cc8280c25d16f329f1204a9123ebd",
+    "after_sha256": "64f68e0e459cb695c518dd66f77c9c16669cc35ee485e0019fd24d160c7eb2d3"
+  }
+]

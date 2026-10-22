@@ -1,0 +1,112 @@
+--- a/flake.nix
++++ b/flake.nix
+@@ -164,16 +164,19 @@
+         registeredInputs;
+ 
+       claimsLib = core.lib.applicationClaims;
+-      claimsForInput = name: input:
++      claimsForInputOnHost = hostName: name: input:
+         if !(input ? applicationClaims) then
+           builtins.throw "composition-nd: ${name} must declare applicationClaims"
+         else
+           let
+             rawClaims =
+-              if name == "browser-ux" && input ? applicationClaimsFor then
++              if name == "browser-ux" && (core.lib.browserRolesR3Selected or false) && input ? applicationClaimsForHost then
++                input.applicationClaimsForHost { inherit hostName; }
++              else if name == "browser-ux" && input ? applicationClaimsFor then
+                 input.applicationClaimsFor (moduleConfiguration.browser-ux.configuration.replacements or { })
+               else input.applicationClaims;
+           in claimsLib.attachOwner name rawClaims;
++      claimsForInput = claimsForInputOnHost "example-primary";
+       coreHostApplicationClaims = hostName:
+         if core ? applicationClaimsFor
+         then core.applicationClaimsFor { inherit hostName system; }
+@@ -381,14 +384,17 @@
+         && lockRefMismatchRejected
+         && noRegisteredInputsAreDarwinConfigurations;
+ 
+-      browserHostSelection = import ./lib/browser-ux-host-selection.nix { lib = pkgs.lib; };
++      browserHostSelection = import ./lib/browser-ux-host-selection.nix {
++        lib = pkgs.lib;
++        rolesR3Selected = core.lib.browserRolesR3Selected or false;
++      };
+ 
+       applicationClaimsForHost = hostName:
+         let
+           coreClaims = coreHostApplicationClaims hostName;
+           registryClaims = builtins.concatMap
+             (entry:
+-              let attached = claimsForInput entry.name inputs.${entry.input};
++              let attached = claimsForInputOnHost hostName entry.name inputs.${entry.input};
+               in builtins.filter (browserHostSelection.claimAppliesToHost hostName) attached
+             )
+             registry;
+@@ -405,6 +411,7 @@
+         }:
+         assert contractValid;
+         assert applicationClaimsGate;
++        assert !(core.lib.browserRolesR3Selected or false) || hostName != "example-primary" || inputs.browser-ux_dinas ? browserRolesR3;
+         core.lib.mkDarwinConfiguration {
+           inherit hostName hostConfig;
+           extraModules = compositionModules
+@@ -549,6 +556,7 @@
+         };
+ 
+         contracts =
++          assert import ./tests/browser-role-r3.nix { lib = pkgs.lib; };
+           assert contractValid;
+           assert builtins.deepSeq moduleConfiguration true;
+           assert compositionProbe.pkgs.compositionCallerSeesCore;
+--- a/lib/browser-ux-host-selection.nix
++++ b/lib/browser-ux-host-selection.nix
+@@ -1,4 +1,4 @@
+-{ lib }:
++{ lib, rolesR3Selected ? false }:
+ let
+   targetHost = "example-primary";
+   replacementsOf = projection: projection.browser-ux.configuration.replacements or { };
+@@ -24,8 +24,10 @@
+       };
+     };
+ 
++  # Inactive R3 preserves legacy installation selection. Active R3 delegates
++  # Vivaldi reference and Floorp installation to Browser UX alone.
+   casksForHost = host: projection:
+-    if host != targetHost then [ ]
++    if rolesR3Selected || host != targetHost then [ ]
+     else (lib.optional (selected host projection "vivaldi") "vivaldi")
+       ++ (lib.optional (selected host projection "floorp") "floorp");
+ 
+@@ -34,7 +36,9 @@
+       && builtins.elem entry.claim.id [ "bundle:com.vivaldi.Vivaldi" "bundle:app.floorp.Floorp" ]
+     then host == targetHost else true;
+ 
++  # Active R3 retains core continuity claims; inactive R3 preserves legacy selection.
+   activeClaimsForHost = host: projection: entries:
++    if rolesR3Selected then entries else
+     let
+       primary = projection.browser-ux.configuration.primaryCutover or null;
+       retired = if host == targetHost && primary != null && primary.enable then primary.retiredBrowsers else [];
+--- /dev/null
++++ b/tests/browser-role-r3.nix
+@@ -0,0 +1,19 @@
++{ lib }:
++let
++  selection = import ../lib/browser-ux-host-selection.nix { inherit lib; rolesR3Selected = true; };
++  inactive = import ../lib/browser-ux-host-selection.nix { inherit lib; };
++  retained.browser-ux.configuration = {
++    replacements = { vivaldi.enable = true; floorp.enable = true; };
++    primaryCutover = { enable = true; activeBrowsers = ["vivaldi" "floorp" "safari"]; retiredBrowsers = ["chrome" "firefox"]; };
++  };
++  core = map (id: { owner = "core"; claim = { inherit id; }; })
++    ["bundle:com.google.Chrome" "bundle:org.mozilla.firefox" "bundle:com.brave.Browser" "bundle:com.kagi.kagimacOS"];
++in
++assert inactive.casksForHost "example-primary" retained == [ "vivaldi" "floorp" ];
++assert inactive.casksForHost "example-workstation" retained == [];
++assert selection.casksForHost "example-primary" retained == [];
++assert selection.casksForHost "example-workstation" retained == [];
++assert selection.activeClaimsForHost "example-primary" retained core == core;
++assert selection.activeClaimsForHost "example-workstation" retained core == core;
++assert !(selection.moduleForHost "example-workstation" retained).browser-ux.configuration ? primaryCutover;
++true

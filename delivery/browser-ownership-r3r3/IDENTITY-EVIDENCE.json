@@ -1,0 +1,35 @@
+{
+  "schema": "browser-gecko-identity-r3r3-v1",
+  "upstreamCommit": "71d7d86f164a2ee8e50ce5a389c9e5cbe0fd6883",
+  "suppliedBuilderBlobs": {
+    "webpack.config.js": "0f37f18649a35b360e68a6bb242af6a8bfbae5ac",
+    "webpack-ff.config.js": "270d4105197117232547511fbbf8aa6ad3a82af2"
+  },
+  "suppliedBuilderSemantics": "webpack assigns browser_specific_settings.gecko.id=vpn@proton.ch; Firefox config sets gecko=true",
+  "onHostBuilderByteVerification": "PENDING_HTTPS_ENVIRONMENT_UNAVAILABLE",
+  "currentAmoGuid": "PENDING_FRESH_HTTPS_READBACK",
+  "currentSignedXpiIdentity": "PENDING_FRESH_HTTPS_AND_BROWSER_SIGNING_READBACK",
+  "priorOct7Evidence": "HISTORICAL_ONLY_NOT_CURRENT_ATTESTATION",
+  "latestXpi": "MOVING_UPDATE_URL_NOT_IDENTITY_PROOF",
+  "readOnlyAttempts": [
+    {
+      "name": "webpack.config.js",
+      "url": "https://raw.githubusercontent.com/ProtonVPN/proton-vpn-browser-extension/71d7d86f164a2ee8e50ce5a389c9e5cbe0fd6883/webpack.config.js",
+      "status": "HTTPS_UNAVAILABLE",
+      "errorType": "URLError"
+    },
+    {
+      "name": "webpack-ff.config.js",
+      "url": "https://raw.githubusercontent.com/ProtonVPN/proton-vpn-browser-extension/71d7d86f164a2ee8e50ce5a389c9e5cbe0fd6883/webpack-ff.config.js",
+      "status": "HTTPS_UNAVAILABLE",
+      "errorType": "URLError"
+    },
+    {
+      "name": "amo.json",
+      "url": "https://addons.mozilla.org/api/v5/addons/addon/proton-vpn-firefox-extension/",
+      "status": "HTTPS_UNAVAILABLE",
+      "errorType": "URLError"
+    }
+  ],
+  "policyAdopted": false
+}

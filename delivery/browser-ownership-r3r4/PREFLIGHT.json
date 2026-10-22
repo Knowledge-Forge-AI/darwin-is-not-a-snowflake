@@ -1,0 +1,56 @@
+[
+  {
+    "check": "r3r3-source-bindings",
+    "records": 91,
+    "drift": [],
+    "digest": "f784382e937897b1a0f4c795b8846aa739a025a5f8e1bd6a6a5104f45ed9404b"
+  },
+  {
+    "check": "browser-ux-preimages",
+    "drift": []
+  },
+  {
+    "check": "composition-preimages",
+    "drift": []
+  },
+  {
+    "check": "r3r3-delivery-checksums",
+    "drift": []
+  },
+  {
+    "check": "attached-historical-closure-receipt",
+    "sha256": "2655e2922efa43e700f953e75d046ad9607c01d0149e9ae36ce3d7a6e36ffd09",
+    "status": "CANDIDATE_SOURCE_CLOSURE_REVIEWABLE",
+    "provenance": {
+      "baseHead": "79021c01e63464020f2e1b447a6f4ec488699ae4",
+      "candidateClosurePaths": 107,
+      "deliveryRecords": 51,
+      "sourceCandidateDigest": "f784382e937897b1a0f4c795b8846aa739a025a5f8e1bd6a6a5104f45ed9404b",
+      "sourcePaths": 91
+    },
+    "historicalOnly": true,
+    "receiptRewritten": false
+  },
+  {
+    "check": "revise-close-entry-source-and-delivery-bindings",
+    "records": 117,
+    "drift": [],
+    "digest": "700aea8add168098ddb4106e8f0590f7a51578673ff0b4b2729ef3a7b802512e",
+    "suppliedProducerTree": "10410359a8cf1d93770c8969027eda5398697051",
+    "treeIdentityRecomputed": false
+  },
+  {
+    "check": "revise-close-entry-owner-preimages",
+    "browser-ux": [],
+    "composition": []
+  },
+  {
+    "check": "revise-close-historical-R3R3-reconstruction-and-delivery",
+    "records": 91,
+    "deliveryRecords": 51,
+    "sourceDigest": "f784382e937897b1a0f4c795b8846aa739a025a5f8e1bd6a6a5104f45ed9404b",
+    "deliveryManifestSha256": "a589e01f749532be81f399f703ca044dac52fe2dff15cbae86eb4e2e3d7a3b0a",
+    "status": "PASS",
+    "historicalOnly": true
+  }
+]

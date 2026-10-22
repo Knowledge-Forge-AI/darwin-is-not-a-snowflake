@@ -1,0 +1,75 @@
+#!/usr/bin/env zunit
+# nix-darwin-test-source-target: libexec/git-gui/git-gui
+# nix-darwin-test-source-target: libexec/nix-unit-tests/run
+
+@setup {
+  test_tmp_root="$(mktemp -d)"
+  fake_bin="$test_tmp_root/bin"
+  fake_repo="$test_tmp_root/repo"
+  fake_out="$test_tmp_root/out"
+  command_log="$test_tmp_root/commands.log"
+  repo_dir="$(cd "$testdir/../../../.." && pwd)"
+  git_gui_script="$repo_dir/libexec/git-gui/git-gui"
+  nix_unit_runner="$repo_dir/libexec/nix-unit-tests/run"
+  base_path="/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
+  mkdir -p "$fake_bin" "$fake_repo/src/test/unit/nix" "$fake_repo/src/test/int/nix"
+  : > "$command_log"
+
+  write_fake_command() {
+    local command_path="$1"
+    local command_body="$2"
+    {
+      print -r -- '#!/usr/bin/env zsh'
+      print -r -- 'set -e'
+      print -r -- "$command_body"
+    } > "$command_path"
+    chmod +x "$command_path"
+  }
+}
+
+@teardown {
+  rm -rf "$test_tmp_root"
+}
+
+@test 'git-gui wrapper dispatches to the packaged git gui binary' {
+  packaged_git_gui="$fake_bin/packaged-git-gui"
+  sed "s|@GIT_GUI@|$packaged_git_gui|g" "$git_gui_script" > "$fake_bin/git-gui"
+  chmod +x "$fake_bin/git-gui"
+  write_fake_command "$packaged_git_gui" 'print -r -- "$*" >> "$COMMAND_LOG"'
+
+  COMMAND_LOG="$command_log" PATH="$fake_bin:$base_path" "$fake_bin/git-gui" --classic --blame
+
+  assert "$(cat "$command_log")" same_as "--classic --blame"
+}
+
+@test 'nix-unit check runner executes unit and integration nix tests' {
+  fake_nix_unit="$fake_bin/nix-unit"
+  rendered_runner="$fake_bin/nix-unit-runner"
+  write_fake_command "$fake_nix_unit" '
+    print -r -- "$*" >> "$COMMAND_LOG"
+    print -r -- "NIX_CONF_DIR=${NIX_CONF_DIR:-}" >> "$COMMAND_LOG"
+    print -r -- "NIX_CONFIG=${NIX_CONFIG:-}" >> "$COMMAND_LOG"
+  '
+  sed "s|@NIX_UNIT@|$fake_nix_unit|g" "$nix_unit_runner" > "$rendered_runner"
+  chmod +x "$rendered_runner"
+  touch "$fake_repo/src/test/unit/nix/a.unit.test.nix"
+  touch "$fake_repo/src/test/unit/nix/b.unit.test.nix"
+  touch "$fake_repo/src/test/int/nix/a.int.test.nix"
+  touch "$fake_repo/src/test/int/nix/b.int.test.nix"
+
+  TMPDIR="$test_tmp_root/tmp" \
+    COMMAND_LOG="$command_log" \
+    PATH="$fake_bin:$base_path" \
+    "$rendered_runner" "$fake_repo" aarch64-darwin "$fake_out"
+
+  assert "$fake_out" is_file
+  assert "$(cat "$command_log")" contains "--gc-roots-dir $test_tmp_root/tmp/nix-darwin-nix-unit."
+  assert "$(cat "$command_log")" contains "/gc-roots --arg repoRoot $fake_repo"
+  assert "$(cat "$command_log")" contains "NIX_CONF_DIR=$test_tmp_root/tmp/nix-darwin-nix-unit."
+  assert "$(cat "$command_log")" contains "/conf"
+  assert "$(cat "$command_log")" contains "NIX_CONFIG=experimental-features = nix-command flakes"
+  assert "$(cat "$command_log")" contains "--arg repoRoot $fake_repo --argstr system aarch64-darwin $fake_repo/src/test/unit/nix/a.unit.test.nix"
+  assert "$(cat "$command_log")" contains "--arg repoRoot $fake_repo --argstr system aarch64-darwin $fake_repo/src/test/unit/nix/b.unit.test.nix"
+  assert "$(cat "$command_log")" contains "--arg repoRoot $fake_repo --argstr system aarch64-darwin $fake_repo/src/test/int/nix/a.int.test.nix"
+  assert "$(cat "$command_log")" contains "--arg repoRoot $fake_repo --argstr system aarch64-darwin $fake_repo/src/test/int/nix/b.int.test.nix"
+}

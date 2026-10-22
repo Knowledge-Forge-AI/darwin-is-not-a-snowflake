@@ -1,0 +1,22 @@
+name	validator	max_bytes	required	default	description
+PATH	path_list	8192	false	/usr/bin:/bin	Executable search path for generated project env files
+JAVA_HOME	path	1024	false		JDK root for Java and Spring projects
+SPRING_PROFILES_ACTIVE	token_list	512	false		Spring profile list
+SPRING_APPLICATION_JSON	raw_safe	8192	false		Spring JSON environment override
+POSTGRES_HOST	host	255	false	localhost	Postgres hostname
+POSTGRES_PORT	port	5	false	5432	Postgres TCP port
+POSTGRES_DB	token	128	false		Postgres database name
+POSTGRES_USER	token	128	false		Postgres user name
+REDIS_HOST	host	255	false	localhost	Redis hostname
+REDIS_PORT	port	5	false	6379	Redis TCP port
+REDIS_URL	uri	1024	false	redis://localhost:6379	Redis connection URI
+NODE_ENV	token	64	false	development	Node runtime mode
+VITE_API_URL	uri_or_path	1024	false		Vite API endpoint
+REACT_APP_API_URL	uri_or_path	1024	false		React API endpoint
+ANGULAR_ENV	token	64	false	development	Angular environment selector
+NESTJS_ENV	token	64	false	development	NestJS environment selector
+FASTAPI_ENV	token	64	false	development	FastAPI environment selector
+HANAMI_ENV	token	64	false	development	Hanami environment selector
+NIX_CONFIG	raw_safe	4096	false		Nix config overrides
+NIX_PATH	path_list	4096	false		Nix search path
+NIXPKGS_ALLOW_UNFREE	bool	8	false	1	Nixpkgs unfree opt-in

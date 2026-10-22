@@ -1,0 +1,8 @@
+{
+  "schema": "dinas-paths-v1",
+  "workspace_root": "$HOME/.local/nix-darwin",
+  "nbin_root": "$HOME/.local/nbin",
+  "nbin_dev_root": "$HOME/.local/nbin_dev",
+  "ai_index_root": "$HOME/ai",
+  "dinas_root": "$HOME/.local/nix-darwin/darwin-is-not-a-snowflake"
+}

@@ -1,0 +1,40 @@
+{
+  "schema": "kitty-stock-style-provenance-v2",
+  "purpose": "Public source lineage and style boundary; exact candidate identities and qualification results belong to the delivery evidence.",
+  "source_inputs": {
+    "style_program": {
+      "sha256": "dd0d941622ee14143087916d50215449854f1c87815200ecbff6128736d90a3b",
+      "basis": "Captured canonical style program; reviewed as source, without inherited acceptance."
+    },
+    "style_sample": {
+      "sha256": "0d9101ad2264a1af35d1c85aadec3162006a79a9f3409d5d3158faeb9e757596",
+      "basis": "Captured public sample; only explanatory prompt-fidelity comments were revised."
+    }
+  },
+  "maintained_sources": {
+    "cli": "tools/kitty-stock-style.py",
+    "sample": "config/kitty/stock-bash-style.toml",
+    "projection_default": "config/nix-darwin/default/kitty-bash.toml",
+    "typed_consumer": "lib/kitty-stock-style.nix",
+    "module": "modules/kitty.nix",
+    "projection": "libexec/nix_darwin_local/projection.py",
+    "documentation": "docs/kitty-stock-bash.md"
+  },
+  "reviewed_corrections": [
+    "Sort ANSI keys numerically by key string.",
+    "Use the installed fallback consistently for startup and manual commands.",
+    "Require schema 1 and palette, terminal and completion tables in every present style file; allow partial values and optional ANSI and faces.",
+    "Validate closed data grammars before emitting fixed shell assignments and face calls; restrict numeric colors to ASCII digits.",
+    "Preserve filesystem refusal for local overrides and output paths; permit hardlinked trusted read-only defaults for Nix optimisation.",
+    "Keep rendering explicit and preserve metadata for byte-identical managed output.",
+    "Invoke the data script through isolated Python; retain mode 100644."
+  ],
+  "privacy_boundary": "The public sample contains illustrative values. Machine-specific style values remain in the separately managed local control projection and its installed data; they are not source inputs to public core.",
+  "verification_sources": [
+    "src/test/unit/python/kitty_stock_style.unit.test.py",
+    "src/test/unit/python/nix_darwin_local_projection.unit.test.py",
+    "src/test/unit/nix/kitty-stock-style.unit.test.nix",
+    "src/test/unit/nix/flake.unit.test.nix",
+    "tests/test_kitty_stock_shell.py"
+  ]
+}

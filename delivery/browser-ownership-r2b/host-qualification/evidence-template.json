@@ -1,0 +1,356 @@
+{
+  "schema": "browser-host-qualification-evidence-v1",
+  "contract_schema": "core-browser-ownership-v1",
+  "contract_sha256": "668722817bf07900420bf529e2f61260f8e44e9c3527c53bb20d981cb8165bf7",
+  "evidence_class": "pending",
+  "overall_status": "pending",
+  "qualification_target": "attended-host-check-readback",
+  "operator_approval_gates": {
+    "chrome_extension_policy_transition": {
+      "changed": true,
+      "approved": false,
+      "description": "Separate approval for a qualified extension/storage-preserving policy and NMH transition; deletion remains forbidden",
+      "operator": "pending",
+      "timestamp": "pending"
+    },
+    "chrome_metrics_ui": {
+      "changed": true,
+      "approved": false,
+      "description": "Operator approval to disable metrics reporting in Chrome UI",
+      "operator": "pending",
+      "timestamp": "pending"
+    },
+    "chrome_ad_privacy_ui": {
+      "changed": true,
+      "approved": false,
+      "description": "Operator approval to disable Privacy Sandbox ad settings in Chrome UI if present",
+      "operator": "pending",
+      "timestamp": "pending"
+    },
+    "chrome_ubol_site_permissions": {
+      "changed": true,
+      "approved": false,
+      "description": "Operator approval for uBlock Origin Lite optimal filtering and broad site permissions",
+      "operator": "pending",
+      "timestamp": "pending"
+    },
+    "safari_search_engine": {
+      "changed": true,
+      "approved": false,
+      "description": "Operator approval for Safari normal and private search engine selection to DuckDuckGo",
+      "operator": "pending",
+      "timestamp": "pending"
+    },
+    "safari_privacy_protections": {
+      "changed": true,
+      "approved": false,
+      "description": "Operator approval for Safari tracking, hide IP, and fraudulent warning protections",
+      "operator": "pending",
+      "timestamp": "pending"
+    },
+    "safari_wipr_extensions": {
+      "changed": true,
+      "approved": false,
+      "description": "Operator approval to enable Wipr 2 content blocker extensions in Safari UI",
+      "operator": "pending",
+      "timestamp": "pending"
+    }
+  },
+  "before_capture": {
+    "capture_phase": "before",
+    "read_only": true,
+    "method": "attended-operator-inspection",
+    "status": "pending",
+    "timestamp": "pending",
+    "notes": "Read-only baseline capture taken prior to any attended settings changes",
+    "safari": {
+      "search_engine": "pending",
+      "protections": {
+        "prevent_cross_site_tracking": false,
+        "hide_ip_address": "pending",
+        "fraudulent_website_warning": false
+      },
+      "wipr": {
+        "enabled": false,
+        "extensions": {
+          "Blocklist 1": {
+            "enabled": false
+          },
+          "Blocklist 2": {
+            "enabled": false
+          },
+          "Blocklist 3": {
+            "enabled": false
+          },
+          "Blocklist 4": {
+            "enabled": false
+          },
+          "Wipr Extra": {
+            "enabled": false,
+            "site_permission_granted": false
+          }
+        }
+      },
+      "bundle_id": "com.apple.Safari",
+      "private_search_engine": "pending"
+    },
+    "chrome": {
+      "policies_readback_status": "pending",
+      "installed_extensions_readback_status": "pending",
+      "method": "pending",
+      "forced_extension_ids": [],
+      "installed_extension_ids": [],
+      "legacy_keepassxc_root_present": null,
+      "ui_settings": {
+        "metrics": {
+          "ui_disabled": null,
+          "readback_verified": false
+        },
+        "ad_privacy": {
+          "available": null,
+          "ui_disabled": null,
+          "readback_verified": false
+        },
+        "ubol": {
+          "installed": null,
+          "site_permission_granted": null,
+          "filtering_mode": "pending",
+          "rulesets": "pending",
+          "readback_verified": false
+        }
+      }
+    }
+  },
+  "after_capture": {
+    "capture_phase": "after",
+    "read_only": true,
+    "method": "attended-operator-inspection",
+    "status": "pending",
+    "timestamp": "pending",
+    "chrome": {
+      "bundle_id": "pending",
+      "installed_version": "pending",
+      "policies": {
+        "readback_status": "pending",
+        "UrlKeyedAnonymizedDataCollectionEnabled": false,
+        "SearchSuggestEnabled": false,
+        "NetworkPredictionOptions": 0,
+        "SafeBrowsingProtectionLevel": 0,
+        "HttpsOnlyMode": "pending",
+        "ExtensionSettings": {
+          "*": {
+            "installation_mode": "pending"
+          },
+          "ddkjiahejlhfcafbddmgiahcphecmpfh": {
+            "installation_mode": "pending",
+            "update_url": "pending"
+          }
+        },
+        "policy_statuses": {
+          "UrlKeyedAnonymizedDataCollectionEnabled": {
+            "status": "pending",
+            "source": "pending",
+            "scope": "pending",
+            "level": "pending",
+            "conflicts": [
+              "pending"
+            ],
+            "readable": false,
+            "method": "pending"
+          },
+          "SearchSuggestEnabled": {
+            "status": "pending",
+            "source": "pending",
+            "scope": "pending",
+            "level": "pending",
+            "conflicts": [
+              "pending"
+            ],
+            "readable": false,
+            "method": "pending"
+          },
+          "NetworkPredictionOptions": {
+            "status": "pending",
+            "source": "pending",
+            "scope": "pending",
+            "level": "pending",
+            "conflicts": [
+              "pending"
+            ],
+            "readable": false,
+            "method": "pending"
+          },
+          "SafeBrowsingProtectionLevel": {
+            "status": "pending",
+            "source": "pending",
+            "scope": "pending",
+            "level": "pending",
+            "conflicts": [
+              "pending"
+            ],
+            "readable": false,
+            "method": "pending"
+          },
+          "HttpsOnlyMode": {
+            "status": "pending",
+            "source": "pending",
+            "scope": "pending",
+            "level": "pending",
+            "conflicts": [
+              "pending"
+            ],
+            "readable": false,
+            "method": "pending"
+          },
+          "ExtensionSettings": {
+            "status": "pending",
+            "source": "pending",
+            "scope": "pending",
+            "level": "pending",
+            "conflicts": [
+              "pending"
+            ],
+            "readable": false,
+            "method": "pending"
+          }
+        }
+      },
+      "ubol": {
+        "extension_id": "pending",
+        "extension_name": "pending",
+        "installed": false,
+        "enabled": false,
+        "filtering_mode": "pending",
+        "site_permission_granted": false,
+        "rulesets": "pending",
+        "filtering_readback_verified": false
+      },
+      "metrics": {
+        "ui_disabled": false,
+        "readback_verified": false,
+        "reason_acknowledged": false
+      },
+      "ad_privacy": {
+        "ui_disabled": false,
+        "readback_verified": false,
+        "reason_acknowledged": false,
+        "available": null
+      },
+      "extension_transition": {
+        "installed_extension_ids": [],
+        "extension_storage_preserved": false,
+        "retained_keepassxc_browser_functional": false
+      }
+    },
+    "framework_chromium_clean_baseline": {
+      "binary_identity_verified": false,
+      "disposable_context_isolated": false,
+      "cdp_verified": false,
+      "playwright_verified": false,
+      "chrome_devtools_mcp": {
+        "codex": false,
+        "claude": false,
+        "antigravity": false
+      },
+      "representative_suite_smoke": false,
+      "managed_policies_absent": false,
+      "forced_extensions_absent": false
+    },
+    "normal_chrome_lane": {
+      "bundle_id": "pending",
+      "binary_identity_verified": false,
+      "device_policy_inherited": false,
+      "disposable_context_isolated": false,
+      "permitted_loopback_navigation": false,
+      "new_tab_inspect_evaluate": false,
+      "cdp_websocket_download": false,
+      "devtools_availability": false,
+      "cdp_verified": false,
+      "playwright_verified": false,
+      "chrome_devtools_mcp": {
+        "codex": false,
+        "claude": "not-configured",
+        "antigravity": false
+      },
+      "representative_suite_smoke": false,
+      "forced_extension_present_in_disposable_profiles": false,
+      "playwright_mcp": {
+        "codex": false,
+        "claude": "not-configured",
+        "antigravity": false
+      }
+    },
+    "safari": {
+      "bundle_id": "pending",
+      "search_engine": "pending",
+      "private_search_engine": "pending",
+      "private_search_availability_documented": false,
+      "direct_navigation_ddg_verified": false,
+      "protections": {
+        "prevent_cross_site_tracking": false,
+        "hide_ip_address": "pending",
+        "fraudulent_website_warning": false,
+        "preserve_other_enabled_protections": false,
+        "all_three_protections_verified": false
+      },
+      "wipr": {
+        "bundle_id": "pending",
+        "app_store_id": "pending",
+        "app_metadata_identity_verified": false,
+        "extensions": {
+          "Blocklist 1": {
+            "enabled": false,
+            "status": "pending"
+          },
+          "Blocklist 2": {
+            "enabled": false,
+            "status": "pending"
+          },
+          "Blocklist 3": {
+            "enabled": false,
+            "status": "pending"
+          },
+          "Blocklist 4": {
+            "enabled": false,
+            "status": "pending"
+          },
+          "Wipr Extra": {
+            "enabled": false,
+            "status": "pending",
+            "site_permission_granted": false
+          }
+        }
+      },
+      "personal_data_and_bookmarks_preserved": false
+    },
+    "stock": {
+      "brave": {
+        "bundle_id": "pending",
+        "package": "pending",
+        "managed_policies_absent": false,
+        "single_brave_identity_verified": false,
+        "brave_youtube_profile_preserved": false,
+        "startup_verified": false,
+        "brave_youtube_bundle_id": "pending",
+        "brave_youtube_startup_verified": false
+      },
+      "librewolf": {
+        "bundle_id": "pending",
+        "package": "pending",
+        "managed_policies_absent": false,
+        "startup_verified": false,
+        "cask_readback_status": "pending"
+      }
+    },
+    "preserved_targets": {
+      "Firefox": false,
+      "Vivaldi": false,
+      "Floorp": false,
+      "Brave YouTube": false,
+      "Apple Keychain": false,
+      "Safari personal data": false,
+      "existing browser profiles": false,
+      "unrelated source pins": false
+    }
+  }
+}

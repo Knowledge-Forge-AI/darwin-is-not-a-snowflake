@@ -1,0 +1,7 @@
+nvm_homebrew_completion="${NVM_HOMEBREW_COMPLETION:-/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm}"
+
+if [ -s "$nvm_homebrew_completion" ]; then
+  . "$nvm_homebrew_completion"
+elif [ -n "$NVM_DIR" ] && [ -s "$NVM_DIR/bash_completion" ]; then
+  . "$NVM_DIR/bash_completion"
+fi

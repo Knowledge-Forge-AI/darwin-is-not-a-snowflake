@@ -1,0 +1,3 @@
+_nix_darwin_env_snapshot_install_prompt_hook 2>/dev/null || true
+echo
+ff

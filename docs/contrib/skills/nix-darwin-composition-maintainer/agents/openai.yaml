@@ -1,0 +1,4 @@
+interface:
+  display_name: "Nix-Darwin Composition Maintainer"
+  short_description: "Maintain nix-darwin core, composition seams, and owner migrations"
+  default_prompt: "Use $nix-darwin-composition-maintainer to determine the owning repository and plan a change against the composition contract."

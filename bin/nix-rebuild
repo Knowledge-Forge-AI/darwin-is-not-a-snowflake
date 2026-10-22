@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+
+usage() {
+  cat <<'USAGE'
+Usage: nix-rebuild PLAN
+
+Compatibility entrypoint for applying one immutable, manually reviewed
+nix-update deployment plan. It never updates flake inputs.
+USAGE
+}
+
+case "${1:-}" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+  "")
+    usage >&2
+    exit 2
+    ;;
+  *)
+    ;;
+esac
+
+if [[ "$1" == -* || "$#" -ne 1 ]]; then
+  usage >&2
+  exit 2
+fi
+
+exec "$script_dir/nix-update" advanced apply "$1"

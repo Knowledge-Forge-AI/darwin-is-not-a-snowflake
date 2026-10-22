@@ -1,0 +1,8 @@
+# Default empty nix-darwin Kitty Bash style configuration
+schema = 1
+
+[palette]
+
+[terminal]
+
+[completion]

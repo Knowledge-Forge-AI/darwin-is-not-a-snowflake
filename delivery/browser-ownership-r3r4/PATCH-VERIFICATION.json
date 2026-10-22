@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "records": [
+    {
+      "owner": "browser-ux",
+      "status": "PASS",
+      "patchSha256": "32347d8cd54e70f7c803aa3ab4ada0edaf0d90098831ad0190a0856164b9c7b9",
+      "postimagePaths": 16
+    },
+    {
+      "owner": "composition",
+      "status": "PASS",
+      "patchSha256": "ee4007cbb4badb00f657e5fc752196f6732452eea2ddd6823a2dcce196021198",
+      "postimagePaths": 3
+    }
+  ],
+  "liveOwnersModified": false,
+  "indexModified": false
+}

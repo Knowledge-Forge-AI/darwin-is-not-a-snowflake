@@ -1,0 +1,180 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly DEFAULT_KEEP=16
+readonly MAX_KEEP=10000
+readonly EXIT_USAGE=64
+readonly EXIT_UNSAFE=65
+
+system_profile="${NIX_DARWIN_SYSTEM_PROFILE:-/nix/var/nix/profiles/system}"
+
+usage() {
+  cat <<USAGE
+Usage: nix-opt [--dry-run] [--keep N]
+
+Prune old Nix system generations, collect unreferenced store paths, and
+optimize the Nix store.
+
+The newest ${DEFAULT_KEEP} system generations are retained by default so the host keeps a
+rollback window. The active generation is always retained, even when a rollback
+has placed it outside the newest ${DEFAULT_KEEP}. Only older system generations outside
+that retained set are deleted.
+
+Options:
+  --dry-run   Report the retain and delete sets and exit without mutating
+              anything: no generation deletion, no garbage collection, and no
+              store optimization.
+  --keep N    Retain the newest N system generations instead of ${DEFAULT_KEEP}.
+              N must be an integer between 1 and ${MAX_KEEP}.
+  -h, --help  Show this help and exit.
+USAGE
+}
+
+usage_error() {
+  printf 'nix-opt: %s\n' "$*" >&2
+  usage >&2
+  exit "$EXIT_USAGE"
+}
+
+unsafe_state() {
+  printf 'nix-opt: %s\n' "$*" >&2
+  printf 'nix-opt: refusing to delete generations from an unverified profile.\n' >&2
+  exit "$EXIT_UNSAFE"
+}
+
+keep="$DEFAULT_KEEP"
+dry_run=0
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    --dry-run)
+      dry_run=1
+      shift
+      ;;
+    --keep)
+      [[ $# -ge 2 ]] || usage_error "--keep requires a value"
+      keep="$2"
+      shift 2
+      ;;
+    --keep=*)
+      keep="${1#--keep=}"
+      shift
+      ;;
+    *)
+      usage_error "unknown argument: $1"
+      ;;
+  esac
+done
+
+[[ "$keep" =~ ^(0|[1-9][0-9]*)$ ]] || usage_error "--keep must be a positive integer: $keep"
+[[ "$keep" -ge 1 ]] || usage_error "--keep must be at least 1"
+[[ "$keep" -le "$MAX_KEEP" ]] || usage_error "--keep must not exceed $MAX_KEEP"
+
+profile_dir="$(dirname "$system_profile")"
+profile_name="$(basename "$system_profile")"
+
+[[ -d "$profile_dir" ]] || unsafe_state "profile directory not found: $profile_dir"
+[[ -L "$system_profile" ]] || unsafe_state "system profile is not a symlink: $system_profile"
+
+# A generation link is named "<profile>-<number>-link"; the number is the
+# generation identity nix-env --delete-generations accepts.
+generation_id() {
+  local base="$1" middle
+  middle="${base#"$profile_name"-}"
+  middle="${middle%-link}"
+  [[ "$middle" =~ ^(0|[1-9][0-9]*)$ ]] || return 1
+  printf '%s' "$middle"
+}
+
+current_target="$(basename "$(readlink "$system_profile")")"
+current="$(generation_id "$current_target")" \
+  || unsafe_state "cannot identify the current generation from: $current_target"
+
+generations=()
+for link in "$profile_dir/$profile_name"-*-link; do
+  [[ -e "$link" ]] || continue
+  base="$(basename "$link")"
+  id="$(generation_id "$base")" \
+    || unsafe_state "malformed generation link: $base"
+  generations+=("$id")
+done
+
+[[ ${#generations[@]} -gt 0 ]] || unsafe_state "no generation links found in $profile_dir"
+
+sorted=()
+while IFS= read -r id; do
+  sorted+=("$id")
+done < <(printf '%s\n' "${generations[@]}" | sort -rn)
+
+current_present=0
+for id in "${sorted[@]}"; do
+  if [[ "$id" == "$current" ]]; then
+    current_present=1
+  fi
+done
+[[ "$current_present" -eq 1 ]] || unsafe_state "current generation $current has no generation link"
+
+retained=()
+for ((i = 0; i < ${#sorted[@]} && i < keep; i++)); do
+  retained+=("${sorted[i]}")
+done
+
+current_needed_protection=0
+current_in_window=0
+for id in "${retained[@]}"; do
+  if [[ "$id" == "$current" ]]; then
+    current_in_window=1
+  fi
+done
+if [[ "$current_in_window" -eq 0 ]]; then
+  retained+=("$current")
+  current_needed_protection=1
+fi
+
+doomed=()
+for id in "${sorted[@]}"; do
+  keep_this=0
+  for retained_id in "${retained[@]}"; do
+    if [[ "$id" == "$retained_id" ]]; then
+      keep_this=1
+    fi
+  done
+  if [[ "$keep_this" -eq 0 ]]; then
+    doomed+=("$id")
+  fi
+done
+
+join() { printf '%s' "$*"; }
+
+printf 'nix-opt: system profile: %s\n' "$system_profile"
+printf 'nix-opt: current generation: %s\n' "$current"
+printf 'nix-opt: retain count: %s\n' "$keep"
+printf 'nix-opt: discovered generations: %s\n' "$(join "${sorted[@]}")"
+printf 'nix-opt: retained generations: %s\n' "$(join "${retained[@]}")"
+if [[ ${#doomed[@]} -gt 0 ]]; then
+  printf 'nix-opt: generations to delete: %s\n' "$(join "${doomed[@]}")"
+else
+  printf 'nix-opt: generations to delete: none\n'
+fi
+if [[ "$current_needed_protection" -eq 1 ]]; then
+  printf 'nix-opt: current generation protected outside the newest %s\n' "$keep"
+else
+  printf 'nix-opt: current generation is inside the newest %s\n' "$keep"
+fi
+
+if [[ "$dry_run" -eq 1 ]]; then
+  printf 'nix-opt: dry run; no generations deleted, no garbage collected, no store optimized.\n'
+  exit 0
+fi
+
+if [[ ${#doomed[@]} -gt 0 ]]; then
+  sudo nix-env --profile "$system_profile" --delete-generations "${doomed[@]}"
+fi
+
+nix-collect-garbage
+sudo nix-collect-garbage
+nix-store --optimise

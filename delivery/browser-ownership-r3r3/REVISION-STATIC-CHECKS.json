@@ -1,0 +1,119 @@
+{
+  "records": [
+    {
+      "path": "config/browser/proton-vpn-r3r3.nix",
+      "status": "PASS",
+      "kind": ".nix"
+    },
+    {
+      "path": "delivery/browser-ownership-r3r3/identity-readback.py",
+      "status": "PASS",
+      "kind": ".py"
+    },
+    {
+      "path": "delivery/browser-ownership-r3r3/native-readback.py",
+      "status": "PASS",
+      "kind": ".py"
+    },
+    {
+      "path": "delivery/browser-ownership-r3r3/prepare-readback.py",
+      "status": "PASS",
+      "kind": ".py"
+    },
+    {
+      "path": "delivery/browser-ownership-r3r3/readback.nix",
+      "status": "PASS",
+      "kind": ".nix"
+    },
+    {
+      "path": "delivery/browser-ownership-r3r3/source-fixture.nix",
+      "status": "PASS",
+      "kind": ".nix"
+    },
+    {
+      "path": "delivery/browser-ownership-r3r3/verify-source.py",
+      "status": "PASS",
+      "kind": ".py"
+    },
+    {
+      "path": "lib/browser-extension-ownership.nix",
+      "status": "PASS",
+      "kind": ".nix"
+    },
+    {
+      "path": "libexec/browser-extension-delivery/readback.py",
+      "status": "PASS",
+      "kind": ".py"
+    },
+    {
+      "path": "modules/browsers.nix",
+      "status": "PASS",
+      "kind": ".nix"
+    },
+    {
+      "path": "src/test/unit/nix/core-browser-ownership.unit.test.nix",
+      "status": "PASS",
+      "kind": ".nix"
+    },
+    {
+      "path": "src/test/unit/python/browser_proton_vpn_r3r3.unit.test.py",
+      "status": "PASS",
+      "kind": ".py"
+    },
+    {
+      "path": "patched-owner/flake.nix",
+      "kind": ".nix",
+      "status": "PASS"
+    },
+    {
+      "path": "patched-owner/tests/dormant-contracts.nix",
+      "kind": ".nix",
+      "status": "PASS"
+    },
+    {
+      "path": "patched-owner/tests/roles-r3.nix",
+      "kind": ".nix",
+      "status": "PASS"
+    },
+    {
+      "path": "patched-owner/tests/contracts.nix",
+      "kind": ".nix",
+      "status": "PASS"
+    },
+    {
+      "path": "patched-owner/tests/composition-delivery-contracts.nix",
+      "kind": ".nix",
+      "status": "PASS"
+    },
+    {
+      "path": "patched-owner/lib/application-claims.nix",
+      "kind": ".nix",
+      "status": "PASS"
+    },
+    {
+      "path": "patched-owner/modules/roles-r3.nix",
+      "kind": ".nix",
+      "status": "PASS"
+    },
+    {
+      "path": "patched-owner/modules/default.nix",
+      "kind": ".nix",
+      "status": "PASS"
+    },
+    {
+      "path": "patched-owner/config/browser/extension-contributions-r3r3.nix",
+      "kind": ".nix",
+      "status": "PASS"
+    },
+    {
+      "path": "patched-owner/config/browser/roles-r3.nix",
+      "kind": ".nix",
+      "status": "PASS"
+    }
+  ],
+  "jsonFiles": "PARSED",
+  "privateOperatorHomeLiteral": "ABSENT_FROM_DELIVERY_ARTIFACTS",
+  "gitDiffCheck": "PASS",
+  "nixBuildPerformed": false,
+  "profileAccess": false
+}

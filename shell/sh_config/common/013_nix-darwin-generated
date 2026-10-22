@@ -1,0 +1,24 @@
+# Resolve the published generation once so an atomic pointer swap cannot mix it.
+_nd_shell_current="$NIX_DARWIN_LOCAL/generated/shell/current"
+_nd_shell_generation=""
+if [ -d "$_nd_shell_current" ]; then
+  _nd_shell_generation="$(cd "$_nd_shell_current" 2>/dev/null && pwd -P)" || _nd_shell_generation=""
+fi
+
+_nd_source_shell_fragments() {
+  if [ -n "${ZSH_VERSION:-}" ]; then
+    setopt localoptions nonomatch
+  fi
+
+  for _nd_shell_fragment in "$_nd_shell_generation"/*.sh; do
+    [ -f "$_nd_shell_fragment" ] || continue
+    . "$_nd_shell_fragment"
+  done
+}
+
+if [ -n "$_nd_shell_generation" ]; then
+  _nd_source_shell_fragments
+fi
+
+unset -f _nd_source_shell_fragments
+unset _nd_shell_current _nd_shell_generation _nd_shell_fragment

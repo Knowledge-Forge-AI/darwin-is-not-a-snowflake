@@ -1,0 +1,127 @@
+{
+  "status": "PASS",
+  "connectedSource": {
+    "active": {
+      "claimsValid": true,
+      "cleanupNone": true,
+      "cleanupReferenceRejected": true,
+      "disableReferenceRejected": true,
+      "disableReferenceWithoutMailRejected": true,
+      "extensionsPreserved": true,
+      "floorpActivationPreserved": true,
+      "floorpPolicySelectionPreserved": true,
+      "floorpPreferred": true,
+      "guardsBeforeEffects": true,
+      "nativeMessagingPreserved": true,
+      "noCompositionSecondWriter": true,
+      "noProfileWriter": true,
+      "noSemanticCollisions": true,
+      "officePreserved": true,
+      "oneVivaldiCask": true,
+      "oneVivaldiClaim": true,
+      "onlyDeploymentAssertionFails": true,
+      "otherUxRolesUnchanged": true,
+      "policyBytesPreserved": true,
+      "predecessorUnaffectedByActive": true,
+      "productivityUnchanged": true,
+      "referenceRetained": true,
+      "renderingNotRetracted": true,
+      "renderingPreserved": true,
+      "replacementWriterPreserved": true,
+      "retireReferenceRejected": true,
+      "sevenPrimaryRoles": true
+    },
+    "predecessor": {
+      "activation": true,
+      "casks": true,
+      "claims": true,
+      "noGlobalFreeze": true,
+      "officeCasks": true,
+      "packages": true,
+      "policyAndStorageOutputs": true,
+      "rendering": true
+    },
+    "target": {
+      "activation": true,
+      "casks": true,
+      "claims": true,
+      "noGlobalFreeze": true,
+      "officeCasks": true,
+      "packages": true,
+      "policyAndStorageOutputs": true,
+      "rendering": true
+    }
+  },
+  "coreOwnershipTests": "PASS",
+  "ownerAndCompositionNixContracts": "PASS",
+  "ownerPythonHoldAndRolloutTests": "PASS",
+  "nixParses": [
+    "browser-ux:config/browser/extension-contributions-r3r3.nix",
+    "browser-ux:config/browser/roles-r3.nix",
+    "browser-ux:flake.nix",
+    "browser-ux:lib/application-claims.nix",
+    "browser-ux:modules/default.nix",
+    "browser-ux:modules/roles-r3.nix",
+    "browser-ux:tests/composition-delivery-contracts.nix",
+    "browser-ux:tests/contracts.nix",
+    "browser-ux:tests/dormant-contracts.nix",
+    "browser-ux:tests/roles-r3.nix",
+    "composition:flake.nix",
+    "composition:lib/browser-ux-host-selection.nix",
+    "composition:tests/browser-role-r3.nix"
+  ],
+  "pythonSyntax": "PASS",
+  "preEffectGuards": [
+    {
+      "script": "activation",
+      "exitCode": 78
+    },
+    {
+      "script": "aggregate",
+      "exitCode": 78
+    },
+    {
+      "script": "automation",
+      "exitCode": 78
+    },
+    {
+      "script": "chrome",
+      "exitCode": 78
+    },
+    {
+      "script": "firefox",
+      "exitCode": 78
+    },
+    {
+      "script": "floorp",
+      "exitCode": 78
+    },
+    {
+      "script": "vivaldi",
+      "exitCode": 78
+    }
+  ],
+  "nativeGraphQualified": false,
+  "nativeStatus": "ENVIRONMENT_DENIED",
+  "ordinaryUserKitPreparation": "PASS",
+  "verificationScope": "focused changed-source contracts; no full build/release suite",
+  "ownerPythonTestCount": 15,
+  "regressionCharacterization": {
+    "beforeCorrection": {
+      "floorpActivationPreserved": false,
+      "floorpPolicySelectionPreserved": true,
+      "replacementWriterPreserved": true
+    },
+    "expectedFailingCheck": "floorpActivationPreserved",
+    "afterCorrection": {
+      "floorpActivationPreserved": true,
+      "floorpPolicySelectionPreserved": true,
+      "replacementWriterPreserved": true
+    }
+  },
+  "independentReview": "PENDING_FINAL_INDEPENDENT_REVIEW",
+  "sourceHashVerification": "PASS",
+  "cumulativePatchReproduction": "PASS",
+  "helperTamperRefusalChecks": 5,
+  "gitDiffCheck": "PASS"
+}

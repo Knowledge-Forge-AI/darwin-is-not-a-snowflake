@@ -1,0 +1,1 @@
+export REPOMAP_HOME="${REPOMAP_HOME:-/Users/operator/ai/agent-central/codex/mcp/repo-map}"

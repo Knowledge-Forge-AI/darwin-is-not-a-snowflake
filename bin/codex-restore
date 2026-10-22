@@ -1,0 +1,14 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+
+script_path="$0"
+while [ -L "$script_path" ]; do
+  link_target="$(/bin/readlink "$script_path")"
+  case "$link_target" in
+    /*) script_path="$link_target" ;;
+    *) script_path="${script_path:h}/$link_target" ;;
+  esac
+done
+
+script_dir="$(cd "${script_path:h}" && /bin/pwd -P)"
+exec "$script_dir/../libexec/codex-dr/restore.zsh" "$@"

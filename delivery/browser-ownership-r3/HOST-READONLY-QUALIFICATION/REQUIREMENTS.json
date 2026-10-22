@@ -1,0 +1,656 @@
+{
+  "brave-automation.blocker-effective": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "enabled blocker and representative effective protection with site permissions",
+    "role": "brave-automation",
+    "stage": "attended"
+  },
+  "brave-automation.devtools-mcp-cdp": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "actual Chrome DevTools MCP/CDP debugger and scoped loopback/pipe transport",
+    "role": "brave-automation",
+    "stage": "attended"
+  },
+  "brave-automation.no-credentials-or-sync": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "no Apple/other credential extension, native saving/autofill or browser sync",
+    "role": "brave-automation",
+    "stage": "attended"
+  },
+  "brave-automation.no-inherited-extensions": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "no global convenience or credential policy injection; profile preferences not overridden",
+    "role": "brave-automation",
+    "stage": "attended"
+  },
+  "brave-automation.package-identity": {
+    "methods": [
+      "native-app-and-package-readback"
+    ],
+    "purpose": "actual package, signed bundle identity and readiness",
+    "role": "brave-automation",
+    "stage": "readonly"
+  },
+  "brave-automation.playwright": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "representative real Playwright localhost, downloads and page assertions",
+    "role": "brave-automation",
+    "stage": "attended"
+  },
+  "brave-automation.privacy-and-search": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "effective role privacy and supported search defaults; no built-in removal claim",
+    "role": "brave-automation",
+    "stage": "attended"
+  },
+  "brave-automation.representative-suite": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "bounded existing browser test suite on sole stock Brave engine",
+    "role": "brave-automation",
+    "stage": "attended"
+  },
+  "brave-daily.apple-passkey": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Apple-only credential flow; official integration compatibility on actual browser/macOS",
+    "role": "brave-daily",
+    "stage": "attended"
+  },
+  "brave-daily.apple-password": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Apple-only credential flow; official integration compatibility on actual browser/macOS",
+    "role": "brave-daily",
+    "stage": "attended"
+  },
+  "brave-daily.apple-totp": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Apple-only credential flow; official integration compatibility on actual browser/macOS",
+    "role": "brave-daily",
+    "stage": "attended"
+  },
+  "brave-daily.blocker-effective": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "enabled blocker and representative effective protection with site permissions",
+    "role": "brave-daily",
+    "stage": "attended"
+  },
+  "brave-daily.extension-adobe-acrobat": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Adobe Acrobat: actual per-profile enabled state and function; unsupported remains held",
+    "role": "brave-daily",
+    "stage": "attended"
+  },
+  "brave-daily.extension-clear-new-tab": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Clear New Tab: actual per-profile enabled state and function; unsupported remains held",
+    "role": "brave-daily",
+    "stage": "attended"
+  },
+  "brave-daily.extension-cookie-editor": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Cookie-Editor: actual per-profile enabled state and function; unsupported remains held",
+    "role": "brave-daily",
+    "stage": "attended"
+  },
+  "brave-daily.extension-json-viewer": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "JSON Viewer: actual per-profile enabled state and function; unsupported remains held",
+    "role": "brave-daily",
+    "stage": "attended"
+  },
+  "brave-daily.extension-language-reactor": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Language Reactor: actual per-profile enabled state and function; unsupported remains held",
+    "role": "brave-daily",
+    "stage": "attended"
+  },
+  "brave-daily.extension-markdown-viewer": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Markdown Viewer: actual per-profile enabled state and function; unsupported remains held",
+    "role": "brave-daily",
+    "stage": "attended"
+  },
+  "brave-daily.extension-video-downloadhelper": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Video DownloadHelper: actual per-profile enabled state and function; unsupported remains held",
+    "role": "brave-daily",
+    "stage": "attended"
+  },
+  "brave-daily.native-manager-transition": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "external compatibility proved first; preserve credential stores and disable competing native saving only where supported",
+    "role": "brave-daily",
+    "stage": "attended"
+  },
+  "brave-daily.package-identity": {
+    "methods": [
+      "native-app-and-package-readback"
+    ],
+    "purpose": "actual package, signed bundle identity and readiness",
+    "role": "brave-daily",
+    "stage": "readonly"
+  },
+  "brave-daily.privacy-and-search": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "effective role privacy and supported search defaults; no built-in removal claim",
+    "role": "brave-daily",
+    "stage": "attended"
+  },
+  "brave-daily.widevine": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "attended opt-in or confirmed off; no automation/global injection",
+    "role": "brave-daily",
+    "stage": "attended"
+  },
+  "brave-youtube.battery-video-smoke": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "short battery-mode video playback; no ad-free or site-bypass guarantee",
+    "role": "brave-youtube",
+    "stage": "attended"
+  },
+  "brave-youtube.blocker-effective": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "enabled blocker and representative effective protection with site permissions",
+    "role": "brave-youtube",
+    "stage": "attended"
+  },
+  "brave-youtube.identity-theme-wallpaper": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "existing identity/artwork/theme and CNT source/stored data preserved; no new writer",
+    "role": "brave-youtube",
+    "stage": "attended"
+  },
+  "brave-youtube.package-identity": {
+    "methods": [
+      "native-app-and-package-readback"
+    ],
+    "purpose": "actual package, signed bundle identity and readiness",
+    "role": "brave-youtube",
+    "stage": "readonly"
+  },
+  "brave-youtube.privacy-and-search": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "effective role privacy and supported search defaults; no built-in removal claim",
+    "role": "brave-youtube",
+    "stage": "attended"
+  },
+  "chrome-cnt-preservation": {
+    "methods": [
+      "native-composed-source-readback",
+      "independent-preservation-attestation"
+    ],
+    "purpose": "Chrome forced extension and CNT IndexedDB/wallpaper preservation independently qualified before any policy retraction",
+    "role": "cross-role",
+    "stage": "readonly"
+  },
+  "complete-composed-graph": {
+    "methods": [
+      "native-composed-source-readback",
+      "independent-preservation-attestation"
+    ],
+    "purpose": "real complete macOS source graph for both hosts, all claims, options and physical writers; not stubs",
+    "role": "cross-role",
+    "stage": "readonly"
+  },
+  "floorp.apple-passkey": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Apple-only credential flow; official integration compatibility on actual browser/macOS",
+    "role": "floorp",
+    "stage": "attended"
+  },
+  "floorp.apple-password": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Apple-only credential flow; official integration compatibility on actual browser/macOS",
+    "role": "floorp",
+    "stage": "attended"
+  },
+  "floorp.apple-totp": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Apple-only credential flow; official integration compatibility on actual browser/macOS",
+    "role": "floorp",
+    "stage": "attended"
+  },
+  "floorp.blocker-effective": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "enabled blocker and representative effective protection with site permissions",
+    "role": "floorp",
+    "stage": "attended"
+  },
+  "floorp.extension-clear-new-tab": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Clear New Tab: actual per-profile enabled state and function; unsupported remains held",
+    "role": "floorp",
+    "stage": "attended"
+  },
+  "floorp.extension-cookie-editor": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Cookie-Editor: actual per-profile enabled state and function; unsupported remains held",
+    "role": "floorp",
+    "stage": "attended"
+  },
+  "floorp.extension-markdown-viewer": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Markdown Viewer: actual per-profile enabled state and function; unsupported remains held",
+    "role": "floorp",
+    "stage": "attended"
+  },
+  "floorp.extension-ublock-origin": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "uBlock Origin: actual per-profile enabled state and function; unsupported remains held",
+    "role": "floorp",
+    "stage": "attended"
+  },
+  "floorp.extension-video-downloadhelper": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Video DownloadHelper: actual per-profile enabled state and function; unsupported remains held",
+    "role": "floorp",
+    "stage": "attended"
+  },
+  "floorp.native-manager-transition": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "external compatibility proved first; preserve credential stores and disable competing native saving only where supported",
+    "role": "floorp",
+    "stage": "attended"
+  },
+  "floorp.package-identity": {
+    "methods": [
+      "native-app-and-package-readback"
+    ],
+    "purpose": "actual package, signed bundle identity and readiness",
+    "role": "floorp",
+    "stage": "readonly"
+  },
+  "floorp.privacy-and-search": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "effective role privacy and supported search defaults; no built-in removal claim",
+    "role": "floorp",
+    "stage": "attended"
+  },
+  "librewolf.apple-passkey": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Apple-only credential flow; official integration compatibility on actual browser/macOS",
+    "role": "librewolf",
+    "stage": "attended"
+  },
+  "librewolf.apple-password": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Apple-only credential flow; official integration compatibility on actual browser/macOS",
+    "role": "librewolf",
+    "stage": "attended"
+  },
+  "librewolf.apple-totp": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Apple-only credential flow; official integration compatibility on actual browser/macOS",
+    "role": "librewolf",
+    "stage": "attended"
+  },
+  "librewolf.blocker-effective": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "enabled blocker and representative effective protection with site permissions",
+    "role": "librewolf",
+    "stage": "attended"
+  },
+  "librewolf.extension-clear-new-tab": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Clear New Tab: actual per-profile enabled state and function; unsupported remains held",
+    "role": "librewolf",
+    "stage": "attended"
+  },
+  "librewolf.native-manager-transition": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "external compatibility proved first; preserve credential stores and disable competing native saving only where supported",
+    "role": "librewolf",
+    "stage": "attended"
+  },
+  "librewolf.package-identity": {
+    "methods": [
+      "native-app-and-package-readback"
+    ],
+    "purpose": "actual package, signed bundle identity and readiness",
+    "role": "librewolf",
+    "stage": "readonly"
+  },
+  "librewolf.privacy-and-search": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "effective role privacy and supported search defaults; no built-in removal claim",
+    "role": "librewolf",
+    "stage": "attended"
+  },
+  "orion.apple-passkey": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Apple-only credential flow; official integration compatibility on actual browser/macOS",
+    "role": "orion",
+    "stage": "attended"
+  },
+  "orion.apple-password": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Apple-only credential flow; official integration compatibility on actual browser/macOS",
+    "role": "orion",
+    "stage": "attended"
+  },
+  "orion.apple-totp": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Apple-only credential flow; official integration compatibility on actual browser/macOS",
+    "role": "orion",
+    "stage": "attended"
+  },
+  "orion.blocker-coordination": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "uBO effective before native content blocker off; Tracking Prevention retained",
+    "role": "orion",
+    "stage": "attended"
+  },
+  "orion.blocker-effective": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "enabled blocker and representative effective protection with site permissions",
+    "role": "orion",
+    "stage": "attended"
+  },
+  "orion.extension-adobe-acrobat": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Adobe Acrobat: actual per-profile enabled state and function; unsupported remains held",
+    "role": "orion",
+    "stage": "attended"
+  },
+  "orion.extension-clear-new-tab": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Clear New Tab: actual per-profile enabled state and function; unsupported remains held",
+    "role": "orion",
+    "stage": "attended"
+  },
+  "orion.extension-cookie-editor": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Cookie-Editor: actual per-profile enabled state and function; unsupported remains held",
+    "role": "orion",
+    "stage": "attended"
+  },
+  "orion.extension-json-viewer": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "JSON Viewer: actual per-profile enabled state and function; unsupported remains held",
+    "role": "orion",
+    "stage": "attended"
+  },
+  "orion.extension-language-reactor": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Language Reactor: actual per-profile enabled state and function; unsupported remains held",
+    "role": "orion",
+    "stage": "attended"
+  },
+  "orion.extension-markdown-viewer": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Markdown Viewer: actual per-profile enabled state and function; unsupported remains held",
+    "role": "orion",
+    "stage": "attended"
+  },
+  "orion.extension-video-downloadhelper": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Video DownloadHelper: actual per-profile enabled state and function; unsupported remains held",
+    "role": "orion",
+    "stage": "attended"
+  },
+  "orion.native-manager-transition": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "external compatibility proved first; preserve credential stores and disable competing native saving only where supported",
+    "role": "orion",
+    "stage": "attended"
+  },
+  "orion.package-identity": {
+    "methods": [
+      "native-app-and-package-readback"
+    ],
+    "purpose": "actual package, signed bundle identity and readiness",
+    "role": "orion",
+    "stage": "readonly"
+  },
+  "orion.privacy-and-search": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "effective role privacy and supported search defaults; no built-in removal claim",
+    "role": "orion",
+    "stage": "attended"
+  },
+  "predecessor-parity": {
+    "methods": [
+      "native-composed-source-readback",
+      "independent-preservation-attestation"
+    ],
+    "purpose": "unchanged predecessor installation/policy/writer behavior",
+    "role": "cross-role",
+    "stage": "readonly"
+  },
+  "safari.apple-passkey": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Apple-only credential flow; official integration compatibility on actual browser/macOS",
+    "role": "safari",
+    "stage": "attended"
+  },
+  "safari.apple-password": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Apple-only credential flow; official integration compatibility on actual browser/macOS",
+    "role": "safari",
+    "stage": "attended"
+  },
+  "safari.apple-totp": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "Apple-only credential flow; official integration compatibility on actual browser/macOS",
+    "role": "safari",
+    "stage": "attended"
+  },
+  "safari.blocker-effective": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "enabled blocker and representative effective protection with site permissions",
+    "role": "safari",
+    "stage": "attended"
+  },
+  "safari.native-manager-transition": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "preserve native Apple Passwords/Keychain and passkeys; no native Apple manager suppression",
+    "role": "safari",
+    "stage": "attended"
+  },
+  "safari.package-identity": {
+    "methods": [
+      "native-app-and-package-readback"
+    ],
+    "purpose": "actual package, signed bundle identity and readiness",
+    "role": "safari",
+    "stage": "readonly"
+  },
+  "safari.privacy-and-search": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "effective role privacy and supported search defaults; no built-in removal claim",
+    "role": "safari",
+    "stage": "attended"
+  },
+  "safari.wipr-blocklist-1": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "enabled AND effective Wipr component including approval and website permission",
+    "role": "safari",
+    "stage": "attended"
+  },
+  "safari.wipr-blocklist-2": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "enabled AND effective Wipr component including approval and website permission",
+    "role": "safari",
+    "stage": "attended"
+  },
+  "safari.wipr-blocklist-3": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "enabled AND effective Wipr component including approval and website permission",
+    "role": "safari",
+    "stage": "attended"
+  },
+  "safari.wipr-blocklist-4": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "enabled AND effective Wipr component including approval and website permission",
+    "role": "safari",
+    "stage": "attended"
+  },
+  "safari.wipr-wipr-extra": {
+    "methods": [
+      "attended-effective-readback"
+    ],
+    "purpose": "enabled AND effective Wipr component including approval and website permission",
+    "role": "safari",
+    "stage": "attended"
+  },
+  "single-brave-install": {
+    "methods": [
+      "native-composed-source-readback",
+      "independent-preservation-attestation"
+    ],
+    "purpose": "one stock core Brave package; retained old YouTube bundle only; no new cask/copy/claim",
+    "role": "cross-role",
+    "stage": "readonly"
+  },
+  "three-brave-roots": {
+    "methods": [
+      "native-composed-source-readback",
+      "independent-preservation-attestation"
+    ],
+    "purpose": "physical roots disjoint, nonnested, nonaliased; automation new owned scratch",
+    "role": "cross-role",
+    "stage": "readonly"
+  },
+  "vivaldi-retention": {
+    "methods": [
+      "native-composed-source-readback",
+      "independent-preservation-attestation"
+    ],
+    "purpose": "feeds/mail/calendar/OAuth/bookmarks and attended profile backup preserved, no uninstall or troubleshooting",
+    "role": "cross-role",
+    "stage": "readonly"
+  }
+}

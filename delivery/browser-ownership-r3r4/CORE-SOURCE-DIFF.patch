@@ -1,0 +1,223 @@
+--- a/config/browser/README.md
++++ b/config/browser/README.md
+@@ -69,8 +69,11 @@
+ IndexedDB wallpaper source remain unchanged. Browser UX is the destination owner,
+ but a lighter wrapper and physical cut require a separate nonoverlapping handoff.
+ The existing copy from the same Brave package is retained continuity, not a new
+-second installation. Vivaldi is decommissioned without deleting data or reopening
+-mail/OAuth work. Tor and Mullvad and all unrelated selections remain untouched.
++second installation. R3R4 retains Vivaldi installed, runnable and unchanged as a
++visual reference outside the seven primary roles; Floorp remains the preferred
++power-user browser. Any later retirement requires explicit operator approval.
++Mail, Calendar, Feeds, OAuth, credentials, extensions, local data and preferences
++remain available. Tor and Mullvad and all unrelated selections remain untouched.
+ 
+ The literal activation-fragment scan is a bounded diagnostic. It rejects known
+ core browser domains and custom-default writers, but cannot prove every computed
+@@ -92,3 +95,7 @@
+ enabled state and tunnel protection remain unobserved. The R3R2 catalog and
+ its same-browser hold are retained historical evidence, superseded by R3R3's
+ per-role, per-ID ownership contract. R3 remains disabled and mechanically held.
++
++The Vivaldi reference decision and cumulative owner handoff are recorded in
++[R3R4 delivery](../../delivery/browser-ownership-r3r4/README.md). Historical R3R3
++source and native receipts apply only to their original bytes.
+--- a/config/browser/roles-r3.json
++++ b/config/browser/roles-r3.json
+@@ -178,7 +178,7 @@
+   },
+   "continuity": {
+     "chrome": "legacy forced policy and CNT/NMH manifests retained; no retraction or retirement",
+-    "vivaldi": "DECOMMISSIONED_NOT_DELETED; retain profiles, feeds, mail, calendar, OAuth and bookmarks for attended backup/retirement",
++    "vivaldi": "VIVALDI_VISUAL_REFERENCE_RETAINED_DECOMMISSION_HELD",
+     "braveYoutubeOwnershipCut": "HELD; no destination active claim or writer",
+     "torMullvad": "UNTOUCHED",
+     "sourcePins": "UNTOUCHED"
+@@ -192,5 +192,25 @@
+     "effective per-profile search/privacy/blocker/extension and password/TOTP/passkey readback",
+     "representative Playwright, DevTools MCP/CDP and browser-suite smoke on stock Brave"
+   ],
+-  "deploymentScope": "ENTIRE_TARGET_HOST_CONFIGURATION_INCLUDING_UNRELATED_DEPLOYMENTS"
++  "deploymentScope": "ENTIRE_TARGET_HOST_CONFIGURATION_INCLUDING_UNRELATED_DEPLOYMENTS",
++  "references": {
++    "vivaldi": {
++      "state": "VIVALDI_VISUAL_REFERENCE_RETAINED_DECOMMISSION_HELD",
++      "primaryRole": false,
++      "purpose": "unchanged runnable visual reference; Floorp remains preferred power-user browser",
++      "appOwner": "browser-ux",
++      "physicalWriter": "existing composition cask projection while inactive; Browser UX module only under active held R3",
++      "package": "homebrew-cask:vivaldi",
++      "preserve": [
++        "installed app and executable access",
++        "existing settings and extensions",
++        "Mail, Calendar, Feeds and OAuth",
++        "unsent/local data and credentials",
++        "imported bookmarks and browser preferences"
++      ],
++      "profileWriter": false,
++      "retirement": "EXPLICIT_OPERATOR_APPROVAL_REQUIRED_BEFORE_ANY_LATER_RETIREMENT",
++      "visualMigration": "DEFERRED_SEPARATELY_ATTENDED_DISPOSABLE_FLOORP_PROFILE_FIRST"
++    }
++  }
+ }
+--- a/docs/adr/2026/10/0002-browser-role-ownership-r3.md
++++ b/docs/adr/2026/10/0002-browser-role-ownership-r3.md
+@@ -11,7 +11,8 @@
+ and [roles-r3.json](../../../../config/browser/roles-r3.json). Core provides one
+ stock Nix Brave package, Homebrew LibreWolf and Orion in the active target-host candidate, and
+ Safari privacy/search/Wipr attestation. Browser UX provides Floorp and bounded
+-convenience intent. The host constructor preserves the predecessor baseline.
++convenience intent, plus the retained Vivaldi reference described below. The host
++constructor preserves the predecessor baseline.
+ No source pin, lock, release branch or installed browser state changes here.
+ 
+ Chrome's legacy forced extension policy, CNT manifest and KeePassXC bridge remain
+@@ -66,9 +67,19 @@
+ overlapping native content blocker only after uBO is effective, and retain Tracking
+ Prevention. Its convenience extensions each require compatibility evidence.
+ 
+-Vivaldi receives no new target policy/install selection. Existing local data and
+-policy files persist for attended backup and retirement; Homebrew cleanup must be
+-none. Tor and Mullvad are outside this change. Source adoption requires manager
++The October 13 R3R4 decision supersedes earlier Vivaldi retirement intent.
++Vivaldi remains installed and runnable as a visual reference outside the seven
++primary roles; Floorp remains the preferred power-user browser. The held active
++R3 proposal assigns Vivaldi's cask and application claim to Browser UX and carries
++existing policy, extension and rendering selection through core's single physical
++writer. Vivaldi-only retraction ownership preserves the prior active-R3 Floorp
++policy behavior. Existing preferences, credentials, bookmarks, Mail/Calendar/Feeds,
++OAuth and local or unsent data remain available, with no forced feeds-only change.
++Homebrew cleanup must be none. Later retirement requires explicit operator
++approval and a separate reviewed source release. See the
++[R3R4 handoff](../../../../delivery/browser-ownership-r3r4/README.md) for exact
++bindings and the deferred Gecko visual-qualification note. Tor and Mullvad are
++outside this change. Source adoption requires manager
+ review of these final bytes and each exact owner patch. Later qualification and
+ any guard-release edit need their own reviewed disposition. A policy rollback
+ cannot recover extension storage lost through browser reconciliation.
+--- a/modules/browsers.nix
++++ b/modules/browsers.nix
+@@ -299,15 +299,22 @@
+   hasExternalVivaldiNMH = hasDefs optVivaldiNMH;
+   hasExternalFloorpPolicies = hasDefs optFloorpPolicies;
+ 
+-  hasExternalContribution =
++  hasExternalPrimaryContribution =
+     hasExternalChromePrefs || hasExternalChromeExts || hasExternalChromeNMH
+     || hasExternalFirefoxPolicies || hasExternalFirefoxPayload || hasExternalFirefoxNMH
+     || hasExternalFirefoxDelivery
+-    || hasExternalVivaldiPrefs || hasExternalVivaldiExts || hasExternalVivaldiNMH
+     || hasExternalFloorpPolicies;
++  hasExternalVivaldiContribution =
++    hasExternalVivaldiPrefs || hasExternalVivaldiExts || hasExternalVivaldiNMH;
++  # R3R4 retains Vivaldi's separate policy targets alongside the unchanged
++  # Chrome/Firefox legacy baseline. All duplicate, priority and ID guards apply.
++  retainedVivaldiReference = cfg.rolesR3 && cfg.corePolicyOwnership
++    && roleOwnership.continuity.vivaldi == "VIVALDI_VISUAL_REFERENCE_RETAINED_DECOMMISSION_HELD";
++  vivaldiPolicyOwnership = cfg.replacementPolicyOwnership || cfg.vivaldiPolicyOwnership;
+ 
+   legacyExclusivityViolations =
+-    if cfg.legacyPolicyDefaults.enable && hasExternalContribution then
++    if cfg.legacyPolicyDefaults.enable && (hasExternalPrimaryContribution
++      || (hasExternalVivaldiContribution && !retainedVivaldiReference)) then
+       [{
+         type = "legacy-exclusivity";
+         option = "programs.browserBaseline.legacyPolicyDefaults.enable";
+@@ -915,6 +922,15 @@
+         Native registrations owned by KeePassXC are outside this retraction.
+       '';
+     };
++    vivaldiPolicyOwnership = lib.mkOption {
++      type = lib.types.bool;
++      default = false;
++      description = ''
++        Ownership of Vivaldi policy and known external-extension retraction only.
++        Retained references can carry legacy Vivaldi ownership without selecting
++        Floorp policy retraction. The existing core physical writer is unchanged.
++      '';
++    };
+     legacyPolicyDefaults.enable = lib.mkOption {
+       type = lib.types.bool;
+       default = true;
+@@ -1306,12 +1322,12 @@
+         fi
+       ''}
+ 
+-      ${lib.optionalString (cfg.replacementPolicyOwnership || vivaldiManagedPlist != null || effectiveVivaldiExtensionFiles != {} || effectiveVivaldiNMHFiles != {}) ''
++      ${lib.optionalString (vivaldiPolicyOwnership || vivaldiManagedPlist != null || effectiveVivaldiExtensionFiles != {} || effectiveVivaldiNMHFiles != {}) ''
+       # Vivaldi Managed Preferences (only an explicitly selected endpoint)
+       ${if vivaldiManagedPlist != null then ''
+         install -d -m 0755 "/Library/Managed Preferences"
+         install -m 0644 "${vivaldiManagedPlist}" "/Library/Managed Preferences/com.vivaldi.Vivaldi.plist"
+-      '' else lib.optionalString cfg.replacementPolicyOwnership ''
++      '' else lib.optionalString vivaldiPolicyOwnership ''
+         rm -f "/Library/Managed Preferences/com.vivaldi.Vivaldi.plist"
+       ''}
+ 
+@@ -1329,7 +1345,7 @@
+         '') effectiveVivaldiExtensionFiles)}
+       '' else ""}
+       # Only explicitly owned, known external manifests are retracted.
+-      ${lib.optionalString cfg.replacementPolicyOwnership (lib.concatMapStrings (id:
++      ${lib.optionalString vivaldiPolicyOwnership (lib.concatMapStrings (id:
+         lib.optionalString (!(effectiveVivaldiExtensions ? "${id}")) ''
+           rm -f "$vivaldiExternalExtensionsDir/${id}.json"
+         '') knownExternalExtensionIdentities)}
+--- a/src/test/unit/nix/core-browser-ownership.unit.test.nix
++++ b/src/test/unit/nix/core-browser-ownership.unit.test.nix
+@@ -190,6 +190,55 @@
+     };
+     expected = { chrome = true; vivaldi = true; floorp = true; accepted = true; };
+   };
++  testRetainedVivaldiKeepsLegacyPrimaryBrowserOutputs = {
++    expr = let c = (evaluateActive [{ programs.browserBaseline.vivaldi.managedPreferences.SearchSuggestEnabled = true; }])
++      .system.build.browserBaseline;
++    in { accepted = c.guardViolations == []; vivaldi = c.vivaldiManagedPlist != null;
++      chrome = c.chromeManagedPlist == bb.chromeManagedPlist;
++      firefox = c.firefoxPolicies == bb.firefoxPolicies;
++      extensions = c.chromeExternalExtensions == bb.chromeExternalExtensions;
++      nativeHosts = c.chromeNativeMessagingHosts == bb.chromeNativeMessagingHosts;
++      deploymentHeld = c.deploymentHeld; };
++    expected = { accepted = true; vivaldi = true; chrome = true; firefox = true;
++      extensions = true; nativeHosts = true; deploymentHeld = true; };
++  };
++  testReferenceExceptionDoesNotRelaxOtherLegacyContributions = {
++    expr = {
++      inactiveVivaldi = (evaluate [{ programs.browserBaseline.vivaldi.managedPreferences.SearchSuggestEnabled = true; }])
++        .system.build.browserBaseline.guardViolations != [];
++      activeFloorp = rejects { programs.browserBaseline.floorp.policies.DisableTelemetry = true; };
++      activeChrome = rejects { programs.browserBaseline.chrome.managedPreferences.SearchSuggestEnabled = true; };
++    };
++    expected = { inactiveVivaldi = true; activeFloorp = true; activeChrome = true; };
++  };
++  testVivaldiOwnershipDoesNotRetractFloorp = {
++    expr = let
++      scoped = evaluateActive [{ programs.browserBaseline.vivaldiPolicyOwnership = true; }];
++      legacy = evaluateActive [{ programs.browserBaseline.replacementPolicyOwnership = true; }];
++      script = c: c.system.activationScripts.postActivation.text;
++      removesVivaldi = c: lib.hasInfix ''rm -f "/Library/Managed Preferences/com.vivaldi.Vivaldi.plist"'' (script c);
++      removesFloorp = c: lib.hasInfix ''rm -f "/Library/Preferences/app.floorp.Floorp.plist"'' (script c);
++    in {
++      vivaldiOwned = removesVivaldi scoped;
++      floorpPreserved = !removesFloorp scoped;
++      legacyVivaldiUnchanged = removesVivaldi legacy;
++      legacyFloorpUnchanged = removesFloorp legacy;
++      deploymentHeld = scoped.system.build.browserBaseline.deploymentHeld;
++    };
++    expected = { vivaldiOwned = true; floorpPreserved = true;
++      legacyVivaldiUnchanged = true; legacyFloorpUnchanged = true; deploymentHeld = true; };
++  };
++  testVivaldiReferenceRetainsSeamSafetyGuards = {
++    expr = {
++      priority = rejects { programs.browserBaseline.vivaldi.managedPreferences = lib.mkForce {}; };
++      invalidId = rejects { programs.browserBaseline.vivaldi.externalExtensions."invalid/id" = {}; };
++      duplicate = (evaluateActive [
++        { _file = "reference-owner-a"; programs.browserBaseline.vivaldi.managedPreferences.SearchSuggestEnabled = true; }
++        { _file = "reference-owner-b"; programs.browserBaseline.vivaldi.managedPreferences.SearchSuggestEnabled = true; }
++      ]).system.build.browserBaseline.guardViolations != [];
++    };
++    expected = { priority = true; invalidId = true; duplicate = true; };
++  };
+   testInjectedBrowserUxDefinitionsRejected = {
+     expr = {
+       chrome = rejects { _file = "browser-ux/modules/default.nix"; programs.browserBaseline.chrome.managedPreferences.SearchSuggestEnabled = false; };

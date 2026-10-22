@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "records": [
+    {
+      "check": "unsafe binding path rejected without reading outside root",
+      "status": "PASS"
+    },
+    {
+      "check": "tampered owner candidate rejected by exact after hash",
+      "status": "PASS"
+    },
+    {
+      "check": "owner preimage drift rejected before source copying or patch application",
+      "status": "PASS"
+    },
+    {
+      "check": "altered canonical fixture configuration rejected before Nix evaluation",
+      "status": "PASS"
+    },
+    {
+      "check": "changed live browser configuration rejected before native invocation",
+      "status": "PASS"
+    }
+  ],
+  "effects": "temporary synthetic fixtures only; live sources unchanged",
+  "stage": "revise_close"
+}

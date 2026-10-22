@@ -1,0 +1,10 @@
+{
+  "schema": "bux-r3r4-historical-native-comparator-v1",
+  "historicalReceiptOnly": true,
+  "nativeEvidenceZipSha256": "11d04d11e11906e1497da461b49176adaa7afa0666f09752f023260d5add8b2c",
+  "records": {
+    "full-composed-two-host-graph": "45d7d2e03f9c369ebb388e1cfea3c4c0b05549a4784d7f0827d3a0a79ca6e56b",
+    "full-composed-two-host-claims": "caf9853581dc0d473fc6536bb8bddb46105e7530b10b0aa4e036b49f042322ca"
+  },
+  "r3r4Qualified": false
+}

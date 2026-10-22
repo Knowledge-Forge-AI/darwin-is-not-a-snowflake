@@ -1,0 +1,77 @@
+#!/run/current-system/sw/bin/bash
+set -euo pipefail
+
+upstream=/run/current-system/sw/bin/darwin-rebuild
+if [ "$EUID" -ne 0 ] && [ -n "${NIX_DARWIN_TEST_UPSTREAM_DARWIN_REBUILD:-}" ]; then
+  upstream="$NIX_DARWIN_TEST_UPSTREAM_DARWIN_REBUILD"
+fi
+dry_run=0
+rollback=0
+conflicting_action=""
+activating_action=""
+
+usage() {
+  cat <<'USAGE'
+Usage: darwin-rebuild [UPSTREAM DARWIN-REBUILD ARGUMENTS]
+
+Guard the managed nix-darwin command against ambiguous rollback and dry-run
+combinations, then delegate all accepted arguments to the upstream command.
+
+Rollback is an activating action. The guard rejects rollback with --dry-run
+and rejects rollback combined with actions other than switch.
+USAGE
+}
+
+fail_unsafe() {
+  echo "darwin-rebuild: unsafe arguments: $*" >&2
+  exit 2
+}
+
+for arg in "$@"; do
+  case "$arg" in
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    --dry-run)
+      dry_run=1
+      ;;
+    --rollback|--switch-generation|-G)
+      rollback=1
+      activating_action=rollback
+      ;;
+    switch)
+      activating_action="$arg"
+      ;;
+    activate|check)
+      activating_action="$arg"
+      if [ -z "$conflicting_action" ]; then
+        conflicting_action="$arg"
+      fi
+      ;;
+    edit|build|changelog|--list-generations)
+      if [ -z "$conflicting_action" ]; then
+        conflicting_action="$arg"
+      fi
+      ;;
+  esac
+done
+
+if [ "$rollback" -eq 1 ] && [ "$dry_run" -eq 1 ]; then
+  fail_unsafe "dry-run does not make rollback non-mutating; refusing rollback"
+fi
+
+if [ "$rollback" -eq 1 ] && [ -n "$conflicting_action" ]; then
+  fail_unsafe "rollback cannot be combined with action '$conflicting_action'"
+fi
+
+if [ "$dry_run" -eq 1 ] && [ -n "$activating_action" ]; then
+  fail_unsafe "dry-run cannot be combined with activating action '$activating_action'"
+fi
+
+if [ ! -x "$upstream" ]; then
+  echo "darwin-rebuild: managed upstream command is unavailable: $upstream" >&2
+  exit 127
+fi
+
+exec "$upstream" "$@"

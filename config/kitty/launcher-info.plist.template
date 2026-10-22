@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "https://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleDevelopmentRegion</key>
+  <string>en</string>
+  <key>CFBundleExecutable</key>
+  <string>@EXECUTABLE_NAME@</string>
+  <key>CFBundleIdentifier</key>
+  <string>@BUNDLE_ID@</string>
+  <key>CFBundleName</key>
+  <string>@APP_NAME@</string>
+  <key>CFBundleDisplayName</key>
+  <string>@APP_NAME@</string>
+  <key>CFBundleIconFile</key>
+  <string>@ICON_FILE@</string>
+  <key>CFBundleIconName</key>
+  <string>@EXECUTABLE_NAME@</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>CFBundleShortVersionString</key>
+  <string>1.0</string>
+  <key>CFBundleVersion</key>
+  <string>1</string>
+  <key>LSEnvironment</key>
+  <dict>
+    <key>KITTY_CONFIG_DIRECTORY</key>
+    <string>@LAUNCHER_CONFIG_DIR@</string>
+    <key>KITTY_LAUNCHED_BY_LAUNCH_SERVICES</key>
+    <string>1</string>
+  </dict>
+  <key>LSMinimumSystemVersion</key>
+  <string>12.0.0</string>
+  <key>LSRequiresNativeExecution</key>
+  <true/>
+  <key>NSHighResolutionCapable</key>
+  <true/>
+  <key>NSSystemAdministrationUsageDescription</key>
+  <string>A program running inside kitty requires elevated privileges.</string>
+</dict>
+</plist>

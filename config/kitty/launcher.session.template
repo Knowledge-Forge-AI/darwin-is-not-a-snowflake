@@ -1,0 +1,4 @@
+cd /Users/@USER_NAME@
+os_window_title @APP_NAME@
+os_window_size 90c 30c
+launch

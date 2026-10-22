@@ -1,0 +1,261 @@
+{
+  "fixturePurpose": "Historical module-classification test rows. Operator metadata and source snapshot payloads omitted; current module behavior is checked independently by the tests.",
+  "entry": {
+    "moduleCount": 28,
+    "postActivationDefinitionCount": 17
+  },
+  "requiredFinal": {
+    "categoryCounts": {
+      "USER_HOME_PRIVILEGED_MUTATION_NEEDS_HARDENING": 0,
+      "USER_HOME_MUTATION_ALREADY_UNPRIVILEGED": 15,
+      "READ_ONLY_USER_HOME": 0,
+      "SYSTEM_OWNED_OUT_OF_SCOPE": 2,
+      "NO_USER_HOME_SURFACE": 11
+    },
+    "UNCATEGORIZED_POSTACTIVATION_USER_HOME_MUTATORS": 0,
+    "CORE_PRIVILEGED_USER_HOME_MUTATOR_COUNT": 0
+  },
+  "modules": [
+    {
+      "module": "modules/android.nix",
+      "definesPostActivation": false,
+      "initialCategory": "NO_USER_HOME_SURFACE",
+      "finalCategory": "NO_USER_HOME_SURFACE",
+      "surfaces": []
+    },
+    {
+      "module": "modules/arq.nix",
+      "definesPostActivation": true,
+      "initialCategory": "USER_HOME_PRIVILEGED_MUTATION_NEEDS_HARDENING",
+      "finalCategory": "USER_HOME_MUTATION_ALREADY_UNPRIVILEGED",
+      "surfaces": [
+        "install -d: ~/cloud-capture",
+        "install -d: ~/Library/Logs",
+        "chown -R: ~/cloud-capture",
+        "chown: ~/Library/Logs"
+      ]
+    },
+    {
+      "module": "modules/brave-youtube.nix",
+      "definesPostActivation": true,
+      "initialCategory": "USER_HOME_PRIVILEGED_MUTATION_NEEDS_HARDENING",
+      "finalCategory": "USER_HOME_MUTATION_ALREADY_UNPRIVILEGED",
+      "surfaces": [
+        "rm -rf/mv/install/cp/chmod/find/template/plist/icon/theme/codesign/touch: ~/Applications/Brave YouTube.app",
+        "mv/install/theme generation/chown -R: ~/Library/Application Support/Brave YouTube"
+      ]
+    },
+    {
+      "module": "modules/brewfile-stragglers.nix",
+      "definesPostActivation": false,
+      "initialCategory": "NO_USER_HOME_SURFACE",
+      "finalCategory": "NO_USER_HOME_SURFACE",
+      "surfaces": []
+    },
+    {
+      "module": "modules/browsers.nix",
+      "definesPostActivation": true,
+      "initialCategory": "SYSTEM_OWNED_OUT_OF_SCOPE",
+      "finalCategory": "SYSTEM_OWNED_OUT_OF_SCOPE",
+      "surfaces": [
+        "/Library/Managed Preferences",
+        "/Library/Preferences",
+        "/Library/Application Support/Google",
+        "/Applications/Firefox.app"
+      ]
+    },
+    {
+      "module": "modules/codex-state.nix",
+      "definesPostActivation": true,
+      "initialCategory": "USER_HOME_MUTATION_ALREADY_UNPRIVILEGED",
+      "finalCategory": "USER_HOME_MUTATION_ALREADY_UNPRIVILEGED",
+      "surfaces": [
+        "target-user writer: ~/.codex, ~/ai/agent-central/codex, ~/.serena, ~/codex, legacy compatibility paths"
+      ]
+    },
+    {
+      "module": "modules/codex.nix",
+      "definesPostActivation": false,
+      "initialCategory": "NO_USER_HOME_SURFACE",
+      "finalCategory": "NO_USER_HOME_SURFACE",
+      "surfaces": []
+    },
+    {
+      "module": "modules/desktop-apps.nix",
+      "definesPostActivation": false,
+      "initialCategory": "NO_USER_HOME_SURFACE",
+      "finalCategory": "NO_USER_HOME_SURFACE",
+      "surfaces": []
+    },
+    {
+      "module": "modules/developer-tooling.nix",
+      "definesPostActivation": false,
+      "initialCategory": "NO_USER_HOME_SURFACE",
+      "finalCategory": "NO_USER_HOME_SURFACE",
+      "surfaces": []
+    },
+    {
+      "module": "modules/fastfetch.nix",
+      "definesPostActivation": true,
+      "initialCategory": "USER_HOME_PRIVILEGED_MUTATION_NEEDS_HARDENING",
+      "finalCategory": "USER_HOME_MUTATION_ALREADY_UNPRIVILEGED",
+      "surfaces": [
+        "install -d/mv/rm/ln/chown -h: ~/.config/fastfetch and managed configs/logos"
+      ]
+    },
+    {
+      "module": "modules/host-security.nix",
+      "definesPostActivation": false,
+      "initialCategory": "NO_USER_HOME_SURFACE",
+      "finalCategory": "NO_USER_HOME_SURFACE",
+      "surfaces": []
+    },
+    {
+      "module": "modules/kitty.nix",
+      "definesPostActivation": true,
+      "initialCategory": "USER_HOME_PRIVILEGED_MUTATION_NEEDS_HARDENING",
+      "finalCategory": "USER_HOME_MUTATION_ALREADY_UNPRIVILEGED",
+      "surfaces": [
+        "install/mv/ln/chown -h/template writes: ~/.config/kitty",
+        "rm -rf/cp/chmod/ln/icon generation/xattr/chown -R/codesign/touch: ~/Applications/Kitty Zsh.app and Kitty Bash.app"
+      ]
+    },
+    {
+      "module": "modules/nixpkgs-policy.nix",
+      "definesPostActivation": false,
+      "initialCategory": "NO_USER_HOME_SURFACE",
+      "finalCategory": "NO_USER_HOME_SURFACE",
+      "surfaces": []
+    },
+    {
+      "module": "modules/nvm.nix",
+      "definesPostActivation": true,
+      "initialCategory": "USER_HOME_PRIVILEGED_MUTATION_NEEDS_HARDENING",
+      "finalCategory": "USER_HOME_MUTATION_ALREADY_UNPRIVILEGED",
+      "surfaces": [
+        "install -d: ~/.nvm"
+      ]
+    },
+    {
+      "module": "modules/oh-my-zsh.nix",
+      "definesPostActivation": true,
+      "initialCategory": "USER_HOME_PRIVILEGED_MUTATION_NEEDS_HARDENING",
+      "finalCategory": "USER_HOME_MUTATION_ALREADY_UNPRIVILEGED",
+      "surfaces": [
+        "rm/mv/ln/chown -h: ~/.oh-my-zsh and ~/.oh-my-zsh-custom",
+        "install -d: ~/.cache/oh-my-zsh"
+      ]
+    },
+    {
+      "module": "modules/password-sync.nix",
+      "definesPostActivation": false,
+      "initialCategory": "NO_USER_HOME_SURFACE",
+      "finalCategory": "NO_USER_HOME_SURFACE",
+      "surfaces": []
+    },
+    {
+      "module": "modules/pyenv.nix",
+      "definesPostActivation": true,
+      "initialCategory": "USER_HOME_PRIVILEGED_MUTATION_NEEDS_HARDENING",
+      "finalCategory": "USER_HOME_MUTATION_ALREADY_UNPRIVILEGED",
+      "surfaces": [
+        "install -d: ~/.pyenv, ~/.pyenv/versions, ~/.pyenv/shims"
+      ]
+    },
+    {
+      "module": "modules/rbenv.nix",
+      "definesPostActivation": true,
+      "initialCategory": "USER_HOME_PRIVILEGED_MUTATION_NEEDS_HARDENING",
+      "finalCategory": "USER_HOME_MUTATION_ALREADY_UNPRIVILEGED",
+      "surfaces": [
+        "install -d: ~/.rbenv and ~/.rbenv/versions"
+      ]
+    },
+    {
+      "module": "modules/repo-map-manager.nix",
+      "definesPostActivation": true,
+      "initialCategory": "USER_HOME_MUTATION_ALREADY_UNPRIVILEGED",
+      "finalCategory": "USER_HOME_MUTATION_ALREADY_UNPRIVILEGED",
+      "surfaces": [
+        "target-user prepareState helper: configured RepoMap manager state"
+      ]
+    },
+    {
+      "module": "modules/repo-map-orchestrator.nix",
+      "definesPostActivation": true,
+      "initialCategory": "USER_HOME_MUTATION_ALREADY_UNPRIVILEGED",
+      "finalCategory": "USER_HOME_MUTATION_ALREADY_UNPRIVILEGED",
+      "surfaces": [
+        "root system-owned contract staging: /Library/Application Support/repo-map/orch32/v1",
+        "target-user prepareState helper: ~/.local/state/repo-map-orchestrator and ~/.local/config/repo-map-orchestrator/repositories.json"
+      ]
+    },
+    {
+      "module": "modules/repo-map-project-tools.nix",
+      "definesPostActivation": false,
+      "initialCategory": "NO_USER_HOME_SURFACE",
+      "finalCategory": "NO_USER_HOME_SURFACE",
+      "surfaces": []
+    },
+    {
+      "module": "modules/repo-map-runner.nix",
+      "definesPostActivation": true,
+      "initialCategory": "USER_HOME_MUTATION_ALREADY_UNPRIVILEGED",
+      "finalCategory": "USER_HOME_MUTATION_ALREADY_UNPRIVILEGED",
+      "surfaces": [
+        "target-user prepareLogs helper: configured runner log root"
+      ]
+    },
+    {
+      "module": "modules/sdkman.nix",
+      "definesPostActivation": true,
+      "initialCategory": "USER_HOME_PRIVILEGED_MUTATION_NEEDS_HARDENING",
+      "finalCategory": "USER_HOME_MUTATION_ALREADY_UNPRIVILEGED",
+      "surfaces": [
+        "install -d/cp/rm/ln/chown -h: ~/.sdkman/etc/config"
+      ]
+    },
+    {
+      "module": "modules/shell.nix",
+      "definesPostActivation": true,
+      "initialCategory": "USER_HOME_PRIVILEGED_MUTATION_NEEDS_HARDENING",
+      "finalCategory": "USER_HOME_MUTATION_ALREADY_UNPRIVILEGED",
+      "surfaces": [
+        "mkdir/chown: ~/.local",
+        "rm/mv/ln/chown -h: ~/.zshrc, ~/.bashrc, ~/.bash_profile, ~/.sh_config, ~/.local/nbin"
+      ]
+    },
+    {
+      "module": "modules/ssh.nix",
+      "definesPostActivation": false,
+      "initialCategory": "NO_USER_HOME_SURFACE",
+      "finalCategory": "NO_USER_HOME_SURFACE",
+      "surfaces": []
+    },
+    {
+      "module": "modules/terminal.nix",
+      "definesPostActivation": true,
+      "initialCategory": "USER_HOME_MUTATION_ALREADY_UNPRIVILEGED",
+      "finalCategory": "USER_HOME_MUTATION_ALREADY_UNPRIVILEGED",
+      "surfaces": [
+        "target-user defaults import: Terminal preferences; root temporary-plist mutation is outside the user-home class"
+      ]
+    },
+    {
+      "module": "modules/video-session.nix",
+      "definesPostActivation": true,
+      "initialCategory": "SYSTEM_OWNED_OUT_OF_SCOPE",
+      "finalCategory": "SYSTEM_OWNED_OUT_OF_SCOPE",
+      "surfaces": [
+        "/private/etc/sudoers.d/video_session_pmset"
+      ]
+    },
+    {
+      "module": "modules/virtual-machines.nix",
+      "definesPostActivation": false,
+      "initialCategory": "NO_USER_HOME_SURFACE",
+      "finalCategory": "NO_USER_HOME_SURFACE",
+      "surfaces": []
+    }
+  ]
+}

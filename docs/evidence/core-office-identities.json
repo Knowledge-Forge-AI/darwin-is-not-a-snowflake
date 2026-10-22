@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "date": "2026-10-11",
+  "identities": [
+    {
+      "cask": "libreoffice",
+      "artifact": "LibreOffice.app",
+      "id": "bundle:org.libreoffice.script",
+      "identityStatus": "VERIFIED_SOURCE",
+      "identityEvidence": "https://github.com/LibreOffice/core/blob/master/configure.ac",
+      "artifactEvidence": "https://formulae.brew.sh/cask/libreoffice",
+      "identitySourceBlob": "bf305646be63814d40de764cbd6e91b9574f8791"
+    },
+    {
+      "cask": "onlyoffice",
+      "artifact": "ONLYOFFICE.app",
+      "id": "bundle:asc.onlyoffice.ONLYOFFICE",
+      "identityStatus": "VERIFIED_SOURCE",
+      "identityEvidence": "https://github.com/ONLYOFFICE/desktop-apps/blob/master/macos/ONLYOFFICE.xcodeproj/project.pbxproj",
+      "artifactEvidence": "https://formulae.brew.sh/cask/onlyoffice",
+      "identitySourceBlob": "1467c0bc9fd48788f96a9bccf0da4b660dea36ff"
+    },
+    {
+      "cask": "zettlr",
+      "artifact": "Zettlr.app",
+      "id": "bundle:com.zettlr.app",
+      "identityStatus": "VERIFIED_SOURCE",
+      "identityEvidence": "https://github.com/Zettlr/Zettlr/blob/develop/forge.config.js",
+      "artifactEvidence": "https://formulae.brew.sh/cask/zettlr",
+      "identitySourceBlob": "5a0bcd3227bda6603f69fdd873b3dcea0e024de2"
+    },
+    {
+      "artifact": "GrandPerspective.app",
+      "id": "bundle:net.sourceforge.grandperspectiv",
+      "identityStatus": "VERIFIED_INSTALLED_METADATA",
+      "identityEvidence": "known system app Info.plist metadata",
+      "artifactEvidence": "https://formulae.brew.sh/cask/grandperspective",
+      "installationProvenance": "UNKNOWN_NOT_HOMEBREW_OR_MAC_APP_STORE",
+      "adoptionPreflight": "Do not force/adopt/replace existing bundle during SECURITY2; independently authorize provider transition later",
+      "management": "EXTERNAL_UNMANAGED_PRESERVED",
+      "claimStatus": "EXCLUDED_NOT_A_MANAGED_APPLICATION_CLAIM",
+      "hostEvidence": "2026-10-11: GrandPerspective 3.7.2 build 25, verified Info.plist; no Homebrew receipt, mas listing or App Store receipt"
+    }
+  ]
+}

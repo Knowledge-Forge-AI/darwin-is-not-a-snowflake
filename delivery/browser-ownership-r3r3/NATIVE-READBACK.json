@@ -1,0 +1,24 @@
+{
+  "schema": "browser-r3r3-native-result-v1",
+  "sourceCandidateDigest": "3bc0b76f61ad3ba4bcf45748a42a393719905eade61f532187595461f5f6f256",
+  "records": [
+    {
+      "check": "full-composed-two-host-graph",
+      "status": "ENVIRONMENT_DENIED",
+      "exitCode": 1,
+      "boundedStderr": "error:\n       \u2026 while fetching the input 'path:<source-root>'\n\n       error: cannot connect to socket at '/nix/var/nix/daemon-socket/socket': Operation not permitted\n",
+      "readback": null
+    },
+    {
+      "check": "full-composed-two-host-claims",
+      "status": "ENVIRONMENT_DENIED",
+      "exitCode": 1,
+      "boundedStderr": "error:\n       \u2026 while fetching the input 'path:<source-root>'\n\n       error: cannot connect to socket at '/nix/var/nix/daemon-socket/socket': Operation not permitted\n",
+      "readback": null
+    }
+  ],
+  "sourceDriftAfterReadback": [],
+  "activationPerformed": false,
+  "nativeSuccess": false,
+  "activeExtensionQualification": "PENDING_ATTENDED"
+}

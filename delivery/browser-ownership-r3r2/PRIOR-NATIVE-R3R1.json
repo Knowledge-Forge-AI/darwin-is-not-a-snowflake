@@ -1,0 +1,24 @@
+{
+  "evidenceClass": "OPERATOR_SUPPLIED_NATIVE_RESULT; not rerun by this producer",
+  "archive": "BUX-R3R1-NATIVE-READBACK1-EVIDENCE.zip",
+  "archiveSha256": "beb6ded7459414ece0b34b3ba3aab5aaff647d671bd0f27828d4a884fc3b7796",
+  "report": "NATIVE_READBACK_PASS",
+  "records": [
+    {
+      "check": "full-composed-two-host-graph",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "check": "full-composed-two-host-claims",
+      "status": "PASS",
+      "exitCode": 0
+    }
+  ],
+  "sourceCandidateDigest": "3e9949480754c85020167652aca94208b243daa586fd2d1bfeeabac0fed6495b",
+  "sourceRecordCount": 30,
+  "auxiliaryRecordCount": 7,
+  "modifiedR3R2NativeGraph": "PENDING",
+  "activeExtensionQualification": "PENDING_ATTENDED",
+  "incidentalPostReadbackShellDiagnostic": "child setpgid permission diagnostic followed successful readback; not a failed Nix check"
+}

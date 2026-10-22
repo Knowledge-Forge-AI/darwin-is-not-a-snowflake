@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="../static/report.css">
+  </head>
+  <body>
+    <main>
+      <header class="report-header">
+        <a href="../index.html">Back to report home</a>
+        <p class="metric-cell">{{ breadcrumbs }}</p>
+        <h1 class="code-block" title="{{ test_path_attr }}">{{ test_path }}</h1>
+      </header>
+
+      <section class="tree-section" aria-labelledby="summary-heading">
+        <div class="section-heading">
+          <h2 id="summary-heading">Test summary</h2>
+        </div>
+        <div class="test-grid row grid-header">
+          <div class="cell path-cell">Test file</div>
+          <div class="cell metric-cell">Total</div>
+          <div class="cell metric-cell">Passed</div>
+          <div class="cell metric-cell">Failed</div>
+          <div class="cell metric-cell">Skipped</div>
+          <div class="cell metric-cell">Status</div>
+        </div>
+        <div class="test-grid row">
+          <div class="cell path-cell code-block">{{ test_path }}</div>
+          <div class="cell metric-cell">{{ total }}</div>
+          <div class="cell metric-cell">{{ passed }}</div>
+          <div class="cell metric-cell">{{ failed }}</div>
+          <div class="cell metric-cell">{{ skipped }}</div>
+          <div class="cell metric-cell">{{ status }}</div>
+        </div>
+      </section>
+
+      {{ test_cases }}
+    </main>
+  </body>
+</html>

@@ -1,0 +1,49 @@
+<main>
+  <header class="report-header">
+    <div class="report-heading">
+      <p class="report-eyebrow">Static host-safe report</p>
+      <h1>nix-darwin Test Report</h1>
+      <p class="report-subtitle">Generated from test and coverage artifacts. Source coverage is organized by source path; test results are organized by test file path.</p>
+    </div>
+    <div class="report-badges" aria-label="Report summary">
+      {{ report_badges }}
+    </div>
+  </header>
+
+  {{ overview_links }}
+
+  {{ coverage_override }}
+
+  {{ runner_steps }}
+
+  {{ coverage_gates }}
+
+  <section class="tree-section" aria-labelledby="coverage-heading" data-tree-id="coverage">
+    <div class="section-heading">
+      <h2 id="coverage-heading">Coverage: source tree</h2>
+    </div>
+    <div class="tree-grid grid-header">
+      <div class="cell path-cell">Path</div>
+      <div class="cell metric-cell">Scope</div>
+      <div class="cell metric-cell">Lang</div>
+      <div class="cell metric-cell">Metric</div>
+      <div class="cell metric-cell">Detail</div>
+    </div>
+    {{ coverage_tree }}
+  </section>
+
+  <section class="tree-section" aria-labelledby="tests-heading" data-tree-id="tests">
+    <div class="section-heading">
+      <h2 id="tests-heading">Test results: test file tree</h2>
+    </div>
+    <div class="test-grid grid-header">
+      <div class="cell path-cell">Path</div>
+      <div class="cell metric-cell">Total</div>
+      <div class="cell metric-cell">Pass</div>
+      <div class="cell metric-cell">Fail</div>
+      <div class="cell metric-cell">Skip</div>
+      <div class="cell status-cell">Status</div>
+    </div>
+    {{ test_tree }}
+  </section>
+</main>

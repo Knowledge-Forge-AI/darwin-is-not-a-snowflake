@@ -1,0 +1,22 @@
+{
+  "schema": "browser-r3r3-test-results-v1",
+  "stage": "revise_close",
+  "sourceQualification": "PASS_INERT_SOURCE_ONLY",
+  "sourceChecks": 102,
+  "maintainedCoreOwnershipTests": 22,
+  "ownerNixContracts": 2,
+  "selectedPythonTests": 49,
+  "guardScripts": 7,
+  "guardEnvironmentVariants": 2,
+  "evidence": "REVISION-VERIFICATION.json",
+  "retainedProducerEvidence": "producer-evidence/TEST-RESULTS.json and unchanged producer-stage result files",
+  "nativeQualification": "PENDING_ENVIRONMENT_DENIED",
+  "fullNativeCurrentComposedGraph": "PENDING_EXTERNAL_READ_ONLY_KIT",
+  "freshGeckoIdentity": "PENDING_EXTERNAL_HTTPS_AND_BROWSER_SIGNING",
+  "independentReview": "PENDING_FINAL_INDEPENDENT_REVIEW",
+  "secondIndependentReviewObtained": false,
+  "browserProfileUse": false,
+  "runtimeActivated": false,
+  "runtimeDependenciesAdded": false,
+  "comprehensiveSuites": "not run; focused scope only"
+}

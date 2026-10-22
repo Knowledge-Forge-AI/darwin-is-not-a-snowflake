@@ -1,0 +1,115 @@
+{
+  "schema": "browser-r3r3-test-results-v1",
+  "sourceQualification": "PASS_INERT_SOURCE_ONLY",
+  "nativeQualification": "PENDING_ENVIRONMENT_DENIED",
+  "checks": [
+    {
+      "check": "R3R3 connected core and exact Browser UX source",
+      "status": "PASS",
+      "checks": 45,
+      "evidence": "SOURCE-TESTS.json"
+    },
+    {
+      "check": "current constructor, core, Browser UX and composition source; two hosts, applications/office continuity",
+      "status": "PASS",
+      "checks": 57,
+      "evidence": "CONNECTED-HOST-SOURCE-TESTS.json",
+      "boundary": "inert packages and artifact writers"
+    },
+    {
+      "check": "maintained core ownership unit evaluation",
+      "status": "PASS",
+      "tests": 14,
+      "evidence": "MAINTAINED-NIX-TESTS.json"
+    },
+    {
+      "check": "patched Browser UX Nix role contracts",
+      "status": "PASS",
+      "tests": 2,
+      "boundary": "evaluation only"
+    },
+    {
+      "check": "attended identity and preservation unit negatives",
+      "status": "PASS",
+      "tests": 8,
+      "command": "rtk proxy env PYTHONDONTWRITEBYTECODE=1 python3 src/test/unit/python/browser_proton_vpn_r3r3.unit.test.py -v"
+    },
+    {
+      "check": "retained automation/CDP isolation unit negatives",
+      "status": "PASS",
+      "tests": 10
+    },
+    {
+      "check": "retained passive host kit",
+      "status": "PASS",
+      "tests": 7
+    },
+    {
+      "check": "patched owner apply/rollback hold negatives",
+      "status": "PASS",
+      "tests": 2
+    },
+    {
+      "check": "patched owner rollout synthetic contract tests",
+      "status": "PASS",
+      "tests": 13
+    },
+    {
+      "check": "retained Chrome MCP lane failure and absent-client negatives",
+      "status": "PASS",
+      "tests": 2,
+      "boundary": "synthetic observations, not runtime MCP invocation",
+      "warning": "pytest cache_dir warning because cacheprovider disabled; no product or test configuration change"
+    },
+    {
+      "check": "activation/attended/automation pre-effect guards",
+      "status": "PASS",
+      "scripts": 7,
+      "environmentVariants": 2,
+      "exitCode": 78,
+      "evidence": "GUARD-TESTS.json"
+    },
+    {
+      "check": "cumulative owner forward/reverse/postimages and bounded core diff",
+      "status": "PASS",
+      "evidence": "PATCH-VERIFICATION.json"
+    },
+    {
+      "check": "full native current composed two-host graph and claims",
+      "status": "ENVIRONMENT_DENIED",
+      "evidence": "NATIVE-READBACK.json"
+    },
+    {
+      "check": "native browser baseline unit/integration evaluation",
+      "status": "ENVIRONMENT_DENIED",
+      "evidence": "MAINTAINED-NIX-TESTS.json"
+    },
+    {
+      "check": "fresh pinned builder/AMO/XPI HTTPS identity",
+      "status": "HTTPS_UNAVAILABLE",
+      "evidence": "IDENTITY-EVIDENCE.json"
+    },
+    {
+      "check": "syntax/JSON/diff checks",
+      "status": "PASS",
+      "evidence": "STATIC-CHECKS.json"
+    },
+    {
+      "check": "shipped incomplete presence template refuses",
+      "status": "PASS_EXPECTED_REFUSAL",
+      "exitCode": 1
+    }
+  ],
+  "browserProfileUse": false,
+  "installedPresence": "PENDING_ATTENDED",
+  "protectedTunnel": "PENDING_SEPARATE_APPROVED_CONNECTION_CANARY",
+  "independentReview": "PENDING_DISPATCHER_POST_WORK_REVIEW",
+  "profiles": {
+    "Python": "Yellow: new helpers <=98 lines; 33-statement cohesive presence validator; copied native/prepare helpers retain existing bounded shape",
+    "Nix": "Yellow: existing large module receives narrow adapter; per-ID merge isolated in a small library; source evidence explicitly separated from native qualification"
+  },
+  "runtimeDependenciesAdded": false,
+  "comprehensiveSuites": "not run; outside bounded source-delivery change",
+  "rtk": "commands prefixed; raw passthrough used for exact bytes; telemetry database inaccessible under sandbox; command execution available",
+  "finalSourceBehaviorVerification": "PASS_FINAL_POLICY_COLLISION_AND_IDENTIFIER_GUARDS"
+}

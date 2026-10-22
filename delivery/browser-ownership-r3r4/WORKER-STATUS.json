@@ -1,0 +1,10 @@
+{
+  "gemini": "used",
+  "task": "read-only owner projection investigation",
+  "job": "worker-r3r4-owner-projection-1",
+  "requestedProfile": "gemini-3.8-flash-high",
+  "effectiveModel": "NOT_OBSERVED",
+  "cleanupProven": true,
+  "parentDisposition": "accepted bounded investigation; parent preserves rendering and policy inputs and verifies",
+  "independentCheckpoint": false
+}

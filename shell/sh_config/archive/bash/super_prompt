@@ -1,0 +1,104 @@
+# customize prompt
+
+# function to generate git branch name
+parse_git_branch() {
+     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1:/'
+}
+
+firstPrompt='true'
+PROMPT_COMMAND=super_prompt
+
+function super_prompt() {
+	local lastCommandStatus=$? # capture status of last command
+
+	# variables to make modification easier
+
+
+	local bell='' # '\a' for bell or '' for no bell
+	local containerColor='0;33' # color of the container for the information header
+	local containerStartSymbol='[' # symbol used at the start of the container for the information header
+	local containerEndSymbol=']\n' # symbol used at the end of the container for the information header
+	local containerDivisionSymbol='|' # symbol used as dividers between sections of the container
+	local dateColor='1;33' # date color
+	local dateFormat='\d, $(date +'%Y')' # date format
+	local timeColor='1;35' # time color
+	local timeFormat='\@' # time format
+	local bashColor='1;36' # Bash version color
+	local bashFormat='Bash v\V' # Bash version format
+	local userColor='1;34' # color for user and host
+	local userFormat='\u@\H' # user format
+	local commandColor='1;35' # command index color
+	local commandFormat='C\#' # command index format
+	local historyColor='1;36' # history index color
+	local historyFormat='H\!' # history index format
+	local pathColor='1;34' # color for path
+	local pathFormat='$PWD' # format for path
+	local successSymbol='✔' # symbol to display when last command succeeds
+	local successColor='1;32' # color for success symbol
+	local failureSymbol='✗' # symbol to display when last command fails
+	local failureColor='1;31' # color for failure symbol
+	local warningColor='1;31' # warning color
+	local warningSymbol='☢' # warning symbol
+	local allClearColor='1;32' # all clear color
+	local allClearSymbol='☀' # all clear symbol
+	local gitColor='1;31' # color for git branch
+
+	# end modification variables
+
+	# container definition
+	containerStart='\e['$containerColor'm'$containerStartSymbol'\e[m' # start of container
+	containerEnd='\e['$containerColor'm'$containerEndSymbol'\e[m' # end of container
+	containerDivision='\e['$containerColor'm'$containerDivisionSymbol'\e[m' # dividers between sections of container
+
+	local primaryPrompt='' # initialize primary prompt
+	local seconaryPrompt='' # intialize secondary prompt
+
+	# an information header defined and written to environment variable PS1 when the terminal is first opened, the user changes, or this file is sourced.
+
+	if [ $firstPrompt == 'true' ]
+
+	then
+
+		primaryPrompt+=$containerStart'\e['$dateColor'm'$dateFormat'\e[m'$containerDivision'\e['$timeColor'm'$timeFormat'\e[m'$containerDivision'\e['$bashColor'm'$bashFormat'\e[m'$containerDivision'\e['$userColor'm'$userFormat'\e[m'$containerEnd
+
+		firstPrompt='false'
+
+	fi
+
+	# write a header to PS1 consisting of command and history numbers and path
+	primaryPrompt+=$containerStart$bell'\e['$commandColor'm'$commandFormat'\e[m'$containerDivision'\e['$historyColor'm'$historyFormat'\e[m'$containerDivision'\e['$gitColor'm'$(parse_git_branch)'\e[m\e['$pathColor'm'$pathFormat'\e[m'$containerEnd
+
+	if [ $lastCommandStatus == 0 ] # if last command succeded, use success color and symbol
+
+	then
+
+		primaryPrompt+='\e['$successColor'm'$successSymbol' \e[m'
+		secondaryPrompt+='\e['$successColor'm'$successSymbol' \e[m'
+
+	else # otherwise, use failure color and symbol
+
+		primaryPrompt+='\e['$failureColor'm'$failureSymbol' \e[m'
+		secondaryPrompt+='\e['$failureColor'm'$failureSymbol' \e[m'
+
+	fi
+
+
+	if [ $(id -u) == 0 ] # if userid is superuser, warn the user by using warning color and symbol
+
+	then
+
+		primaryPrompt+='\e['$warningColor'm'$warningSymbol' > \e[m'
+		secondaryPrompt+='\e['$warningColor'm'$warningSymbol' > \e[m'
+
+
+	else # otherwise, use all clear color and symbol
+
+		primaryPrompt+='\e['$allClearColor'm'$allClearSymbol' > \e[m'
+		secondaryPrompt+='\e['$allClearColor'm'$allClearSymbol' > \e[m'
+
+	fi
+
+	PS1=$primaryPrompt # write constructed primary prompt to environment variable PS1
+	PS2=$secondaryPrompt # write constructed secondary prompt to environment variable PS2
+
+}

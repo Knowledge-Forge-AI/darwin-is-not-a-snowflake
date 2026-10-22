@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="../static/report.css">
+  </head>
+  <body>
+    <main>
+      <header class="report-header">
+        <a href="../index.html">Back to report home</a>
+        <p class="metric-cell">{{ breadcrumbs }}</p>
+        <h1 class="code-block" title="{{ source_path_attr }}">{{ source_path }}</h1>
+      </header>
+
+      <section class="tree-section" aria-labelledby="summary-heading">
+        <div class="section-heading">
+          <h2 id="summary-heading">Coverage summary</h2>
+        </div>
+        <div class="tree-grid row">
+          <div class="cell metric-cell">Scope</div>
+          <div class="cell metric-cell">Language</div>
+          <div class="cell metric-cell">Detail</div>
+          <div class="cell path-cell">Metrics</div>
+          <div class="cell path-cell">Source</div>
+        </div>
+        <div class="tree-grid row">
+          <div class="cell metric-cell">{{ scope }}</div>
+          <div class="cell metric-cell">{{ language }}</div>
+          <div class="cell metric-cell">{{ detail_kind }}</div>
+          <div class="cell path-cell">{{ metric_chips }}</div>
+          <div class="cell path-cell code-block">{{ source_path }}</div>
+        </div>
+      </section>
+
+      {{ native_report }}
+
+      {{ detail_rows }}
+    </main>
+  </body>
+</html>

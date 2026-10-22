@@ -1,0 +1,9 @@
+export NVM_DIR="$HOME/.nvm"
+
+nvm_homebrew_script="${NVM_HOMEBREW_SCRIPT:-/opt/homebrew/opt/nvm/nvm.sh}"
+
+if [ -s "$nvm_homebrew_script" ]; then
+  . "$nvm_homebrew_script"
+elif [ -s "$NVM_DIR/nvm.sh" ]; then
+  . "$NVM_DIR/nvm.sh"
+fi

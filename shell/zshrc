@@ -1,0 +1,12 @@
+for file in "$HOME"/.sh_config/common/*(N); do
+  [ "${file:t}" = "999_on-login" ] && continue
+  source "$file"
+done
+
+for file in "$HOME"/.sh_config/zsh/*(N); do
+  source "$file"
+done
+
+if [ -f "$HOME/.sh_config/common/999_on-login" ]; then
+  source "$HOME/.sh_config/common/999_on-login"
+fi

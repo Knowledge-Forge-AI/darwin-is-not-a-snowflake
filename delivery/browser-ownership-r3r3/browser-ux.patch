@@ -1,0 +1,647 @@
+--- /dev/null
++++ b/config/browser/extension-contributions-r3r3.nix
+@@ -0,0 +1,34 @@
++# Semantic inputs only. Core renders one combined attended delivery plan.
++let
++  roles = import ./roles-r3.nix;
++  rows = role: entries: builtins.map (id: {
++    inherit role id;
++    owner = "browser-ux";
++    purpose = if id == "vpn@proton.ch" then "security"
++      else if id == "uBlock0@raymondhill.net" then "blocker" else "convenience";
++    name = entries.${id}.name;
++    method = if id == "vpn@proton.ch" then "ATTENDED_OFFICIAL_STORE" else "PRESERVED_CONVENIENCE_INTENT";
++    automaticInstallation = false;
++    automaticSignIn = false;
++    autoConnect = false;
++    policy = {};
++  } // (if id == "vpn@proton.ch" then {
++    procedure = ../../delivery/proton-vpn-floorp.md;
++    storeUrl = "https://addons.mozilla.org/en-US/firefox/addon/proton-vpn-firefox-extension/";
++    updateUrl = entries.${id}.install_url;
++    status = "ATTENDED_INSTALLATION_HELD_PENDING_IDENTITY_RELEASE_AND_READBACK";
++  } else {})) (builtins.attrNames entries);
++in rows "brave-daily" roles.braveDaily.extensions
++  ++ rows "librewolf" roles.librewolf.extensions
++  ++ rows "orion" roles.orion.extensions
++  ++ rows "floorp" roles.floorp.extensions
++  ++ [{
++    role = "floorp";
++    id = roles.floorp.credentialExtension;
++    owner = "browser-ux";
++    purpose = "credentials";
++    name = "Apple Passwords";
++    method = "PRESERVED_COMPATIBILITY_HELD_INTENT";
++    automaticInstallation = false; automaticSignIn = false; autoConnect = false;
++    policy = {};
++  }]
+--- /dev/null
++++ b/config/browser/roles-r3.nix
+@@ -0,0 +1,57 @@
++let
++  catalog = import ./extension-policy.nix;
++  chrome = catalog.chromeExtensions.defaultOn // {
++    felphkbfjadmcejnibcmcncimlappdde = catalog.chromeExtensions.required.felphkbfjadmcejnibcmcncimlappdde;
++  };
++  gecko = catalog.firefoxExtensions.defaultOn // catalog.firefoxExtensions.required;
++  held = entries: builtins.mapAttrs (_: item: item // {
++    status = "ATTENDED_OR_UNSUPPORTED";
++    automaticInstallation = false;
++    effectiveReadbackRequired = true;
++  }) entries;
++in {
++  schema = "browser-ux-role-ownership-r3-v1";
++  enable = true;
++  deployment = "HELD_SOURCE_RELEASE_REQUIRED";
++  floorp = {
++    package = "floorp";
++    bundleId = "app.floorp.Floorp";
++    searchDefault = "Brave Search";
++    extensions = held (gecko // {
++      # Core owns Proton VPN for core-installed browsers; Floorp alone is ours.
++      "vpn@proton.ch" = catalog.firefoxExtensions.trial."vpn@proton.ch" // {
++        extensionOwner = "browser-ux";
++        installationIntent = "per-profile attended official AMO add";
++        installationProcedure = ../../delivery/proton-vpn-floorp.md;
++        sourceDelivery = "ATTENDED_INSTALLATION_PREPARED_NOT_INSTALLED";
++        autoConnectDefault = false;
++        autoConnectEnforcement = "NONE; attended UI readback required";
++        automaticSignIn = false;
++        dnsPolicy = "UNCHANGED; compatibility and DNS/DoH leak check pending";
++      };
++    });
++    credentialExtension = "password-manager-firefox-extension@apple.com";
++    credentialCompatibility = "PASSWORD_TOTP_PASSKEY_PROOF_REQUIRED_BEFORE_NATIVE_SUPPRESSION";
++    deliveredPolicies = {};
++  };
++  librewolf = {
++    extensions = held { "clear-new-tab@loftyshaky" = catalog.firefoxExtensions.required."clear-new-tab@loftyshaky"; };
++    privacyAndCredentialsOwner = "core";
++    deliveredPolicies = {};
++  };
++  braveDaily = {
++    extensions = held chrome;
++    delivery = "per-profile attended only; no global forced policy";
++    widevine = { enabled = false; delivery = "attended opt-in only"; };
++    privacyAndCredentialsOwner = "core";
++  };
++  orion = {
++    extensions = held chrome;
++    delivery = "each Chrome-family extension requires actual Orion API/functionality attestation";
++    privacyBlockerAndCredentialsOwner = "core";
++  };
++  braveAutomation = { extensions = {}; credentialManagers = []; sync = false; };
++  braveYoutube = { physicalWriter = "core retained"; ownershipCut = "HELD"; destinationWriterEnabled = false; };
++  vivaldi = { state = "DECOMMISSIONED_NOT_DELETED"; profileWriter = false; mailOAuthTroubleshooting = false; };
++  retiredR1Cutover = "configuration retained for continuity; target runtime selects R3 rather than primaryCutover/replacements";
++}
+--- /dev/null
++++ b/delivery/proton-vpn-floorp.md
+@@ -0,0 +1,55 @@
++# Floorp Proton VPN attended installation
++
++Status: source prepared; installation held pending separate approved release,
++fresh Gecko identity and attended authorization. Browser UX installs Floorp and
++owns its Proton VPN add-on `vpn@proton.ch`. Core defines no Floorp VPN entry.
++Browser UX contributes per-ID data to core's single combined plan renderer;
++this creates no competing policy or profile writer.
++
++1. Use the installed Floorp app and the intended existing profile. Record an
++   anonymous local profile label, browser version, all existing extension IDs
++   and enabled states, forced extension IDs, policy equality baseline, CNT
++   wallpaper and credential behavior. Preserve uBO, Clear New Tab, the existing
++   Firefox-family convenience suite and Apple Passwords compatibility intent.
++   Do not suppress native password storage or remove competing existing state.
++   If Proton is already present, skip Add actions and observe it without
++   reinstalling. Record OBSERVED_EXISTING rather than ADDED_THIS_SESSION.
++   Confirm complete inventories and explicitly confirm any empty baseline.
++2. Run core's R3R3 read-only HTTPS identity kit. Require a fresh official AMO
++   `guid=vpn@proton.ch`, current XPI manifest ID/version and AMO SHA256 agreement.
++   Require browser signing verification on install. A `latest.xpi` URL or the
++   pinned upstream builder alone does not attest a current signed package.
++3. In that Floorp profile, open the official
++   [Proton VPN AMO listing](https://addons.mozilla.org/en-US/firefox/addon/proton-vpn-firefox-extension/).
++   Check Proton AG, click **Add to Firefox**, inspect the permissions, then
++   approve **Add**. This is an actual per-profile installation procedure.
++   If unavailable, blocked or incompatible, stop and retain held status.
++   Do not overwrite managed settings or `policies.json`, disable signing, load
++   an unpacked/temporary XPI or edit profile databases. Allow normal official
++   signed AMO updates; never downgrade or disable updates.
++4. Do not log in or connect. Do not enable private browsing or auto-connect.
++   Record auto-connect as OFF if visible or UNOBSERVABLE_LOGGED_OUT if not.
++5. Read `about:addons` and `about:support` for ID, version, enabled state and
++   signing; compare existing extensions, forced IDs, policy values, wallpaper,
++   credentials, hardening and DNS settings with the baseline. Feed sanitized
++   observations to core's R3R3 presence validator with semanticOwner=browser-ux.
++   Pass the fresh identity kit JSON as --identity-evidence and copy its XPI
++   SHA256 into identitySha256. Match the installed version to that receipt,
++   refreshed during this session (within 24 hours). If AMO updates between
++   readback and Add, refresh and compare again without downgrading/reinstalling.
++   The receipt binds observed version to a fetched package; installed bytes
++   still require browser signing readback. A boolean identity flag is insufficient.
++   Presence is distinct from an enabled, authenticated and protected tunnel.
++6. Stop on preservation failure. If newly installed here, an attended disable
++   of this one add-on is the bounded rollback. Do not delete data or reset an
++   already present add-on. Uninstall needs a separate preservation decision.
++
++Floorp compatibility and Firefox DNS/DoH behavior need a later separately
++authorized connection canary. Do not set `network.trr.mode`. Record only route
++change outcomes; keep IPs, resolvers and raw account/profile data local.
++Proton's [official Firefox-family guide](https://protonvpn.com/support/browser-extensions)
++supports attended add-on installation; it does not establish this Floorp
++version's working tunnel. Mozilla's
++[policy reference](https://mozilla.github.io/policy-templates/#extensionsettings)
++distinguishes `allowed` from automatic installation. No automatic policy is
++selected in this source candidate.
+--- a/delivery/rollout.py
++++ b/delivery/rollout.py
+@@ -158,6 +158,7 @@
+ 
+ 
+ def execute(args):
++    require(False, "R3_DEPLOYMENT_HELD_SOURCE_RELEASE_REQUIRED")
+     require(args.backup is not None, "BACKUP_ARGUMENT_REQUIRED")
+     require(args.attended, "ATTENDED_CONFIRMATIONS_REQUIRED")
+     browsers = selected_browsers(args)
+@@ -180,6 +181,7 @@
+ 
+ 
+ def rollback(args):
++    require(False, "R3_LEGACY_ROLLBACK_HELD_SEPARATE_PRESERVING_AUTHORITY_REQUIRED")
+     require(args.backup is not None, "BACKUP_ARGUMENT_REQUIRED")
+     require(args.attended and os.geteuid() == 0, "ATTENDED_ADMINISTRATIVE_PROMPT_REQUIRED")
+     records = json.loads((args.backup / "BACKUP.json").read_text())
+--- a/flake.nix
++++ b/flake.nix
+@@ -28,7 +28,7 @@
+         outPath = builtins.toString nixpkgs.outPath;
+       };
+ 
+-      inherit (import ./lib/application-claims.nix) applicationClaims applicationClaimsFor;
++      inherit (import ./lib/application-claims.nix) applicationClaims applicationClaimsFor applicationClaimsForHost;
+ 
+       configAllowlist = {
+         "browser-ux.toml" = [
+@@ -41,7 +41,7 @@
+       };
+ 
+       releaseCandidate = {
+-        milestone = "BUX5A: dormant command package + skills + CNT authority inventory";
++        milestone = "R3: held browser role and physical owner source candidate";
+         commandPackageRegistered = false;
+         commandTrialBoundary = "Help/status and fixture-only dry runs; mutating trials require separate operator authorization. Core remains selected command owner. BUX5 is incomplete.";
+         schema = "browser-ux-release-candidate-v1";
+@@ -50,15 +50,19 @@
+         enforcementBoundary = "none";
+         note = "Self-asserted destination metadata; not an enforcement boundary consumed by core or composition.";
+         deployPreconditions = [
+-          "Adopt matched Browser UX, core-owned writer, public/private composition and scoped local TOML delta through native snapshot/lock mechanisms. Preserve all unrelated selections."
+-          "On example-primary only, select Vivaldi, Floorp and Safari; retire daily Chrome/Firefox package ownership and exact policy targets while retaining profiles and recoverable data. Family baselines remain inheritable."
+-          "Apple Passwords is the selected credential provider. iCloud Passwords alone is the credential extension; remove KeePassXC-Browser and Proton Pass without deleting native apps or vaults. Proton VPN stays independent. Built-in save suppression does not prove full autofill suppression or passkey operation."
+-          "Vivaldi feeds-only supersedes Mail/Calendar-on intent; use supported UI controls, preserve local data, and observe stopped account activity. The historical OPERATOR_REPORTED_RESOLVED Mail repair remains accepted provenance."
+-          "Safari Wipr 2 five toggles, Apple pairing, Startpage defaults and two accessible bookmarks need attended effective readback. Safari search is PENDING_SUPPORTED_MECHANISM until an installed supported route is verified. A generated kit is preparation, not installed success."
++          "R3 supersedes target-host R1. Final source and exact owner patches require manager review before adoption; all browser deployment is mechanically held in core."
++          "Core owns stock Brave, LibreWolf, Orion and Safari privacy. Browser UX owns Floorp and per-profile convenience intent; Brave automation receives no convenience or credential extensions."
++          "Preserve Chrome/Clear New Tab storage and Brave YouTube core writer, profiles, artwork and wallpaper source. Vivaldi is decommissioned without uninstall, data deletion or mail/OAuth work."
++          "Apple Passwords password/TOTP/passkey compatibility precedes native-manager suppression. Unsupported fork integration stays held; preserve credential stores and recovery vaults."
+         ];
+         qualificationNotes = [
+-          "Primary-cutover contracts evaluate lifecycle, family inheritance, provider independence and scoped ownership. Runtime policy, native helper, feeds, search, Wipr and passkey behavior remain attended observations; historic receipts are not new installation proof. Legacy consumers retain schema-compatible defaults."
++          "Real composed graph, package acquisition, effective per-profile search/privacy/blockers/extensions and representative Brave automation remain native/attended qualification. No source declaration proves effectiveness."
+         ];
++        targetHostGeneration = {
++          homebrewCasks = [ "floorp" ];
++          effectiveQualification = "HELD";
++        };
++        # Legacy/non-target baseline; target package ownership is declared above.
+         hostGeneration = {
+           systemPackages = [ ];
+           homebrewCasks = [ ];
+@@ -91,6 +95,7 @@
+     in
+     {
+       darwinModules.default = defaultModule;
++      browserRolesR3 = import ./config/browser/roles-r3.nix;
+       replacementParity = {
+         schema = "browser-ux-replacement-parity-v1";
+         system1 = (import ./config/browser/replacements).system1Catalog;
+@@ -110,6 +115,7 @@
+       inherit
+         applicationClaims
+         applicationClaimsFor
++        applicationClaimsForHost
+         packageSetIdentity
+         configAllowlist
+         releaseCandidate
+@@ -132,6 +138,7 @@
+       }) // (import ./tests/command-checks.nix { inherit pkgs commands; })
+         // (import ./tests/apple-proton-contracts.nix { inherit lib pkgs; })
+         // (import ./tests/composition-delivery-contracts.nix { inherit lib pkgs; })
+-        // (import ./tests/primary-cutover-contracts.nix { inherit lib pkgs; });
++        // (import ./tests/primary-cutover-contracts.nix { inherit lib pkgs; })
++        // (import ./tests/roles-r3.nix { inherit lib pkgs; });
+     };
+ }
+--- a/lib/application-claims.nix
++++ b/lib/application-claims.nix
+@@ -1,19 +1,7 @@
+ # Destination-owned migration provenance; the public claim schema excludes location fields.
+ let
+-  inventory = [
+-    {
+-      id = "bundle:com.operator.brave-youtube";
+-      artifact = "Brave YouTube.app";
+-      provider = "nix";
+-      package = "brave";
+-      surface = "system.activationScripts";
+-      declaration = "modules/brave-youtube.nix";
+-      handoff = {
+-        from = "core";
+-        adr = "docs/adr/2026/08/0002-domain-ownership-application-claims-and-migration-sequencing.md";
+-      };
+-    }
+-  ];
++  # Core retains the existing Brave YouTube physical writer and active claim.
++  inventory = [ ];
+   replacementInventory = {
+     vivaldi = {
+       id = "bundle:com.vivaldi.Vivaldi"; artifact = "Vivaldi.app";
+@@ -59,5 +47,7 @@
+ in
+ {
+   inherit inventory replacementInventory applicationClaims replacementApplicationClaims;
++  applicationClaimsForHost = { hostName, ... }:
++    if hostName == "example-primary" then project [ replacementInventory.floorp ] else [ ];
+   applicationClaimsFor = replacements: applicationClaims ++ replacementApplicationClaims replacements;
+ }
+--- a/modules/default.nix
++++ b/modules/default.nix
+@@ -1,4 +1,4 @@
+-{ config, lib, ... }:
++{ config, options ? {}, lib, ... }:
+ let
+   extensionPolicy = import ../config/browser/extension-policy.nix;
+   keepassxcEnabled = config."browser-ux".configuration.keepassxc.enable;
+@@ -231,8 +231,17 @@
+     readOnly = true;
+   };
+ 
+-  config =
+-    let
++  options."browser-ux".rolesR3 = lib.mkOption {
++    description = "R3 per-role convenience intent with automatic deployment held.";
++    type = lib.types.attrsOf lib.types.anything;
++    readOnly = true;
++  };
++
++  config = let
++    hasRolesR3Option = options ? programs && options.programs ? browserBaseline && options.programs.browserBaseline ? rolesR3;
++    rolesR3Active = currentHost && hasRolesR3Option && (config.programs.browserBaseline.rolesR3 or false);
++    r3Config = import ./roles-r3.nix { inherit config lib options; };
++    legacyConfig = let
+       primaryCutoverCfg = config."browser-ux".configuration.primaryCutover or null;
+       primaryCutoverActive = currentHost && primaryCutoverCfg != null && primaryCutoverCfg.enable;
+       credentialProvider =
+@@ -338,4 +347,16 @@
+       floorp.policies = rendering.floorp.deliverable;
+     };
+   };
++  in lib.mkMerge [
++    {
++      "browser-ux" = {
++        rolesR3 = if rolesR3Active then r3Config."browser-ux".rolesR3 else { enable = false; };
++        primaryCutover = if rolesR3Active then r3Config."browser-ux".primaryCutover else legacyConfig."browser-ux".primaryCutover;
++        replacementRendering = if rolesR3Active then r3Config."browser-ux".replacementRendering else legacyConfig."browser-ux".replacementRendering;
++        replacementApplicationClaims = if rolesR3Active then r3Config."browser-ux".replacementApplicationClaims else legacyConfig."browser-ux".replacementApplicationClaims;
++      };
++    }
++    (lib.mkIf rolesR3Active (builtins.removeAttrs r3Config [ "browser-ux" ]))
++    (lib.mkIf (!rolesR3Active) (builtins.removeAttrs legacyConfig [ "browser-ux" ]))
++  ];
+ }
+--- /dev/null
++++ b/modules/roles-r3.nix
+@@ -0,0 +1,37 @@
++{ config, lib, options ? null }:
++let
++  intent = import ../config/browser/roles-r3.nix;
++  claims = import ../lib/application-claims.nix;
++  hasHomebrew = options == null || options ? homebrew;
++  hasAssertions = options == null || options ? assertions;
++  hasExtensionSeam = options == null || (options ? programs
++    && options.programs ? browserBaseline
++    && options.programs.browserBaseline ? extensionContributions);
++in {
++} // lib.optionalAttrs hasExtensionSeam {
++  programs.browserBaseline.extensionContributions =
++    import ../config/browser/extension-contributions-r3r3.nix;
++} // lib.optionalAttrs hasHomebrew {
++  homebrew.casks = [ "floorp" ];
++} // lib.optionalAttrs hasAssertions {
++  assertions = [
++    {
++      assertion = (config.programs.browserBaseline.rolesR3 or false)
++        && (config.programs.browserBaseline.corePolicyOwnership or false);
++      message = "Browser UX R3 requires the matched held core role source.";
++    }
++    {
++      assertion = (config.homebrew.onActivation.cleanup or "none") == "none";
++      message = "Browser R3 decommissioning preserves installed apps and profiles; Homebrew cleanup must remain none.";
++    }
++  ];
++} // {
++  "browser-ux" = {
++    rolesR3 = intent;
++    replacementRendering = { floorp = null; vivaldi = null; };
++    replacementApplicationClaims = claims.applicationClaimsForHost { hostName = "example-primary"; };
++    primaryCutover = { enable = false; supersededBy = intent.schema; };
++  };
++  # No global Firefox policy suite, Brave force-install policy, Chrome/Safari
++  # contribution or profile writer. Core retains its legacy CNT/Chrome bridge.
++}
+--- a/tests/composition-delivery-contracts.nix
++++ b/tests/composition-delivery-contracts.nix
+@@ -66,7 +66,9 @@
+   single-host-cask-claims = check "single-host-cask-claims" (
+     selection.casksForHost "example-primary" shared == [ "vivaldi" "floorp" ]
+     && selection.casksForHost "example-workstation" shared == []
+-    && builtins.length (builtins.filter (selection.claimAppliesToHost "example-workstation") attached) == 1
++    && # Under R3, core retains Brave YouTube writer/claim (inventory is empty);
++    # predecessor receives 0 attached claims from browser-ux (1 in legacy R1).
++    builtins.length (builtins.filter (selection.claimAppliesToHost "example-workstation") attached) == (if claims.applicationClaims == [] then 0 else 1)
+     && builtins.filter (selection.claimAppliesToHost "example-primary") attached == attached
+     && selection.claimAppliesToHost "example-workstation" { owner = "other"; claim.id = "bundle:com.vivaldi.Vivaldi"; }
+   );
+--- a/tests/contracts.nix
++++ b/tests/contracts.nix
+@@ -1586,11 +1586,11 @@
+     assert releaseCandidate.hostGeneration.homebrewCasks == [ ];
+     assert releaseCandidate.hostGeneration.activationScripts == [ ];
+     assert releaseCandidate.hostGeneration.launchdDefinitions == [ ];
+-    assert lib.any (text: lib.hasInfix "core-owned writer" text) releaseCandidate.deployPreconditions;
+-    assert lib.any (text: lib.hasInfix "OPERATOR_REPORTED_RESOLVED" text) releaseCandidate.deployPreconditions;
+-    assert lib.any (text: lib.hasInfix "Apple Passwords is the selected" text) releaseCandidate.deployPreconditions;
+-    assert lib.any (text: lib.hasInfix "feeds-only supersedes Mail/Calendar-on" text) releaseCandidate.deployPreconditions;
+-    assert lib.any (text: lib.hasInfix "Primary-cutover contracts" text) releaseCandidate.qualificationNotes;
++    assert lib.any (text: lib.hasInfix "mechanically held in core" text) releaseCandidate.deployPreconditions;
++    assert lib.any (text: lib.hasInfix "Vivaldi is decommissioned" text) releaseCandidate.deployPreconditions;
++    assert lib.any (text: lib.hasInfix "Apple Passwords password/TOTP/passkey" text) releaseCandidate.deployPreconditions;
++    assert lib.any (text: lib.hasInfix "no convenience or credential extensions" text) releaseCandidate.deployPreconditions;
++    assert lib.any (text: lib.hasInfix "Real composed graph" text) releaseCandidate.qualificationNotes;
+     assert (map (op: op.id) releaseCandidate.operatorOnlyOperations) == [
+       "clear-new-tab-profile-mutation"
+       "clear-new-tab-playwright-import"
+--- a/tests/delivery-rollout.test.py
++++ b/tests/delivery-rollout.test.py
+@@ -84,7 +84,9 @@
+         self.assertIn("/Library/Managed Preferences/com.google.Chrome.plist", names)
+         self.assertFalse(any("Vivaldi" in name or "org.mozilla.firefox.plist" in name for name in names))
+ 
++
+     def test_execute_healthy_lane_uses_its_core_script_and_exact_backup(self):
++        # Target R3 rollout holds execution before any effect, backup write or prerequisite script run.
+         with tempfile.TemporaryDirectory() as temporary:
+             root = Path(temporary).resolve()
+             chrome, vivaldi, payload = (root / name for name in
+@@ -96,15 +98,41 @@
+             targets = [{"target": str(file), "source": str(payload)} for file in (chrome, vivaldi)]
+             args = type("Args", (), dict(build_manifest=build, backup=root / "backup", attended=True,
+                 mail_calendar_feeds_on=True, browsers=["chrome"], vpn_instance_confirmed=False))()
++            # 1. Target R3 mechanical hold: execute raises before check, backup, or apply script run
+             with mock.patch.object(rollout, "check", return_value={"browserReadiness": {
++                    "chrome": {"canApplyConfiguration": True}, "vivaldi": {"canApplyConfiguration": False}}}) as check, \
++                 mock.patch.object(rollout, "validate_build", return_value=(targets, payload)), \
++                 mock.patch.object(rollout.os, "geteuid", return_value=0), \
++                 mock.patch.object(rollout.subprocess, "run") as run:
++                with self.assertRaisesRegex(ValueError, "R3_DEPLOYMENT_HELD_SOURCE_RELEASE_REQUIRED"):
++                    rollout.execute(args)
++                check.assert_not_called()
++                run.assert_not_called()
++                self.assertFalse((root / "backup").exists())
++
++            # 2. Existing backup guard: if backup directory already exists, backup creation is refused
++            existing_backup = root / "existing_backup"
++            existing_backup.mkdir()
++            with self.assertRaisesRegex(ValueError, "BACKUP_DESTINATION_UNSAFE"):
++                rollout.backup(targets, existing_backup)
++
++            # 3. Legacy execute implementation characterized with the hold mocked out (no release authority)
++            def unheld_require(cond, msg):
++                if msg == "R3_DEPLOYMENT_HELD_SOURCE_RELEASE_REQUIRED":
++                    return
++                if not cond:
++                    raise ValueError(msg)
++
++            with mock.patch.object(rollout, "require", side_effect=unheld_require), \
++                 mock.patch.object(rollout, "check", return_value={"browserReadiness": {
+                     "chrome": {"canApplyConfiguration": True}, "vivaldi": {"canApplyConfiguration": False}}}), \
+                  mock.patch.object(rollout, "validate_build", return_value=(targets, payload)), \
+                  mock.patch.object(rollout.os, "geteuid", return_value=0), \
+                  mock.patch.object(rollout.subprocess, "run") as run:
+                 result = rollout.execute(args)
+-            self.assertEqual(result["status"], "CONFIGURATION_WRITTEN_EFFECTIVE_READBACK_PENDING")
+-            self.assertEqual(run.call_args.args[0], ["/nix/store/synthetic-chrome-script"])
+-            self.assertEqual([row["target"] for row in json.loads((args.backup / "BACKUP.json").read_text())], [str(chrome)])
++                self.assertEqual(result["status"], "CONFIGURATION_WRITTEN_EFFECTIVE_READBACK_PENDING")
++                self.assertEqual(run.call_args.args[0], ["/nix/store/synthetic-chrome-script"])
++                self.assertEqual([row["target"] for row in json.loads((args.backup / "BACKUP.json").read_text())], [str(chrome)])
+ 
+     def test_check_never_invokes_writer_or_creates_backup(self):
+         with tempfile.TemporaryDirectory() as temporary:
+@@ -148,7 +176,10 @@
+             self.assertEqual(observation["signedIn"], "UNVERIFIED")
+             self.assertEqual(observation["behavior"], "UNVERIFIED")
+ 
++
++
+     def test_backup_restores_only_fixture_files_links_and_absence(self):
++        # Target R3 rollback remains held before reading host backups or performing restoration.
+         with tempfile.TemporaryDirectory() as temporary:
+             root = Path(temporary).resolve()
+             file, link, absent, referent = (root / name for name in ("file", "link", "absent", "referent"))
+@@ -164,7 +195,27 @@
+             link.write_text("synthetic-new-manifest")
+             absent.write_text("synthetic-installed")
+             args = type("Args", (), {"backup": backup, "attended": True})()
++
++            # 1. Target R3 mechanical hold: rollback raises before any host read or restoration
+             with mock.patch.object(rollout, "TARGETS", {str(path) for path in (file, link, absent)}), \
++                 mock.patch.object(rollout.os, "geteuid", return_value=0), \
++                 mock.patch.object(rollout.os, "chown"):
++                with self.assertRaisesRegex(ValueError, "R3_LEGACY_ROLLBACK_HELD_SEPARATE_PRESERVING_AUTHORITY_REQUIRED"):
++                    rollout.rollback(args)
++            # Verify no restoration occurred under held R3
++            self.assertEqual(file.read_text(), "synthetic-policy-after")
++            self.assertEqual(link.read_text(), "synthetic-new-manifest")
++            self.assertTrue(absent.exists())
++
++            # 2. Legacy rollback implementation characterized with the hold mocked out (no release authority)
++            def unheld_require(cond, msg):
++                if msg == "R3_LEGACY_ROLLBACK_HELD_SEPARATE_PRESERVING_AUTHORITY_REQUIRED":
++                    return
++                if not cond:
++                    raise ValueError(msg)
++
++            with mock.patch.object(rollout, "require", side_effect=unheld_require), \
++                 mock.patch.object(rollout, "TARGETS", {str(path) for path in (file, link, absent)}), \
+                  mock.patch.object(rollout.os, "geteuid", return_value=0), \
+                  mock.patch.object(rollout.os, "chown"):
+                 result = rollout.rollback(args)
+@@ -177,6 +228,7 @@
+             self.assertEqual(referent.read_text(), "synthetic-reference")
+ 
+     def test_invalid_backup_is_validated_before_any_restore(self):
++        # Tampered and unsafe backups are refused before any file restoration.
+         with tempfile.TemporaryDirectory() as temporary:
+             root = Path(temporary).resolve()
+             file = root / "file"
+@@ -185,11 +237,31 @@
+             rollout.backup([{"target": str(file)}], backup)
+             (backup / "0").write_text("synthetic-tampered")
+             args = type("Args", (), {"backup": backup, "attended": True})()
++
++            # 1. Target R3 hold refuses rollback
+             with mock.patch.object(rollout, "TARGETS", {str(file)}), \
+                  mock.patch.object(rollout.os, "geteuid", return_value=0):
+-                with self.assertRaises(ValueError):
++                with self.assertRaisesRegex(ValueError, "R3_LEGACY_ROLLBACK_HELD_SEPARATE_PRESERVING_AUTHORITY_REQUIRED"):
+                     rollout.rollback(args)
+             self.assertEqual(file.read_text(), "synthetic-current")
++
++            # 2. Even under mocked hold release, tampered checksum is refused before any restore
++            def unheld_require(cond, msg):
++                if msg == "R3_LEGACY_ROLLBACK_HELD_SEPARATE_PRESERVING_AUTHORITY_REQUIRED":
++                    return
++                if not cond:
++                    raise ValueError(msg)
++
++            with mock.patch.object(rollout, "require", side_effect=unheld_require), \
++                 mock.patch.object(rollout, "TARGETS", {str(file)}), \
++                 mock.patch.object(rollout.os, "geteuid", return_value=0):
++                with self.assertRaisesRegex(ValueError, "BACKUP_CHECKSUM_MISMATCH"):
++                    rollout.rollback(args)
++            self.assertEqual(file.read_text(), "synthetic-current")
++
++            # 3. Existing backup destination refusal guard
++            with self.assertRaisesRegex(ValueError, "BACKUP_DESTINATION_UNSAFE"):
++                rollout.backup([{"target": str(file)}], backup)
+ 
+     def test_evaluated_posture_mismatch_refuses_build(self):
+         with tempfile.TemporaryDirectory() as temporary:
+--- a/tests/dormant-contracts.nix
++++ b/tests/dormant-contracts.nix
+@@ -10,7 +10,7 @@
+       adr = "docs/adr/2026/08/0002-domain-ownership-application-claims-and-migration-sequencing.md";
+     };
+   };
+-  expectedClaims = [ expectedClaim ];
++  expectedClaims = [ ];
+   provenance = import ../lib/application-claims.nix;
+   hashes = builtins.fromJSON (builtins.readFile ./fixtures/dormant-source-sha256.json);
+   # Direct application supplies the preserved outer argument. Configuration owns identity.
+@@ -37,12 +37,7 @@
+   checks = { applicationClaims, defaultActivation }: {
+     dormant-handoff-contract =
+       assert applicationClaims == expectedClaims;
+-      assert provenance.inventory == [ (expectedClaim // {
+-        surface = "system.activationScripts";
+-        declaration = "modules/brave-youtube.nix";
+-      }) ];
+-      assert builtins.attrNames (builtins.head applicationClaims)
+-        == [ "artifact" "handoff" "id" "package" "provider" ];
++      assert provenance.inventory == [ ];
+       assert lib.all (token: !lib.hasInfix token defaultActivation) forbidden;
+       assert lib.all (path: builtins.hashFile "sha256" (../. + "/${path}") == hashes.${path})
+         (builtins.attrNames hashes);
+--- /dev/null
++++ b/tests/roles-r3.nix
+@@ -0,0 +1,42 @@
++{ lib, pkgs ? { runCommandLocal = name: _: text: { inherit name text; }; } }:
++let
++  roles = import ../config/browser/roles-r3.nix;
++  provenance = import ../lib/application-claims.nix;
++  target = import ../modules/roles-r3.nix {
++    inherit lib;
++    config = { networking.hostName = "example-primary";
++      programs.browserBaseline = { rolesR3 = true; corePolicyOwnership = true; };
++      homebrew.onActivation.cleanup = "none";
++    };
++  };
++  check = name: predicate: assert predicate; pkgs.runCommandLocal name {} ''touch "$out"'';
++  chromeIds = builtins.attrNames roles.braveDaily.extensions;
++in {
++  roles-r3-owner-cut = check "roles-r3-owner-cut" (
++    target.homebrew.casks == ["floorp"]
++    && target.programs.browserBaseline ? extensionContributions && !(target ? system)
++    && lib.all (row: row.owner == "browser-ux" && row.policy == {}
++      && !row.automaticInstallation && !row.autoConnect)
++      target.programs.browserBaseline.extensionContributions
++    && provenance.inventory == [] && provenance.applicationClaims == []
++    && map (c: c.id) (provenance.applicationClaimsForHost { hostName = "example-primary"; }) == ["bundle:app.floorp.Floorp"]
++    && provenance.applicationClaimsForHost { hostName = "example-workstation"; } == []
++    && lib.all (a: a.assertion) target.assertions
++    && !target."browser-ux".primaryCutover.enable
++    && target."browser-ux".replacementRendering == { floorp = null; vivaldi = null; }
++  );
++  roles-r3-convenience-boundary = check "roles-r3-convenience-boundary" (
++    builtins.length chromeIds == 7
++    && !(builtins.elem "ddkjiahejlhfcafbddmgiahcphecmpfh" chromeIds)
++    && !(builtins.elem "oboonakemofpalcgghocfoadofidjkkk" chromeIds)
++    && !(builtins.elem "pejdijmoenmkgeppbflobdenhhabjlaj" chromeIds)
++    && builtins.attrNames roles.librewolf.extensions == ["clear-new-tab@loftyshaky"]
++    && roles.braveAutomation.extensions == {}
++    && roles.braveAutomation.credentialManagers == []
++    && roles.orion.extensions == roles.braveDaily.extensions
++    && !roles.braveDaily.widevine.enabled
++    && lib.all (item: !item.automaticInstallation) (builtins.attrValues roles.braveDaily.extensions)
++    && roles.vivaldi.state == "DECOMMISSIONED_NOT_DELETED"
++    && !roles.braveYoutube.destinationWriterEnabled
++  );
++}
+--- /dev/null
++++ b/tests/roles-r3.test.py
+@@ -0,0 +1,31 @@
++"""R3 legacy delivery is held before any prerequisite, backup or writer."""
++import importlib.util
++from pathlib import Path
++import sys
++import unittest
++from unittest import mock
++
++ROOT = Path(__file__).resolve().parents[1]
++sys.path.insert(0, str(ROOT / "delivery"))
++SPEC = importlib.util.spec_from_file_location("r3_rollout", ROOT / "delivery/rollout.py")
++ROLLOUT = importlib.util.module_from_spec(SPEC)
++SPEC.loader.exec_module(ROLLOUT)
++
++
++class RoleHoldTests(unittest.TestCase):
++    def test_apply_held_before_any_effect(self):
++        with mock.patch.object(ROLLOUT, "check") as check, mock.patch.object(ROLLOUT, "backup") as backup:
++            with self.assertRaisesRegex(ValueError, "R3_DEPLOYMENT_HELD"):
++                ROLLOUT.execute(object())
++            check.assert_not_called()
++            backup.assert_not_called()
++
++    def test_rollback_held_before_read_or_effect(self):
++        with mock.patch.object(ROLLOUT.subprocess, "run") as run:
++            with self.assertRaisesRegex(ValueError, "R3_LEGACY_ROLLBACK_HELD"):
++                ROLLOUT.rollback(object())
++            run.assert_not_called()
++
++
++if __name__ == "__main__":
++    unittest.main()
+--- a/tests/source-only-roster.json
++++ b/tests/source-only-roster.json
+@@ -183,5 +183,9 @@
+   "tests/core-delivery-contracts.nix",
+   "tests/delivery-rollout.test.py",
+   "tests/delivery-transport.test.py",
+-  "tests/matched-delivery-contracts.nix"
++  "tests/matched-delivery-contracts.nix",
++  "config/browser/roles-r3.nix",
++  "modules/roles-r3.nix",
++  "tests/roles-r3.nix",
++  "tests/roles-r3.test.py"
+ ]

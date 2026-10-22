@@ -1,0 +1,63 @@
+{
+  "schema": "bux-r3r4-review-disposition-v1",
+  "stage": "revise_close",
+  "disposition": "amend",
+  "producerBinding": {
+    "head": "79021c01e63464020f2e1b447a6f4ec488699ae4",
+    "kind": "git_tree",
+    "tree": "10410359a8cf1d93770c8969027eda5398697051"
+  },
+  "currentWorktreeBindingOnEntry": {
+    "head": "79021c01e63464020f2e1b447a6f4ec488699ae4",
+    "kind": "git_tree",
+    "tree": "10410359a8cf1d93770c8969027eda5398697051"
+  },
+  "entryQualification": {
+    "sourceBindingAndDeliveryChecksumVerification": "PASS",
+    "sourceRecords": 117,
+    "localOwnerPreimages": "PASS",
+    "suppliedTreeIdentityRecomputed": false
+  },
+  "originalScope": "retain runnable Vivaldi reference outside seven primary roles; preserve unrelated R3R3 behavior; source-only, owners read-only",
+  "priorStageDeltas": "accepted with scoped amendments; no unrelated changes rejected or reset",
+  "findings": [
+    {
+      "id": "F1",
+      "disposition": "amend",
+      "rationale": "Shared replacementPolicyOwnership selected new active Floorp plist deletion. Copy legacy ownership into Vivaldi-only vivaldiPolicyOwnership; preserve existing shared legacy behavior.",
+      "verification": "Connected Floorp activation check failed on producer, passes on revised candidate. Active Floorp policy selection and attended activation equal R3R3; no new Floorp rm. Core unit tests cover scoped and legacy retraction."
+    },
+    {
+      "id": "F2",
+      "disposition": "amend",
+      "rationale": "ADR now records retained reference, Browser UX cask/claim and existing policy selection, Floorp preservation, and explicit approval for later retirement."
+    },
+    {
+      "id": "F3",
+      "disposition": "accept",
+      "rationale": "Retained literal-status seam remains intentionally bounded by both R3 selectors and duplicate/priority/ID guards. Chrome/Floorp/inactive rejection fixtures remain; narrowing module provenance is deferred beyond this retention slice.",
+      "residualConcern": "The Vivaldi contribution seam is not restricted to Browser UX module provenance."
+    }
+  ],
+  "regressionEvidence": {
+    "beforeCorrection": {
+      "floorpActivationPreserved": false,
+      "floorpPolicySelectionPreserved": true,
+      "replacementWriterPreserved": true
+    },
+    "expectedFailingCheck": "floorpActivationPreserved",
+    "afterCorrection": {
+      "floorpActivationPreserved": true,
+      "floorpPolicySelectionPreserved": true,
+      "replacementWriterPreserved": true
+    }
+  },
+  "independentReview": {
+    "dispatcherOwnedCheckpointsReceived": 1,
+    "secondIndependentReviewObtained": false,
+    "finalBytesStatus": "PENDING_FINAL_INDEPENDENT_REVIEW"
+  },
+  "nativeQualification": "pending fresh ordinary-user readback; historical R3R3 PASS does not qualify revisions",
+  "adoption": "SEPARATE_MANAGER_DISPOSITION_AND_NEW_CLOSURE_HASH_PLAN_REQUIRED",
+  "noSourceCommitAuthority": true
+}

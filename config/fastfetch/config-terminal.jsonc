@@ -1,0 +1,52 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/master/doc/json_schema.json",
+  "display": {
+    "separator": ": ",
+    "disableLinewrap": true,
+    "color": {
+      "keys": "38;5;220",
+      "title": "green",
+      "output": "green",
+      "separator": "38;5;220"
+    }
+  },
+  "modules": [
+    "title",
+    "separator",
+    "datetime",
+    "os",
+    "host",
+    "kernel",
+    "uptime",
+    {
+      "type": "packages",
+      "combined": true
+    },
+    "shell",
+    "terminal",
+    "cpu",
+    "cpuusage",
+    "gpu",
+    "memory",
+    {
+      "type": "disk",
+      "key": "Disk",
+      "folders": "/",
+      "format": "{size-used} / {size-total} ({size-percentage})"
+    },
+    {
+      "type": "battery",
+      "key": "Battery"
+    },
+    {
+      "type": "poweradapter",
+      "key": "Power"
+    },
+    "locale",
+    "break",
+    {
+      "type": "custom",
+      "format": "{#yellow}󰮯{#} {#magenta}󰊠{#} {#blue}󰊠{#} {#magenta}󰊠{#} {#red}󰊠{#} {#yellow}󰊠{#} {#green}󰊠{#} {#cyan}󰊠{#} {#blue}󰊠{#}  "
+    }
+  ]
+}

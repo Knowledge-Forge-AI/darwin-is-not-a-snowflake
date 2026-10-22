@@ -1,0 +1,45 @@
+--- a/codex/config.d/400-mcp.toml
++++ b/codex/config.d/400-mcp.toml
+@@ -42,3 +42,3 @@
+ command = "npx"
+-args = ["@playwright/mcp@latest", "--executable-path", "/Applications/Nix Apps/Google Chrome.app/Contents/MacOS/Google Chrome"]
++args = ["@playwright/mcp@latest", "--isolated", "--sandbox", "--executable-path", "/run/current-system/sw/bin/browser-automation"]
+ 
+@@ -46,3 +46,3 @@
+ command = "npx"
+-args = ["chrome-devtools-mcp@latest", "--executablePath", "/Applications/Nix Apps/Google Chrome.app/Contents/MacOS/Google Chrome"]
++args = ["chrome-devtools-mcp@latest", "--isolated", "--executablePath", "/run/current-system/sw/bin/browser-automation"]
+ 
+--- /dev/null
++++ b/codex/tests/test_browser_roles_r3.py
+@@ -0,0 +1,30 @@
++"""Only the two modular automation MCP routes adopt the held core adapter."""
++from pathlib import Path
++import tomllib
++import unittest
++
++
++class BrowserRolesR3Tests(unittest.TestCase):
++    def setUp(self):
++        path = Path(__file__).resolve().parents[1] / "config.d/400-mcp.toml"
++        self.servers = tomllib.loads(path.read_text())["mcp_servers"]
++
++    def test_playwright_isolated_core_adapter(self):
++        self.assertEqual(self.servers["playwright"]["args"],
++                         ["@playwright/mcp@latest", "--isolated", "--sandbox", "--executable-path", "/run/current-system/sw/bin/browser-automation"])
++
++    def test_devtools_isolated_core_adapter(self):
++        self.assertEqual(self.servers["chrome-devtools"]["args"],
++                         ["chrome-devtools-mcp@latest", "--isolated", "--executablePath", "/run/current-system/sw/bin/browser-automation"])
++
++    def test_no_personal_attachment_or_new_runtime_gate(self):
++        for name in ("playwright", "chrome-devtools"):
++            server = self.servers[name]
++            self.assertEqual(server["command"], "npx")
++            self.assertNotIn("env", server)
++            self.assertFalse(any(arg.startswith(("--extension", "--autoConnect", "--browserUrl", "--userDataDir", "--storage-state"))
++                                 for arg in server["args"]))
++
++
++if __name__ == "__main__":
++    unittest.main()

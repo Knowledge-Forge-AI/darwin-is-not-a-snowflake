@@ -1,0 +1,33 @@
+name	validator	max_bytes	required	default	description
+PATH	path_list	8192	true	/usr/bin:/bin	Executable search path
+MANPATH	raw_safe	8192	false		Manual page search path
+INFOPATH	raw_safe	8192	false		Info page search path
+SHELL	path	1024	false		Interactive shell path
+TERM	token	128	false	xterm-256color	Terminal type
+LANG	token	128	false	en_US.UTF-8	Locale language
+LC_ALL	token	128	false		Locale override
+LC_CTYPE	token	128	false		Character classification locale
+LC_COLLATE	token	128	false		Collation locale
+LC_MESSAGES	token	128	false		Message locale
+NIX_PATH	path_list	4096	false		Nix search path
+NIX_PROFILES	path_list	4096	false		Nix profiles
+NIX_SSL_CERT_FILE	path	1024	false		Nix TLS certificate bundle
+NIXPKGS_ALLOW_UNFREE	bool	8	false	1	Nixpkgs unfree opt-in
+PYTHONPYCACHEPREFIX	path	2048	false		Python bytecode cache prefix
+JAVA_HOME	path	1024	false		JDK root
+SDKMAN_DIR	path	1024	false		SDKMAN root
+PYENV_ROOT	path	1024	false		pyenv root
+RBENV_ROOT	path	1024	false		rbenv root
+NVM_DIR	path	1024	false		nvm root
+PNPM_HOME	path	1024	false		pnpm root
+HOMEBREW_PREFIX	path	1024	false		Homebrew prefix
+HOMEBREW_CELLAR	path	1024	false		Homebrew cellar
+HOMEBREW_REPOSITORY	path	1024	false		Homebrew repository
+DOCKER_HOST	uri	1024	false		Docker daemon endpoint
+DOCKER_CONTEXT	token	128	false		Docker context name
+ORBSTACK_SHELL	token	128	false		OrbStack shell marker
+SSH_AUTH_SOCK	path	1024	false		SSH agent socket
+GPG_TTY	path	1024	false		GPG TTY path
+EDITOR	command	512	false		Default command-line editor
+VISUAL	command	512	false		Default visual editor
+PAGER	command	512	false		Default pager command

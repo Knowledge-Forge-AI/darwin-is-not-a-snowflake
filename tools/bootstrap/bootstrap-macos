@@ -1,0 +1,205 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+
+script_path="${${(%):-%x}:A}"
+flake_dir="$(cd "${script_path:h}/../.." && pwd)"
+local_root="${NIX_DARWIN_LOCAL:-$HOME/.local/nix-darwin}"
+public_composition_url="git@github.com:Knowledge-Forge-AI/composition_dinas.git"
+tmp_root=""
+nix_git=""
+
+usage() {
+  cat <<EOF
+Usage: ${0##*/} [options]
+
+Establish the nix-darwin bootstrap foundation.
+
+The bootstrap installs or verifies Nix, builds Nix-managed Git, creates an
+absent quiescent control file, clones the public composition when absent, and
+stops. It does not run composition bootstrap, build a Darwin system, switch,
+or activate.
+
+Options:
+  --flake-dir PATH    Core nix-darwin checkout. Defaults to this script's root.
+  --local-root PATH   Machine-local framework root. Defaults to
+                      NIX_DARWIN_LOCAL or ~/.local/nix-darwin.
+  -h, --help          Show this help.
+EOF
+}
+
+fail() {
+  echo "bootstrap-macos: $*" >&2
+  exit 1
+}
+
+cleanup() {
+  if [ -n "$tmp_root" ] && [ -d "$tmp_root" ]; then
+    rm -rf "$tmp_root"
+  fi
+}
+
+load_nix_environment() {
+  local profile
+
+  if [ "${BOOTSTRAP_SKIP_NIX_ENV:-0}" = "1" ]; then
+    return
+  fi
+
+  for profile in \
+    /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh \
+    /nix/var/nix/profiles/default/etc/profile.d/nix.sh \
+    "$HOME/.nix-profile/etc/profile.d/nix.sh"
+  do
+    if [ -r "$profile" ]; then
+      # shellcheck source=/dev/null
+      . "$profile"
+      break
+    fi
+  done
+}
+
+nix_with_flakes() {
+  nix --extra-experimental-features "nix-command flakes" "$@"
+}
+
+ensure_command_line_tools() {
+  if xcode-select -p >/dev/null 2>&1; then
+    return
+  fi
+
+  cat <<EOF
+Apple Command Line Tools are not installed yet.
+macOS will open the installer now. Finish that installer, then rerun:
+
+  $0
+EOF
+  xcode-select --install >/dev/null 2>&1 || true
+  exit 69
+}
+
+ensure_nix() {
+  local installer
+
+  load_nix_environment
+  if command -v nix >/dev/null 2>&1; then
+    echo "Nix is already installed."
+    return
+  fi
+
+  echo "Installing Nix with the official multi-user macOS installer..."
+  installer="$tmp_root/install-nix"
+  curl -fsSL https://nixos.org/nix/install -o "$installer"
+  sh "$installer" --daemon
+
+  load_nix_environment
+  command -v nix >/dev/null 2>&1 \
+    || fail "Nix installed, but nix is not on PATH. Open a new terminal and rerun this script."
+}
+
+ensure_nix_git() {
+  local git_root
+
+  echo "Building Git from the core Nix package set..."
+  git_root="$(nix_with_flakes build \
+    "$flake_dir#legacyPackages.aarch64-darwin.git" \
+    --no-link \
+    --print-out-paths)"
+  [ -n "$git_root" ] || fail "Nix did not return a Git store path"
+  nix_git="$git_root/bin/git"
+  [ -x "$nix_git" ] || fail "Nix-managed Git is unavailable at $nix_git"
+}
+
+establish_local_root() {
+  local config_dir="$local_root/config"
+  local control_file="$config_dir/nix-darwin.toml"
+
+  mkdir -p "$config_dir"
+  if [ -e "$control_file" ] || [ -L "$control_file" ]; then
+    echo "Preserving existing control file at $control_file."
+    return
+  fi
+
+  (
+    umask 077
+    cat > "$control_file" <<'EOF'
+[flake]
+active = ""
+EOF
+  )
+  echo "Created quiescent control file at $control_file."
+}
+
+establish_public_composition() {
+  local checkout="$local_root/composition-nd"
+  local actual_origin
+
+  if [ ! -e "$checkout" ] && [ ! -L "$checkout" ]; then
+    echo "Cloning the public composition into $checkout."
+    "$nix_git" clone -- "$public_composition_url" "$checkout"
+    return
+  fi
+
+  [ -d "$checkout/.git" ] \
+    || fail "existing composition checkout is not a Git repository: $checkout"
+  actual_origin="$("$nix_git" -C "$checkout" remote get-url origin)" \
+    || fail "unable to read existing composition checkout origin: $checkout"
+  [ "$actual_origin" = "$public_composition_url" ] \
+    || fail "existing composition checkout has an unexpected origin: $checkout"
+  echo "Preserving existing public composition checkout at $checkout."
+}
+
+main() {
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --flake-dir)
+        [ "$#" -ge 2 ] || fail "--flake-dir requires a value"
+        flake_dir="$2"
+        shift 2
+        ;;
+      --local-root)
+        [ "$#" -ge 2 ] || fail "--local-root requires a value"
+        local_root="$2"
+        shift 2
+        ;;
+      -h|--help)
+        usage
+        exit 0
+        ;;
+      *)
+        fail "unknown option: $1"
+        ;;
+    esac
+  done
+
+  [ "$(uname -s)" = "Darwin" ] || fail "this bootstrap script is for macOS only"
+  [ "$(id -u)" -ne 0 ] || fail "run this as your normal user, not root"
+  [ -d "$flake_dir" ] && [ -f "$flake_dir/flake.nix" ] \
+    || fail "flake.nix not found in $flake_dir"
+  flake_dir="$(cd "$flake_dir" && pwd)"
+  case "$local_root" in
+    /*) ;;
+    *) fail "local root must be an absolute path: $local_root" ;;
+  esac
+
+  tmp_root="$(mktemp -d)"
+  trap cleanup EXIT
+
+  ensure_command_line_tools
+  ensure_nix
+  ensure_nix_git
+  establish_local_root
+  establish_public_composition
+
+  cat <<EOF
+Bootstrap foundation complete.
+
+The public composition checkout is available at:
+  $local_root/composition-nd
+
+No composition bootstrap, Darwin build, switch, or activation was requested.
+EOF
+}
+
+if [ "${BOOTSTRAP_TEST_MODE:-0}" != "1" ]; then
+  main "$@"
+fi

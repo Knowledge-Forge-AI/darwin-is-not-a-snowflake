@@ -1,0 +1,7 @@
+[
+  {
+    "path": "lib/browser-ux-host-selection.nix",
+    "before_sha256": "c31954a2118128c6a3fa7b5d721e1f40d9b4218cfb5b4cbc74cba72753804ae6",
+    "after_sha256": "1b90259edfa7e0651774d4f16f8c27a90f98b22c00e3231e27caa009ef703888"
+  }
+]

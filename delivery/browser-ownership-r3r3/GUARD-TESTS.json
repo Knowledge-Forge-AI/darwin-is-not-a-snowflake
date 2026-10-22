@@ -1,0 +1,54 @@
+{
+  "records": [
+    {
+      "script": "activation",
+      "status": "PASS",
+      "exitCode": 78,
+      "environmentVariants": 2,
+      "effectObserved": false
+    },
+    {
+      "script": "aggregate",
+      "status": "PASS",
+      "exitCode": 78,
+      "environmentVariants": 2,
+      "effectObserved": false
+    },
+    {
+      "script": "automation",
+      "status": "PASS",
+      "exitCode": 78,
+      "environmentVariants": 2,
+      "effectObserved": false
+    },
+    {
+      "script": "chrome",
+      "status": "PASS",
+      "exitCode": 78,
+      "environmentVariants": 2,
+      "effectObserved": false
+    },
+    {
+      "script": "firefox",
+      "status": "PASS",
+      "exitCode": 78,
+      "environmentVariants": 2,
+      "effectObserved": false
+    },
+    {
+      "script": "floorp",
+      "status": "PASS",
+      "exitCode": 78,
+      "environmentVariants": 2,
+      "effectObserved": false
+    },
+    {
+      "script": "vivaldi",
+      "status": "PASS",
+      "exitCode": 78,
+      "environmentVariants": 2,
+      "effectObserved": false
+    }
+  ],
+  "runtimeBrowsersUsed": false
+}

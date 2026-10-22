@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+extension_id="felphkbfjadmcejnibcmcncimlappdde"
+source_chrome_profile="${CLEAR_NEW_TAB_SOURCE_CHROME_PROFILE:-$HOME/Library/Application Support/Google/Chrome/Default}"
+
+usage() {
+  cat <<'USAGE'
+Usage: clear-new-tab-sync [brave-youtube|status]
+
+Sync Clear New Tab from the normal Chrome profile into the Brave YouTube
+Chromium profile. Chrome remains the source of truth for the Brave YouTube
+wallpaper lineup.
+
+Supported:
+  brave-youtube   Copy the Chrome extension bundle and Chromium profile state
+                  into ~/Library/Application Support/Brave YouTube.
+  status          Show source and target state.
+
+Environment:
+  CLEAR_NEW_TAB_SOURCE_CHROME_PROFILE=~/Library/Application Support/Google/Chrome/Default
+  BRAVE_YOUTUBE_USER_DATA_DIR=~/Library/Application Support/Brave YouTube
+USAGE
+}
+
+script_path() {
+  local script_dir
+  local script_name
+
+  case "$0" in
+    /*)
+      printf '%s\n' "$0"
+      ;;
+    */*)
+      script_dir="$(/usr/bin/dirname "$0")"
+      script_name="$(/usr/bin/basename "$0")"
+      printf '%s/%s\n' "$(cd "$script_dir" && /bin/pwd -P)" "$script_name"
+      ;;
+    *)
+      command -v "$0"
+      ;;
+  esac
+}
+
+script_dir() {
+  /usr/bin/dirname "$(script_path)"
+}
+
+clear_new_tab_libexec_dir() {
+  printf '%s/../libexec/clear-new-tab\n' "$(script_dir)"
+}
+
+latest_source_extension_dir() {
+  local root="$source_chrome_profile/Extensions/$extension_id"
+
+  if [ ! -d "$root" ]; then
+    return 1
+  fi
+
+  /usr/bin/python3 "$(clear_new_tab_libexec_dir)/latest-source-extension-dir.py" "$root"
+}
+
+sync_dir() {
+  local source="$1"
+  local target="$2"
+  local target_parent
+  local tmp
+  local backup
+
+  if [ ! -e "$source" ]; then
+    return 0
+  fi
+
+  target_parent="$(/usr/bin/dirname "$target")"
+  /bin/mkdir -p "$target_parent"
+
+  tmp="$target.sync.$$"
+  backup="$target.backup.$$"
+  /bin/rm -rf "$tmp" "$backup"
+  /bin/cp -pR "$source" "$tmp"
+
+  if [ -e "$target" ]; then
+    /bin/mv "$target" "$backup"
+  fi
+  /bin/mv "$tmp" "$target"
+  /bin/rm -rf "$backup"
+}
+
+sync_brave_youtube() {
+  local target_root="${BRAVE_YOUTUBE_USER_DATA_DIR:-$HOME/Library/Application Support/Brave YouTube}"
+  local target_default="$target_root/Default"
+  local source_extension_dir
+
+  source_extension_dir="$(latest_source_extension_dir)" || {
+    echo "clear-new-tab-sync: Clear New Tab is not installed in $source_chrome_profile" >&2
+    return 1
+  }
+
+  /bin/mkdir -p "$target_root" "$target_default"
+  sync_dir "$source_extension_dir" "$target_root/clear-new-tab-extension"
+  sync_dir \
+    "$source_chrome_profile/IndexedDB/chrome-extension_${extension_id}_0.indexeddb.leveldb" \
+    "$target_default/IndexedDB/chrome-extension_${extension_id}_0.indexeddb.leveldb"
+  sync_dir \
+    "$source_chrome_profile/IndexedDB/chrome-extension_${extension_id}_0.indexeddb.blob" \
+    "$target_default/IndexedDB/chrome-extension_${extension_id}_0.indexeddb.blob"
+  sync_dir \
+    "$source_chrome_profile/Local Extension Settings/$extension_id" \
+    "$target_default/Local Extension Settings/$extension_id"
+
+  echo "synced Clear New Tab to Brave YouTube"
+}
+
+status() {
+  local latest=""
+  latest="$(latest_source_extension_dir || true)"
+  printf 'source_chrome_profile: %s\n' "$source_chrome_profile"
+  printf 'source_extension: %s\n' "${latest:-missing}"
+  printf 'brave_youtube_target: %s\n' "${BRAVE_YOUTUBE_USER_DATA_DIR:-$HOME/Library/Application Support/Brave YouTube}"
+}
+
+case "${1:-status}" in
+  brave-youtube)
+    sync_brave_youtube
+    ;;
+  status)
+    status
+    ;;
+  -h|--help|help)
+    usage
+    ;;
+  *)
+    echo "clear-new-tab-sync: unknown command: $1" >&2
+    usage >&2
+    exit 2
+    ;;
+esac

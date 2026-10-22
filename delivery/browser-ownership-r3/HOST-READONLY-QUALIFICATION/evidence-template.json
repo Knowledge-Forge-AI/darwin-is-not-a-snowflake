@@ -1,0 +1,492 @@
+{
+  "observations": {
+    "brave-automation.blocker-effective": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-automation.devtools-mcp-cdp": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-automation.no-credentials-or-sync": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-automation.no-inherited-extensions": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-automation.package-identity": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-automation.playwright": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-automation.privacy-and-search": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-automation.representative-suite": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-daily.apple-passkey": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-daily.apple-password": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-daily.apple-totp": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-daily.blocker-effective": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-daily.extension-adobe-acrobat": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-daily.extension-clear-new-tab": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-daily.extension-cookie-editor": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-daily.extension-json-viewer": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-daily.extension-language-reactor": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-daily.extension-markdown-viewer": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-daily.extension-video-downloadhelper": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-daily.native-manager-transition": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-daily.package-identity": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-daily.privacy-and-search": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-daily.widevine": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-youtube.battery-video-smoke": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-youtube.blocker-effective": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-youtube.identity-theme-wallpaper": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-youtube.package-identity": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "brave-youtube.privacy-and-search": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "chrome-cnt-preservation": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "complete-composed-graph": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "floorp.apple-passkey": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "floorp.apple-password": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "floorp.apple-totp": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "floorp.blocker-effective": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "floorp.extension-clear-new-tab": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "floorp.extension-cookie-editor": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "floorp.extension-markdown-viewer": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "floorp.extension-ublock-origin": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "floorp.extension-video-downloadhelper": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "floorp.native-manager-transition": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "floorp.package-identity": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "floorp.privacy-and-search": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "librewolf.apple-passkey": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "librewolf.apple-password": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "librewolf.apple-totp": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "librewolf.blocker-effective": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "librewolf.extension-clear-new-tab": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "librewolf.native-manager-transition": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "librewolf.package-identity": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "librewolf.privacy-and-search": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "orion.apple-passkey": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "orion.apple-password": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "orion.apple-totp": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "orion.blocker-coordination": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "orion.blocker-effective": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "orion.extension-adobe-acrobat": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "orion.extension-clear-new-tab": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "orion.extension-cookie-editor": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "orion.extension-json-viewer": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "orion.extension-language-reactor": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "orion.extension-markdown-viewer": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "orion.extension-video-downloadhelper": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "orion.native-manager-transition": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "orion.package-identity": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "orion.privacy-and-search": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "predecessor-parity": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "safari.apple-passkey": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "safari.apple-password": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "safari.apple-totp": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "safari.blocker-effective": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "safari.native-manager-transition": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "safari.package-identity": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "safari.privacy-and-search": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "safari.wipr-blocklist-1": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "safari.wipr-blocklist-2": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "safari.wipr-blocklist-3": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "safari.wipr-blocklist-4": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "safari.wipr-wipr-extra": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "single-brave-install": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "three-brave-roots": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    },
+    "vivaldi-retention": {
+      "evidenceSha256": null,
+      "method": null,
+      "observedAt": null,
+      "status": "PENDING"
+    }
+  },
+  "schema": "browser-roles-r3-host-readback-v1",
+  "sourceCandidateDigest": "0233f65d5ab5e2f7fbae8f462985b331cd00c42864ab4f5fd9998e84b696f278"
+}

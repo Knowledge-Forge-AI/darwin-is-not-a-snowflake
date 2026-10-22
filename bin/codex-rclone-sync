@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+RCLONE="${RCLONE:-rclone}"
+LOCAL_DIR="${CODEX_LOCAL_DIR:-$HOME/.codex}"
+REMOTE="${CODEX_CRYPT_REMOTE:-codex-crypt:}"
+
+common_args=()
+common_args+=(--links)
+common_args+=(--create-empty-src-dirs)
+common_args+=(--fast-list)
+common_args+=(--progress)
+common_args+=(--exclude ".DS_Store")
+common_args+=(--exclude ".git/**")
+common_args+=(--exclude ".tmp/**")
+common_args+=(--exclude "tmp/**")
+common_args+=(--exclude "cache/**")
+common_args+=(--exclude "computer-use/**")
+common_args+=(--exclude "models_cache.json")
+common_args+=(--exclude "plugins/.remote-plugin-install-staging/**")
+common_args+=(--exclude "plugins/cache/**")
+common_args+=(--exclude "process_manager/**")
+common_args+=(--exclude "shell_snapshots/**")
+common_args+=(--exclude "vendor_imports/**")
+common_args+=(--exclude "version.json")
+
+usage() {
+  cat <<EOF
+Usage: codex-rclone-sync [push|pull|dry-run-push|dry-run-pull|push-merge|pull-merge|dry-run-push-merge|dry-run-pull-merge|size]
+
+Syncs ${LOCAL_DIR}
+with ${REMOTE}
+through rclone crypt, preserving symlinks with --links.
+
+push/pull are exact mirror operations and can delete files from the target.
+push-merge/pull-merge only copy new or changed files and never delete target
+files. Prefer merge modes for moving recent Codex history between Macs.
+
+Tip: close Codex before pull/restore operations so live SQLite files are not
+replaced while the app is running.
+EOF
+}
+
+require_local_dir() {
+  if [ ! -d "$LOCAL_DIR" ]; then
+    echo "Local Codex directory does not exist: $LOCAL_DIR" >&2
+    exit 1
+  fi
+}
+
+confirm_pull() {
+  printf "This will sync encrypted remote state down into %s. Continue? [y/N] " "$LOCAL_DIR" >&2
+  IFS= read -r answer
+  case "$answer" in
+    y|Y|yes|YES) ;;
+    *) echo "Aborted." >&2; exit 1 ;;
+  esac
+}
+
+case "${1:-}" in
+  push)
+    require_local_dir
+    "$RCLONE" sync "${common_args[@]}" "$LOCAL_DIR" "$REMOTE"
+    ;;
+  pull)
+    confirm_pull
+    mkdir -p "$LOCAL_DIR"
+    "$RCLONE" sync "${common_args[@]}" "$REMOTE" "$LOCAL_DIR"
+    ;;
+  dry-run-push)
+    require_local_dir
+    "$RCLONE" sync --dry-run "${common_args[@]}" "$LOCAL_DIR" "$REMOTE"
+    ;;
+  dry-run-pull)
+    "$RCLONE" sync --dry-run "${common_args[@]}" "$REMOTE" "$LOCAL_DIR"
+    ;;
+  push-merge)
+    require_local_dir
+    "$RCLONE" copy "${common_args[@]}" "$LOCAL_DIR" "$REMOTE"
+    ;;
+  pull-merge)
+    mkdir -p "$LOCAL_DIR"
+    "$RCLONE" copy "${common_args[@]}" "$REMOTE" "$LOCAL_DIR"
+    ;;
+  dry-run-push-merge)
+    require_local_dir
+    "$RCLONE" copy --dry-run "${common_args[@]}" "$LOCAL_DIR" "$REMOTE"
+    ;;
+  dry-run-pull-merge)
+    mkdir -p "$LOCAL_DIR"
+    "$RCLONE" copy --dry-run "${common_args[@]}" "$REMOTE" "$LOCAL_DIR"
+    ;;
+  size)
+    "$RCLONE" size "$REMOTE"
+    ;;
+  -h|--help|"")
+    usage
+    ;;
+  *)
+    usage >&2
+    exit 2
+    ;;
+esac

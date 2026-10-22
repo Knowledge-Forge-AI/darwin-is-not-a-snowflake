@@ -1,0 +1,271 @@
+--- a/modules/browsers.nix
++++ b/modules/browsers.nix
+@@ -1065,6 +1065,9 @@
+       policyDefinitionOwner = if cfg.corePolicyOwnership then "core" else "contribution-seam";
+       ownershipContract = if cfg.rolesR3 then roleOwnership else coreOwnership;
+       rolesR3 = if cfg.rolesR3 then roleOwnership else null;
++      # Per-profile availability intent only; never a global install/proxy policy.
++      protonVpnR3R2 = if cfg.rolesR3 then builtins.fromJSON
++        (builtins.readFile ../config/browser/proton-vpn-r3r2.json) else null;
+       automationBrowser = if cfg.rolesR3 then automationBrowser else null;
+       deploymentHeld = coreDeploymentHeld;
+       deploymentHoldMessage = coreDeploymentHoldMessage;
+--- /dev/null
++++ b/config/browser/proton-vpn-r3r2.json
+@@ -0,0 +1,122 @@
++{
++  "schema": "core-proton-vpn-r3r2-v1",
++  "selected": false,
++  "deployment": "HELD_SOURCE_RELEASE_REQUIRED",
++  "scope": "browser-only HTTPS VPN proxy; native clients are outside extension coverage",
++  "extensions": {
++    "chromium": {
++      "name": "Proton VPN",
++      "id": "jplgfhpmjnbigmhklmmbgecoobifkmpa",
++      "storeUrl": "https://chromewebstore.google.com/detail/proton-vpn-fast-secure/jplgfhpmjnbigmhklmmbgecoobifkmpa",
++      "updateUrl": "https://clients2.google.com/service/update2/crx"
++    },
++    "gecko": {
++      "name": "Proton VPN",
++      "id": "vpn@proton.ch",
++      "storeUrl": "https://addons.mozilla.org/en-US/firefox/addon/proton-vpn-firefox-extension/",
++      "installUrl": "https://addons.mozilla.org/firefox/downloads/latest/proton-vpn-firefox-extension/latest.xpi",
++      "identityEvidence": "delivery/browser-ownership-r3r2/IDENTITY-EVIDENCE.json",
++      "updates": "official signed AMO route; no version downgrade or signing bypass"
++    }
++  },
++  "roles": {
++    "brave-daily": {
++      "automaticInstallation": false,
++      "automaticSignIn": false,
++      "autoConnectDefault": false,
++      "autoConnectEnforcement": "NONE; attended setting readback required before any later use",
++      "deliveredPolicies": {},
++      "profileMutation": false,
++      "effectiveReadback": "PENDING_ATTENDED",
++      "installedVersion": null,
++      "extension": "chromium",
++      "extensionOwner": "core",
++      "status": "MANUAL_OFFICIAL_STORE_AVAILABILITY",
++      "delivery": "per-profile attended official-store add; no machine-wide policy",
++      "preserve": "existing profile, Shields, extension storage and preferences"
++    },
++    "brave-automation": {
++      "automaticInstallation": false,
++      "automaticSignIn": false,
++      "autoConnectDefault": false,
++      "autoConnectEnforcement": "extension absent; no persistent VPN context is supplied",
++      "deliveredPolicies": {},
++      "profileMutation": false,
++      "effectiveReadback": "NOT_APPLICABLE_EPHEMERAL_EXTENSION_DISABLED",
++      "installedVersion": null,
++      "extension": "chromium",
++      "extensionOwner": "core",
++      "status": "AUTOMATION_AVAILABILITY_HELD",
++      "delivery": "not available in the retained launcher: fresh empty user-data root per launch and extensions disabled; separate approved design required",
++      "defaultInstalledExtensions": [],
++      "ordinaryTestsUseVpn": false,
++      "persistentInstallTarget": false,
++      "extensionsEnabled": false
++    },
++    "librewolf": {
++      "automaticInstallation": false,
++      "automaticSignIn": false,
++      "autoConnectDefault": false,
++      "autoConnectEnforcement": "NONE; attended setting readback required before any later use",
++      "deliveredPolicies": {},
++      "profileMutation": false,
++      "effectiveReadback": "PENDING_ATTENDED",
++      "installedVersion": null,
++      "extension": "gecko",
++      "extensionOwner": "core",
++      "status": "MANUAL_OFFICIAL_STORE_AVAILABILITY",
++      "delivery": "per-profile attended official-store add; no machine-wide policy",
++      "preserve": "bundled uBlock Origin, hardening, Apple Passwords, existing extension storage and browser signing enforcement",
++      "dnsPolicy": "UNCHANGED; DNS/DoH route characterization required; no network.trr.mode override"
++    },
++    "brave-youtube": {
++      "automaticInstallation": false,
++      "automaticSignIn": false,
++      "autoConnectDefault": false,
++      "autoConnectEnforcement": "NONE; attended setting readback required before any later use",
++      "deliveredPolicies": {},
++      "profileMutation": false,
++      "effectiveReadback": "PENDING_ATTENDED",
++      "installedVersion": null,
++      "extension": "chromium",
++      "extensionOwner": "core",
++      "status": "WRAPPER_PROJECTION_HELD",
++      "delivery": "separate attended manual-store availability proposal after wrapper qualification; no stock profile cloning or extension DB writes",
++      "stockProfileInheritance": "UNPROVEN; distinct bundle identity, copied renamed binary and dedicated user-data root",
++      "autoConnectReason": "preserve playback and battery reliability"
++    },
++    "orion": {
++      "automaticInstallation": false,
++      "automaticSignIn": false,
++      "autoConnectDefault": false,
++      "autoConnectEnforcement": "NONE; attended setting readback required before any later use",
++      "deliveredPolicies": {},
++      "profileMutation": false,
++      "effectiveReadback": "PENDING_ATTENDED",
++      "installedVersion": null,
++      "extensionOwner": "core",
++      "engine": "WebKit",
++      "status": "REQUESTED_COMPATIBILITY_HELD",
++      "capability": "PROXY_API_UNQUALIFIED",
++      "installed": false,
++      "canary": "at most one later attended scratch-profile check only after supported API/new release evidence; require public-IP and DNS route change",
++      "fallback": "existing system Proton VPN app separately; no app changes"
++    }
++  },
++  "excluded": [
++    "Safari",
++    "Tor",
++    "Mullvad",
++    "Vivaldi",
++    "legacy Chrome"
++  ],
++  "profileStorageWrites": false,
++  "proxyPolicyWrites": false,
++  "availabilityEffect": "INTENT_ONLY_NO_NEW_RUNTIME_CAPABILITY",
++  "heldBrowserOwnerConflicts": [
++    "brave-daily",
++    "librewolf",
++    "orion"
++  ],
++  "singleOwnerQualification": "HELD_RECONCILIATION_REQUIRED; retained R3 Browser UX convenience definitions conflict with installer ownership"
++}
+--- /dev/null
++++ b/src/test/unit/python/browser_proton_vpn_r3r2.unit.test.py
+@@ -0,0 +1,131 @@
++"""Negative safety contracts for held per-profile Proton VPN availability."""
++import copy
++import importlib.util
++import json
++from pathlib import Path
++import tempfile
++import unittest
++
++ROOT = Path(__file__).resolve().parents[4]
++KIT = ROOT / "delivery/browser-ownership-r3r2"
++spec = importlib.util.spec_from_file_location("proton_delivery", KIT / "verify-delivery.py")
++VERIFY = importlib.util.module_from_spec(spec)
++spec.loader.exec_module(VERIFY)
++
++
++class ProtonAvailabilityTests(unittest.TestCase):
++    def setUp(self):
++        self.catalog = json.loads((ROOT / "config/browser/proton-vpn-r3r2.json").read_text())
++        # Unit seam only; connected evaluation of the real owner patch is separate.
++        self.floorp = {"extensionOwner": "browser-ux", "geckoId": VERIFY.GECKO_ID,
++                       "install_url": VERIFY.AMO_URL, "automaticInstallation": False,
++                       "automaticSignIn": False, "autoConnectDefault": False,
++                       "status": "ATTENDED_OR_UNSUPPORTED"}
++
++    def test_source_availability_is_held(self):
++        self.assertEqual(VERIFY.validate_catalog(self.catalog, self.floorp), [])
++
++    def test_slug_and_chromium_id_cannot_stand_in_for_gecko_identity(self):
++        for wrong in ("proton-vpn-firefox-extension", VERIFY.CHROMIUM_ID, "vpn@proton.me", ""):
++            with self.subTest(wrong=wrong):
++                candidate = copy.deepcopy(self.catalog)
++                candidate["extensions"]["gecko"]["id"] = wrong
++                self.assertIn("INCORRECT_GECKO_ID", VERIFY.validate_catalog(candidate, self.floorp))
++
++    def test_wrong_store_identity_and_update_route_refused(self):
++        for key, value, error in (("id", "a" * 32, "INCORRECT_CHROMIUM_ID"),
++                                  ("updateUrl", "https://example.invalid/update", "INCORRECT_CHROMIUM_UPDATE_URL")):
++            candidate = copy.deepcopy(self.catalog)
++            candidate["extensions"]["chromium"][key] = value
++            self.assertIn(error, VERIFY.validate_catalog(candidate, self.floorp))
++
++    def test_floorp_cannot_acquire_second_core_owner(self):
++        self.catalog["roles"]["floorp"] = copy.deepcopy(self.catalog["roles"]["librewolf"])
++        self.assertIn("CORE_ROLE_SCOPE_OR_DUPLICATE_OWNER", VERIFY.validate_catalog(self.catalog, self.floorp))
++        self.floorp["extensionOwner"] = "core"
++        self.assertIn("FLOORP_ID_OR_OWNER", VERIFY.validate_catalog(self.catalog, self.floorp))
++
++    def test_every_context_refuses_auto_install_login_connect_or_profile_mutation(self):
++        for role in self.catalog["roles"]:
++            for flag in ("automaticInstallation", "automaticSignIn", "autoConnectDefault", "profileMutation"):
++                with self.subTest(role=role, flag=flag):
++                    candidate = copy.deepcopy(self.catalog)
++                    candidate["roles"][role][flag] = True
++                    self.assertIn("AUTOMATIC_EFFECT:" + role, VERIFY.validate_catalog(candidate, self.floorp))
++
++    def test_policy_and_storage_effects_refused(self):
++        for flag in ("profileStorageWrites", "proxyPolicyWrites"):
++            candidate = copy.deepcopy(self.catalog)
++            candidate[flag] = True
++            self.assertIn("PROFILE_OR_PROXY_EFFECT", VERIFY.validate_catalog(candidate, self.floorp))
++        self.catalog["roles"]["brave-daily"]["deliveredPolicies"] = {"ExtensionInstallForcelist": [VERIFY.CHROMIUM_ID]}
++        self.assertIn("GLOBAL_POLICY:brave-daily", VERIFY.validate_catalog(self.catalog, self.floorp))
++
++    def test_automation_keeps_extension_free_default(self):
++        self.catalog["roles"]["brave-automation"]["defaultInstalledExtensions"] = [VERIFY.CHROMIUM_ID]
++        self.assertIn("AUTOMATION_DEFAULT_CHANGED", VERIFY.validate_catalog(self.catalog, self.floorp))
++
++    def test_ephemeral_automation_cannot_claim_manual_availability(self):
++        self.catalog["roles"]["brave-automation"]["status"] = "MANUAL_OFFICIAL_STORE_AVAILABILITY"
++        self.assertIn("AUTOMATION_AVAILABILITY_UNQUALIFIED",
++                      VERIFY.validate_catalog(self.catalog, self.floorp))
++
++    def test_automation_cannot_claim_a_persistent_install_target(self):
++        self.catalog["roles"]["brave-automation"]["persistentInstallTarget"] = True
++        self.assertIn("AUTOMATION_AVAILABILITY_UNQUALIFIED",
++                      VERIFY.validate_catalog(self.catalog, self.floorp))
++
++    def test_different_extensions_still_require_one_owner_per_browser(self):
++        roles = {"roles": [{"id": "brave-daily", "appOwner": "core"}]}
++        owner = {"braveDaily": {"extensions": {"different-extension": {}}}}
++        self.assertEqual(VERIFY.browser_ownership_conflicts(roles, owner), ["brave-daily"])
++        self.assertIn("UNDECLARED_BROWSER_OWNER_CONFLICT:brave-daily",
++                      VERIFY.validate_browser_ownership(roles, owner, []))
++
++    def test_conflict_detection_reads_convenience_owner_without_proton_overlap(self):
++        roles = {"roles": [{"id": "librewolf", "appOwner": "core",
++                            "convenienceOwner": "browser-ux"}]}
++        self.assertEqual(VERIFY.browser_ownership_conflicts(roles, {}), ["librewolf"])
++
++    def test_known_owner_conflicts_are_held_rather_than_qualified(self):
++        roles = json.loads((ROOT / "config/browser/roles-r3.json").read_text())
++        conflicts = VERIFY.browser_ownership_conflicts(roles, {})
++        self.assertEqual(conflicts, ["brave-daily", "librewolf", "orion"])
++        self.assertEqual(VERIFY.validate_browser_ownership(roles, {}, conflicts), [])
++        self.assertIn("STALE_BROWSER_OWNER_HOLD:floorp",
++                      VERIFY.validate_browser_ownership(roles, {}, conflicts + ["floorp"]))
++
++    def test_floorp_suite_belongs_to_its_installer(self):
++        roles = {"roles": [{"id": "floorp", "appOwner": "browser-ux"}]}
++        owner = {"floorp": {"extensions": {VERIFY.GECKO_ID: {}}}}
++        self.assertEqual(VERIFY.browser_ownership_conflicts(roles, owner), [])
++
++    def test_wrapper_and_orion_cannot_claim_effectiveness(self):
++        self.catalog["roles"]["brave-youtube"]["status"] = "ACTIVE"
++        self.catalog["roles"]["orion"]["status"] = "PROTECTED"
++        errors = VERIFY.validate_catalog(self.catalog, self.floorp)
++        self.assertIn("WRAPPER_INHERITANCE_UNQUALIFIED", errors)
++        self.assertIn("ORION_TUNNEL_UNQUALIFIED", errors)
++
++    def test_floorp_wrong_id_and_automatic_delivery_refused(self):
++        for key, value in (("geckoId", "proton-vpn-firefox-extension"),
++                           ("automaticInstallation", True), ("autoConnectDefault", True),
++                           ("install_url", "https://example.invalid/vpn.xpi")):
++            with self.subTest(key=key):
++                floorp = dict(self.floorp, **{key: value})
++                self.assertTrue(VERIFY.validate_catalog(self.catalog, floorp))
++
++    def test_source_drift_and_unsafe_inventory_paths_refuse(self):
++        with tempfile.TemporaryDirectory() as temporary:
++            root = Path(temporary)
++            record = {"path": "missing.json", "after_sha256": "a" * 64}
++            self.assertEqual(VERIFY.check_paths(root, [record], "after_sha256"),
++                             ["SOURCE_DRIFT:missing.json"])
++            for path in ("../outside", "/outside"):
++                record["path"] = path
++                self.assertEqual(VERIFY.check_paths(root, [record], "after_sha256"),
++                                 ["UNSAFE_BINDING_PATH"])
++
++
++if __name__ == "__main__":
++    unittest.main()

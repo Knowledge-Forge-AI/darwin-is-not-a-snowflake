@@ -1,0 +1,15 @@
+{
+  "retainedR3R2": {
+    "recordsVerifiedBeforeEdit": 50,
+    "digest": "7a15c1ccc9605cca07b3871be7ac2eb7bf498f7eebe03778db3fbf8caaf4aec1"
+  },
+  "producedR3R3": {
+    "records": 74,
+    "digest": "3bc0b76f61ad3ba4bcf45748a42a393719905eade61f532187595461f5f6f256",
+    "revision": "UNCOMMITTED_NOT_SELECTED",
+    "independentReview": "PENDING_DISPATCHER_POST_WORK_REVIEW"
+  },
+  "coreDiffSha256": "2a3f102c6606fd3b8d9171f72cd18cdae8b4ec87467b761a2c76766b844a61b6",
+  "ownerPatchSha256": "61ac98aa1c2bf462b5d99209c53aea828e5efe814c61639647c9d7bee2df242c",
+  "oldEvidenceRewritten": false
+}

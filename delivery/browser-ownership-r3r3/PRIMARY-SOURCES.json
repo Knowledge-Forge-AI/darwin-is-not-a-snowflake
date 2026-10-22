@@ -1,0 +1,27 @@
+{
+  "readDate": "2026-10-13",
+  "records": [
+    {
+      "url": "https://protonvpn.com/support/browser-extensions",
+      "supports": "official Brave/LibreWolf installation and browser-only coverage; Firefox DNS caveat"
+    },
+    {
+      "url": "https://support.brave.com/hc/en-us/articles/360017909112-How-can-I-add-extensions-to-Brave",
+      "supports": "official Web Store install procedure"
+    },
+    {
+      "url": "https://support.brave.com/hc/en-us/articles/360039248271-Group-Policy",
+      "supports": "Brave uses Chromium policies and exposes effective policy readback"
+    },
+    {
+      "url": "https://support.google.com/chrome/a/answer/9867568",
+      "supports": "ExtensionSettings precedence can override other extension policies"
+    },
+    {
+      "url": "https://mozilla.github.io/policy-templates/#extensionsettings",
+      "supports": "allowed vs automatic install modes and signed AMO update routes"
+    }
+  ],
+  "inference": "attended per-profile installation is chosen to avoid unqualified platform-policy propagation/override effects",
+  "currentPackageAttestation": "PENDING"
+}

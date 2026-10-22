@@ -1,0 +1,91 @@
+# shellcheck shell=sh
+_path_result=""
+
+_path_add() {
+  [ -n "$1" ] || return 0
+  case ":$_path_result:" in
+    *":$1:"*) ;;
+    *) _path_result="${_path_result:+$_path_result:}$1" ;;
+  esac
+}
+
+_path_mode_is_safe() {
+  case "$1" in
+    *[2367][0-7]|*[0-7][2367]) return 1 ;;
+    *) return 0 ;;
+  esac
+}
+
+_nbin_root="${_dinas_projected_nbin_root:-$HOME/.local/nbin}"
+_nbin_uid="$(/usr/bin/id -u)"
+if [ -d "$_nbin_root" ] && [ ! -L "$_nbin_root" ]; then
+  _nbin_meta="$(/usr/bin/stat -f '%u %Lp' "$_nbin_root" 2>/dev/null || true)"
+  _nbin_owner=${_nbin_meta%% *}
+  _nbin_mode=${_nbin_meta#* }
+  if [ "$_nbin_owner" = "$_nbin_uid" ] && _path_mode_is_safe "$_nbin_mode"; then
+    _nbin_had_lc_all=${LC_ALL+x}
+    _nbin_old_lc_all=${LC_ALL-}
+    LC_ALL=C
+    export LC_ALL
+    for _d in "$_nbin_root"/*; do
+      [ -e "$_d" ] || [ -L "$_d" ] || continue
+      case ${_d##*/} in
+        *[!A-Za-z0-9_-]*) continue ;;
+      esac
+      [ -d "$_d" ] || continue
+      _nbin_link_meta="$(/usr/bin/stat -f '%u %Lp' "$_d" 2>/dev/null || true)"
+      _nbin_link_owner=${_nbin_link_meta%% *}
+      [ "$_nbin_link_owner" = "$_nbin_uid" ] || continue
+      _nbin_target_meta="$(/usr/bin/stat -Lf '%u %Lp' "$_d" 2>/dev/null || true)"
+      _nbin_target_owner=${_nbin_target_meta%% *}
+      _nbin_target_mode=${_nbin_target_meta#* }
+      case "$_nbin_target_owner" in
+        0|"$_nbin_uid") ;;
+        *) continue ;;
+      esac
+      _path_mode_is_safe "$_nbin_target_mode" || continue
+      _path_add "$_d"
+    done
+    if [ "$_nbin_had_lc_all" = x ]; then
+      LC_ALL=$_nbin_old_lc_all
+      export LC_ALL
+    else
+      unset LC_ALL
+    fi
+  fi
+fi
+
+_path_add "$HOME/.local/share/agentic-praxis-grimoire/bin"
+_path_add "/run/current-system/sw/bin"
+_path_add "/nix/var/nix/profiles/default/bin"
+_path_add "$HOME/.local/bin"
+_path_add "/Applications/OrbStack.app/Contents/MacOS/xbin"
+_path_add "/Applications/Postgres.app/Contents/Versions/17/bin"
+_path_add "$HOME/Library/Python/3.12/bin"
+_path_add "/opt/homebrew/bin"
+_path_add "/opt/homebrew/sbin"
+
+_path_remaining=$PATH
+while :; do
+  case $_path_remaining in
+    *:*)
+      _path_entry=${_path_remaining%%:*}
+      _path_remaining=${_path_remaining#*:}
+      _path_last=0
+      ;;
+    *)
+      _path_entry=$_path_remaining
+      _path_remaining=""
+      _path_last=1
+      ;;
+  esac
+  _path_add "$_path_entry"
+  [ "$_path_last" -eq 0 ] || break
+done
+
+export PATH="$_path_result"
+unset -f _path_add _path_mode_is_safe 2>/dev/null || true
+unset _d _nbin_had_lc_all _nbin_link_meta _nbin_link_owner _nbin_meta
+unset _nbin_mode _nbin_old_lc_all _nbin_owner _nbin_root _dinas_projected_nbin_root
+unset _nbin_target_meta _nbin_target_mode _nbin_target_owner _nbin_uid
+unset _path_entry _path_last _path_remaining _path_result

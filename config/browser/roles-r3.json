@@ -1,0 +1,226 @@
+{
+  "schema": "browser-role-ownership-r3-v1",
+  "status": "SOURCE_CANDIDATE_NOT_SELECTED",
+  "deployment": "HELD_SOURCE_RELEASE_REQUIRED",
+  "applicationAcquisition": {
+    "selector": "programs.browserBaseline.stockApplications",
+    "selectedHost": "example-primary",
+    "genericDefault": false,
+    "packages": ["nix:brave", "homebrew-cask:librewolf", "homebrew-cask:orion"],
+    "policyTransitionSelected": false,
+    "hostInstallationObserved": false,
+    "independentOf": ["R3 policy release", "credential qualification", "Chrome/Firefox retirement"]
+  },
+  "target": "example-primary",
+  "predecessor": "PRESERVE_EXISTING_BASELINE",
+  "roles": [
+    {
+      "id": "brave-automation",
+      "role": "Brave automation/development/testing/agents",
+      "appOwner": "core",
+      "physicalWriter": "core:modules/browsers.nix",
+      "package": "nix:brave",
+      "bundleId": "com.brave.Browser",
+      "binary": "stock-core-brave",
+      "profile": "fresh-automation-user-data-directory",
+      "blocker": "native-Brave-Shields",
+      "credentials": "NONE",
+      "extensions": [],
+      "sync": false,
+      "nativeSavingAndAutofill": false,
+      "debugging": "pipe-preferred; loopback-only temporary CDP otherwise; never attach personal data",
+      "qualification": [
+        "Playwright",
+        "Chrome DevTools MCP/CDP",
+        "representative browser test suite",
+        "localhost",
+        "downloads",
+        "DevTools",
+        "no credential manager or global injected extensions"
+      ],
+      "fallback": "explicit isolated Chrome compatibility proposal only after material Brave failure and manager review"
+    },
+    {
+      "id": "safari",
+      "role": "Safari",
+      "appOwner": "macOS",
+      "physicalWriter": "core:privacy intent and attended attestation only",
+      "bundleId": "com.apple.Safari",
+      "searchDefault": "DuckDuckGo",
+      "blocker": "Wipr 2",
+      "requiredComponents": [
+        "Blocklist 1",
+        "Blocklist 2",
+        "Blocklist 3",
+        "Blocklist 4",
+        "Wipr Extra"
+      ],
+      "credentials": "Apple Passwords/Keychain native integration",
+      "delivery": "ATTENDED_OR_UNSUPPORTED",
+      "preserve": [
+        "Apple authentication",
+        "personal preferences",
+        "passkeys",
+        "Wipr purchase and approvals"
+      ]
+    },
+    {
+      "id": "librewolf",
+      "role": "LibreWolf",
+      "appOwner": "core",
+      "physicalWriter": "core:modules/browsers.nix package; privacy and credential attestation only",
+      "package": "homebrew-cask:librewolf",
+      "bundleId": "io.gitlab.librewolf-community",
+      "blocker": "stock bundled uBlock Origin",
+      "privacy": "preserve stock hardening and fingerprinting defense; no Firefox policy suite",
+      "credentials": "official Apple iCloud Passwords Gecko extension only if actual compatibility succeeds",
+      "nativeManagerTransition": "HELD_UNTIL_PASSWORD_TOTP_PASSKEY_PROOF; preserve native stores",
+      "convenienceOwner": "browser-ux",
+      "convenience": [
+        "Clear New Tab only"
+      ],
+      "delivery": "ATTENDED_OR_UNSUPPORTED"
+    },
+    {
+      "id": "brave-daily",
+      "role": "Brave daily driver",
+      "appOwner": "core",
+      "physicalWriter": "core:modules/browsers.nix package; per-profile attended privacy and credentials",
+      "package": "nix:brave",
+      "bundleId": "com.brave.Browser",
+      "binary": "stock-core-brave",
+      "profile": "existing persistent daily Brave data; physically disjoint from automation and YouTube",
+      "blocker": "native-Brave-Shields",
+      "credentials": "official Apple iCloud Passwords Chromium extension only if actual compatibility succeeds",
+      "nativeManagerTransition": "HELD_UNTIL_PASSWORD_TOTP_PASSKEY_PROOF; preserve native stores",
+      "convenienceOwner": "browser-ux",
+      "convenience": "Chrome-family catalog without duplicate blockers or credential managers",
+      "widevine": "browser-ux opt-in, never automation default",
+      "delivery": "PER_PROFILE_ATTENDED; automatic global extension policy HELD"
+    },
+    {
+      "id": "orion",
+      "role": "Orion by Kagi (operator called it Origin)",
+      "appOwner": "core",
+      "physicalWriter": "core:modules/browsers.nix package; attended blocker/search/privacy/credential attestation",
+      "package": "homebrew-cask:orion",
+      "bundleId": "com.kagi.kagimacOS",
+      "blocker": "uBlock Origin Firefox build linked by Kagi's supported guide",
+      "contentBlocker": "turn overlapping native content blocker off only after uBO works; retain Tracking Prevention",
+      "credentials": "official Apple extension only if tested; native Apple Passwords picker may be qualified without importing into Orion Keychain",
+      "nativeManagerTransition": "HELD_UNTIL_PASSWORD_TOTP_PASSKEY_PROOF; never import credentials into a second vault",
+      "convenienceOwner": "browser-ux",
+      "convenience": "each Chrome-family extension separately tested; incomplete WebExtensions API support",
+      "delivery": "ATTENDED_OR_UNSUPPORTED"
+    },
+    {
+      "id": "floorp",
+      "role": "Floorp power-user",
+      "appOwner": "browser-ux",
+      "physicalWriter": "browser-ux:modules/roles-r3.nix package; configuration intent held pending qualification",
+      "package": "homebrew-cask:floorp",
+      "bundleId": "app.floorp.Floorp",
+      "blocker": "uBlock Origin",
+      "credentials": "official Apple iCloud Passwords Gecko extension only if actual Floorp/macOS compatibility succeeds",
+      "nativeManagerTransition": "HELD_UNTIL_PASSWORD_TOTP_PASSKEY_PROOF; preserve native stores",
+      "convenienceOwner": "browser-ux",
+      "convenience": "Firefox-family suite without competing credential managers",
+      "delivery": "ATTENDED_OR_UNSUPPORTED; no global Firefox policy spillover"
+    },
+    {
+      "id": "brave-youtube",
+      "role": "Brave YouTube",
+      "appOwner": "browser-ux destination; existing core writer retains physical authority",
+      "physicalWriter": "core:modules/brave-youtube.nix and existing app writer, unchanged until separately approved nonoverlapping cut",
+      "package": "same nix:brave package; no second Brave installation",
+      "bundleId": "com.operator.brave-youtube",
+      "binary": "existing core-generated bundle retained; future lightweight wrapper uses stock-core-brave",
+      "profile": "existing Brave YouTube and legacy YouTube Brave data retained",
+      "blocker": "native-Brave-Shields",
+      "convenienceOwner": "browser-ux destination; no active new writer",
+      "preserve": [
+        "bundle identity",
+        "artwork",
+        "theme",
+        "wallpaper source",
+        "Clear New Tab Chrome IndexedDB",
+        "existing and legacy profiles"
+      ],
+      "qualification": "short attended battery-mode video smoke; no guaranteed ad-free streaming or site restriction bypass"
+    }
+  ],
+  "search": {
+    "configuredGeneralPurpose": [
+      "Brave Search",
+      "Startpage",
+      "DuckDuckGo"
+    ],
+    "default": "Brave Search",
+    "safariDefault": "DuckDuckGo",
+    "delivery": "supported native policy or UI only; unsupported choices remain ATTENDED_OR_UNSUPPORTED",
+    "builtInRemovalClaim": false,
+    "preserve": [
+      "site and localhost search",
+      "direct URLs",
+      "Google AI Mode bookmarks",
+      "ChatGPT bookmarks",
+      "imported bookmark trees"
+    ]
+  },
+  "privacy": {
+    "intent": [
+      "disable optional telemetry and marketing",
+      "disable unnecessary background services and suggestions",
+      "block third-party tracking/cookies where compatible",
+      "HTTPS upgrades",
+      "deny abusive notifications with site-specific choices"
+    ],
+    "delivery": "supported native UI with effective readback; no speculative flag fleet or fabricated preference keys"
+  },
+  "credentials": {
+    "soleStore": "Apple Passwords/Keychain where supported",
+    "chromiumOfficialId": "pejdijmoenmkgeppbflobdenhhabjlaj",
+    "geckoOfficialId": "password-manager-firefox-extension@apple.com",
+    "compatibility": "UNQUALIFIED for Brave, LibreWolf, Orion and Floorp; Chrome/Firefox listing does not prove fork/helper/passkey compatibility",
+    "competingExtensions": "do not install KeePassXC-Browser or Proton Pass into R3 roles; existing removal requires separately approved preserving path",
+    "recovery": "preserve KeePass/Proton apps, vaults and native browser credential stores"
+  },
+  "continuity": {
+    "chrome": "legacy forced policy and CNT/NMH manifests retained; retirement REQUIRED_UNFINISHED after preserving data, CNT and automation qualification",
+    "firefox": "legacy cask, policies and NMH retained; retirement REQUIRED_UNFINISHED after preserving data and replacement qualification",
+    "vivaldi": "VIVALDI_VISUAL_REFERENCE_RETAINED_DECOMMISSION_HELD",
+    "braveYoutubeOwnershipCut": "HELD; no destination active claim or writer",
+    "torMullvad": "UNTOUCHED",
+    "sourcePins": "UNTOUCHED"
+  },
+  "mandatoryBeforeSourceRelease": [
+    "manager review of final source and exact owner patches",
+    "daemon-capable complete composed source graph for both hosts and unique physical writers/claims",
+    "qualified preserving Chrome forced-extension and CNT wallpaper/storage transition",
+    "actual stock Brave/Orion/LibreWolf acquisition and identities",
+    "three physically disjoint Brave data roots and credential-free automation",
+    "effective per-profile search/privacy/blocker/extension and password/TOTP/passkey readback",
+    "representative Playwright, DevTools MCP/CDP and browser-suite smoke on stock Brave"
+  ],
+  "deploymentScope": "ADVANCED_R3_POLICY_TRANSITION_ONLY; additive stock application acquisition is independently selected",
+  "references": {
+    "vivaldi": {
+      "state": "VIVALDI_VISUAL_REFERENCE_RETAINED_DECOMMISSION_HELD",
+      "primaryRole": false,
+      "purpose": "unchanged runnable visual reference; Floorp remains preferred power-user browser",
+      "appOwner": "browser-ux",
+      "physicalWriter": "existing composition cask projection while inactive; Browser UX module only under active held R3",
+      "package": "homebrew-cask:vivaldi",
+      "preserve": [
+        "installed app and executable access",
+        "existing settings and extensions",
+        "Mail, Calendar, Feeds and OAuth",
+        "unsent/local data and credentials",
+        "imported bookmarks and browser preferences"
+      ],
+      "profileWriter": false,
+      "retirement": "EXPLICIT_OPERATOR_APPROVAL_REQUIRED_BEFORE_ANY_LATER_RETIREMENT",
+      "visualMigration": "DEFERRED_SEPARATELY_ATTENDED_DISPOSABLE_FLOORP_PROFILE_FIRST"
+    }
+  }
+}

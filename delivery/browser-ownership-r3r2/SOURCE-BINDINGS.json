@@ -1,0 +1,424 @@
+{
+  "schema": "browser-r3r2-source-binding-v1",
+  "bindingAuthority": "exact source path pre/postimages; semantic host selection, no HEAD hash gate",
+  "priorR3R1SourceDigest": "3e9949480754c85020167652aca94208b243daa586fd2d1bfeeabac0fed6495b",
+  "priorR3R1Records": [
+    {
+      "owner": "core",
+      "path": "config/browser/README.md",
+      "sha256": "6d27412b8a1189f70c45662dd4cc494da391ab7c0f1c225e043f3c35247bc858"
+    },
+    {
+      "owner": "core",
+      "path": "config/browser/chrome-policy-defaults.nix",
+      "sha256": "ff22184f01da5165a1ef0031300875951e56e6eeb7a9b0716e6347cbb19f7d5c"
+    },
+    {
+      "owner": "core",
+      "path": "config/browser/chrome-policy-legacy-defaults.nix",
+      "sha256": "94f387b949cf5948f9c8bd2ac794553358d7e77477e1cc3afefc4b5e6bb06c4c"
+    },
+    {
+      "owner": "core",
+      "path": "config/browser/chrome-policy-legacy.plist",
+      "sha256": "ddf5cbe47a6e5cbb8f41e71e13b29015896abd8d63860736d557f613ba8502fa"
+    },
+    {
+      "owner": "core",
+      "path": "config/browser/chrome-policy.plist",
+      "sha256": "e5ddd98e9396e797407787b7319e2cfa7ee197f92c3bbe3b3a23c488b47bc10f"
+    },
+    {
+      "owner": "core",
+      "path": "config/browser/core-ownership.json",
+      "sha256": "668722817bf07900420bf529e2f61260f8e44e9c3527c53bb20d981cb8165bf7"
+    },
+    {
+      "owner": "core",
+      "path": "config/browser/roles-r3.json",
+      "sha256": "84006e49beb70963d5a2ed20d73acb53e77909d6ed06e81ae5babfdca37a921c"
+    },
+    {
+      "owner": "core",
+      "path": "docs/adr/2026/10/0001-core-chrome-safari-ownership.md",
+      "sha256": "5370981faa53e055e347cbbf86b8ece00cc0f008b868bb5b8fcee3bddb04bdbb"
+    },
+    {
+      "owner": "core",
+      "path": "docs/adr/2026/10/0002-browser-role-ownership-r3.md",
+      "sha256": "074631de6448c75cbd0367f049d84b7d77d21cdff7afc5feeacd5555890c16bb"
+    },
+    {
+      "owner": "core",
+      "path": "docs/architecture/domain-migrations/browser-ux_dinas-inventory.md",
+      "sha256": "bcd8e614a4f1056a07b26b62376c8750ab9e6fd1b5e9a18e809ceee7015d7ada"
+    },
+    {
+      "owner": "core",
+      "path": "flake.nix",
+      "sha256": "a6cf09b9eba38a2a11bf787117d612490e30fe4566e259540d53aa753e6b5840"
+    },
+    {
+      "owner": "core",
+      "path": "lib/core-application-inventory.nix",
+      "sha256": "0bd69fe1741d3cf029a08848c234889f9bac5a3252d48d17c5847fc79362902b"
+    },
+    {
+      "owner": "core",
+      "path": "libexec/browser-automation/launch.py",
+      "sha256": "4ca08a5902b01645736de24a4e6211feb56ce4808258c312c9e8ea12f10e6451"
+    },
+    {
+      "owner": "core",
+      "path": "modules/browsers.nix",
+      "sha256": "f5f4377b16339bc342580516223d5f094122e24a28e9e2ab8e53fa3103ef8f08"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/int/nix/application-claims.int.test.nix",
+      "sha256": "442e30e5a3268d6e7909d0814ba0dba41be949f461b074a18a5583ea62504bd7"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/int/nix/browser-baseline.int.test.nix",
+      "sha256": "3aae9f0727954f351fae1358d56b0f27ef146bf3ce2784c4caaf435641e0f382"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/unit/bash/browser-config.unit.test.bats",
+      "sha256": "d6b10b4904910f90bf6b4eb5fc57705d16514b75a5e59868ab73b260d611199d"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/unit/nix/application-claims.unit.test.nix",
+      "sha256": "aa2d8a0702a35b6c50cfa4b78a518de74f258f5dbbb161824818e01d134dbedf"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/unit/nix/browser-baseline.unit.test.nix",
+      "sha256": "328daec8e5c9704bb8078780de21c2d0d4233a29de43cf5d30fd7069f579fcf0"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/unit/nix/core-browser-ownership.unit.test.nix",
+      "sha256": "4cf6fc9ceb199216e471b06c4e6a231a7df40fa51ebf3473d7af2a00e38fa246"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/unit/python/browser_automation_roles_r3.unit.test.py",
+      "sha256": "e99015f21d58d71250b295d662993fa437a3c552b0443e5c3bcfe496349467bf"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/unit/python/browser_host_qualification.unit.test.py",
+      "sha256": "f2063563db0599ddcf868bf9d1a2efc206852a013e53e0dc30cced3ca2606cc7"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/unit/python/browser_roles_r3_host_kit.unit.test.py",
+      "sha256": "beb179817a307fc07fd20f632a8d38bbc7c92e902dccfe29659f209b3b492b35"
+    },
+    {
+      "owner": "browser-ux",
+      "path": "delivery/browser-ownership-r3/browser-ux.patch",
+      "sha256": "b96ee8ea0394326d38995fc5949779d0fff2f4404abff8ce908eb89669b346de"
+    },
+    {
+      "owner": "composition",
+      "path": "delivery/browser-ownership-r3r1/composition.patch",
+      "sha256": "9cfb35eeeb4b845b21a0c0fc90f22900290cf9ace6b8d6638640632c7d8c3f19"
+    },
+    {
+      "owner": "agent-central",
+      "path": "delivery/browser-ownership-r3/agent-central.patch",
+      "sha256": "6ccf81cc8aa4ab629e24ec08884ab655f1aa6405ad5080636f852de070ecf832"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r1/source-fixture.nix",
+      "sha256": "158434ba8c5c85e4638b7ea267d4284dfe1de8d73aba9e4c6a083ffa70b9fc15"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r1/readback.nix",
+      "sha256": "750ece120463ef0ab70490a9606e8ba0565c40efd5d64899a9d4c12e62c41909"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r1/verify-source.py",
+      "sha256": "8c3a4792fb5323688254e006e887e530a69c3c8e75b5000a3a7078604798f6ef"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r1/native-readback.py",
+      "sha256": "bd3829cb7437105453664bfa22ffd08309e022dca9eaa069c5cf1f63fa7e0e84"
+    }
+  ],
+  "priorManifestSha256": "f73286e4a2e2ea0be2d665265a046efed9fe044861a82491182cf05cf0445f16",
+  "records": [
+    {
+      "owner": "core",
+      "path": "config/browser/README.md",
+      "before_sha256": "6d27412b8a1189f70c45662dd4cc494da391ab7c0f1c225e043f3c35247bc858",
+      "after_sha256": "6d27412b8a1189f70c45662dd4cc494da391ab7c0f1c225e043f3c35247bc858"
+    },
+    {
+      "owner": "core",
+      "path": "config/browser/chrome-policy-defaults.nix",
+      "before_sha256": "ff22184f01da5165a1ef0031300875951e56e6eeb7a9b0716e6347cbb19f7d5c",
+      "after_sha256": "ff22184f01da5165a1ef0031300875951e56e6eeb7a9b0716e6347cbb19f7d5c"
+    },
+    {
+      "owner": "core",
+      "path": "config/browser/chrome-policy-legacy-defaults.nix",
+      "before_sha256": "94f387b949cf5948f9c8bd2ac794553358d7e77477e1cc3afefc4b5e6bb06c4c",
+      "after_sha256": "94f387b949cf5948f9c8bd2ac794553358d7e77477e1cc3afefc4b5e6bb06c4c"
+    },
+    {
+      "owner": "core",
+      "path": "config/browser/chrome-policy-legacy.plist",
+      "before_sha256": "ddf5cbe47a6e5cbb8f41e71e13b29015896abd8d63860736d557f613ba8502fa",
+      "after_sha256": "ddf5cbe47a6e5cbb8f41e71e13b29015896abd8d63860736d557f613ba8502fa"
+    },
+    {
+      "owner": "core",
+      "path": "config/browser/chrome-policy.plist",
+      "before_sha256": "e5ddd98e9396e797407787b7319e2cfa7ee197f92c3bbe3b3a23c488b47bc10f",
+      "after_sha256": "e5ddd98e9396e797407787b7319e2cfa7ee197f92c3bbe3b3a23c488b47bc10f"
+    },
+    {
+      "owner": "core",
+      "path": "config/browser/core-ownership.json",
+      "before_sha256": "668722817bf07900420bf529e2f61260f8e44e9c3527c53bb20d981cb8165bf7",
+      "after_sha256": "668722817bf07900420bf529e2f61260f8e44e9c3527c53bb20d981cb8165bf7"
+    },
+    {
+      "owner": "core",
+      "path": "config/browser/roles-r3.json",
+      "before_sha256": "84006e49beb70963d5a2ed20d73acb53e77909d6ed06e81ae5babfdca37a921c",
+      "after_sha256": "84006e49beb70963d5a2ed20d73acb53e77909d6ed06e81ae5babfdca37a921c"
+    },
+    {
+      "owner": "core",
+      "path": "docs/adr/2026/10/0001-core-chrome-safari-ownership.md",
+      "before_sha256": "5370981faa53e055e347cbbf86b8ece00cc0f008b868bb5b8fcee3bddb04bdbb",
+      "after_sha256": "5370981faa53e055e347cbbf86b8ece00cc0f008b868bb5b8fcee3bddb04bdbb"
+    },
+    {
+      "owner": "core",
+      "path": "docs/adr/2026/10/0002-browser-role-ownership-r3.md",
+      "before_sha256": "074631de6448c75cbd0367f049d84b7d77d21cdff7afc5feeacd5555890c16bb",
+      "after_sha256": "074631de6448c75cbd0367f049d84b7d77d21cdff7afc5feeacd5555890c16bb"
+    },
+    {
+      "owner": "core",
+      "path": "docs/architecture/domain-migrations/browser-ux_dinas-inventory.md",
+      "before_sha256": "bcd8e614a4f1056a07b26b62376c8750ab9e6fd1b5e9a18e809ceee7015d7ada",
+      "after_sha256": "bcd8e614a4f1056a07b26b62376c8750ab9e6fd1b5e9a18e809ceee7015d7ada"
+    },
+    {
+      "owner": "core",
+      "path": "flake.nix",
+      "before_sha256": "a6cf09b9eba38a2a11bf787117d612490e30fe4566e259540d53aa753e6b5840",
+      "after_sha256": "a6cf09b9eba38a2a11bf787117d612490e30fe4566e259540d53aa753e6b5840"
+    },
+    {
+      "owner": "core",
+      "path": "lib/core-application-inventory.nix",
+      "before_sha256": "0bd69fe1741d3cf029a08848c234889f9bac5a3252d48d17c5847fc79362902b",
+      "after_sha256": "0bd69fe1741d3cf029a08848c234889f9bac5a3252d48d17c5847fc79362902b"
+    },
+    {
+      "owner": "core",
+      "path": "libexec/browser-automation/launch.py",
+      "before_sha256": "4ca08a5902b01645736de24a4e6211feb56ce4808258c312c9e8ea12f10e6451",
+      "after_sha256": "4ca08a5902b01645736de24a4e6211feb56ce4808258c312c9e8ea12f10e6451"
+    },
+    {
+      "owner": "core",
+      "path": "modules/browsers.nix",
+      "before_sha256": "f5f4377b16339bc342580516223d5f094122e24a28e9e2ab8e53fa3103ef8f08",
+      "after_sha256": "9e21ab4d87d7e3131948b0a9a0e857073a0949f9cceaf3a2af28f87229808b73"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/int/nix/application-claims.int.test.nix",
+      "before_sha256": "442e30e5a3268d6e7909d0814ba0dba41be949f461b074a18a5583ea62504bd7",
+      "after_sha256": "442e30e5a3268d6e7909d0814ba0dba41be949f461b074a18a5583ea62504bd7"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/int/nix/browser-baseline.int.test.nix",
+      "before_sha256": "3aae9f0727954f351fae1358d56b0f27ef146bf3ce2784c4caaf435641e0f382",
+      "after_sha256": "3aae9f0727954f351fae1358d56b0f27ef146bf3ce2784c4caaf435641e0f382"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/unit/bash/browser-config.unit.test.bats",
+      "before_sha256": "d6b10b4904910f90bf6b4eb5fc57705d16514b75a5e59868ab73b260d611199d",
+      "after_sha256": "d6b10b4904910f90bf6b4eb5fc57705d16514b75a5e59868ab73b260d611199d"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/unit/nix/application-claims.unit.test.nix",
+      "before_sha256": "aa2d8a0702a35b6c50cfa4b78a518de74f258f5dbbb161824818e01d134dbedf",
+      "after_sha256": "aa2d8a0702a35b6c50cfa4b78a518de74f258f5dbbb161824818e01d134dbedf"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/unit/nix/browser-baseline.unit.test.nix",
+      "before_sha256": "328daec8e5c9704bb8078780de21c2d0d4233a29de43cf5d30fd7069f579fcf0",
+      "after_sha256": "328daec8e5c9704bb8078780de21c2d0d4233a29de43cf5d30fd7069f579fcf0"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/unit/nix/core-browser-ownership.unit.test.nix",
+      "before_sha256": "4cf6fc9ceb199216e471b06c4e6a231a7df40fa51ebf3473d7af2a00e38fa246",
+      "after_sha256": "4cf6fc9ceb199216e471b06c4e6a231a7df40fa51ebf3473d7af2a00e38fa246"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/unit/python/browser_automation_roles_r3.unit.test.py",
+      "before_sha256": "e99015f21d58d71250b295d662993fa437a3c552b0443e5c3bcfe496349467bf",
+      "after_sha256": "e99015f21d58d71250b295d662993fa437a3c552b0443e5c3bcfe496349467bf"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/unit/python/browser_host_qualification.unit.test.py",
+      "before_sha256": "f2063563db0599ddcf868bf9d1a2efc206852a013e53e0dc30cced3ca2606cc7",
+      "after_sha256": "f2063563db0599ddcf868bf9d1a2efc206852a013e53e0dc30cced3ca2606cc7"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/unit/python/browser_roles_r3_host_kit.unit.test.py",
+      "before_sha256": "beb179817a307fc07fd20f632a8d38bbc7c92e902dccfe29659f209b3b492b35",
+      "after_sha256": "beb179817a307fc07fd20f632a8d38bbc7c92e902dccfe29659f209b3b492b35"
+    },
+    {
+      "owner": "browser-ux",
+      "path": "delivery/browser-ownership-r3/browser-ux.patch",
+      "before_sha256": "b96ee8ea0394326d38995fc5949779d0fff2f4404abff8ce908eb89669b346de",
+      "after_sha256": "b96ee8ea0394326d38995fc5949779d0fff2f4404abff8ce908eb89669b346de"
+    },
+    {
+      "owner": "composition",
+      "path": "delivery/browser-ownership-r3r1/composition.patch",
+      "before_sha256": "9cfb35eeeb4b845b21a0c0fc90f22900290cf9ace6b8d6638640632c7d8c3f19",
+      "after_sha256": "9cfb35eeeb4b845b21a0c0fc90f22900290cf9ace6b8d6638640632c7d8c3f19"
+    },
+    {
+      "owner": "agent-central",
+      "path": "delivery/browser-ownership-r3/agent-central.patch",
+      "before_sha256": "6ccf81cc8aa4ab629e24ec08884ab655f1aa6405ad5080636f852de070ecf832",
+      "after_sha256": "6ccf81cc8aa4ab629e24ec08884ab655f1aa6405ad5080636f852de070ecf832"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r1/source-fixture.nix",
+      "before_sha256": "158434ba8c5c85e4638b7ea267d4284dfe1de8d73aba9e4c6a083ffa70b9fc15",
+      "after_sha256": "158434ba8c5c85e4638b7ea267d4284dfe1de8d73aba9e4c6a083ffa70b9fc15"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r1/readback.nix",
+      "before_sha256": "750ece120463ef0ab70490a9606e8ba0565c40efd5d64899a9d4c12e62c41909",
+      "after_sha256": "750ece120463ef0ab70490a9606e8ba0565c40efd5d64899a9d4c12e62c41909"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r1/verify-source.py",
+      "before_sha256": "8c3a4792fb5323688254e006e887e530a69c3c8e75b5000a3a7078604798f6ef",
+      "after_sha256": "8c3a4792fb5323688254e006e887e530a69c3c8e75b5000a3a7078604798f6ef"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r1/native-readback.py",
+      "before_sha256": "bd3829cb7437105453664bfa22ffd08309e022dca9eaa069c5cf1f63fa7e0e84",
+      "after_sha256": "bd3829cb7437105453664bfa22ffd08309e022dca9eaa069c5cf1f63fa7e0e84"
+    },
+    {
+      "owner": "core",
+      "path": "config/browser/proton-vpn-r3r2.json",
+      "before_sha256": null,
+      "after_sha256": "1c0a6047fe1a8a3a2dccf20905a8a1de08c688d2c368b256721821ca83ad8298"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/CORE-SOURCE-DIFF.patch",
+      "before_sha256": null,
+      "after_sha256": "218cde8d8e89aec39f22cc396895ee64a979f2b5fe31c1e2cbe5ea3f3ffcfa87"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/IDENTITY-EVIDENCE.json",
+      "before_sha256": null,
+      "after_sha256": "7dfd5a7b6a8c4762ba3ab6d79ff54d070d8fd5baa16d7b0da783bd0bd4bb574e"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/PRIOR-NATIVE-R3R1.json",
+      "before_sha256": null,
+      "after_sha256": "42bd294021cd34ce261a62ece6cdce82b43598354b43597034ed951f326b4c3e"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/browser-ux-manifest.json",
+      "before_sha256": null,
+      "after_sha256": "4ac831fbf5e86059591357cdb8d6362c3f25a9d65ab7d7789e1c79d2180ce493"
+    },
+    {
+      "owner": "browser-ux",
+      "path": "delivery/browser-ownership-r3r2/browser-ux.patch",
+      "before_sha256": null,
+      "after_sha256": "3921f50ceb56d85ac06b7b0757c362e86e2a44ebbc49858deb21e5a5776e9286"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/native-readback.py",
+      "before_sha256": null,
+      "after_sha256": "527b911daec0c23cf83ee656a52251a6de7a0a3239881c2cefc2ff57f65fe36e"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/prepare-readback.py",
+      "before_sha256": null,
+      "after_sha256": "72a45b7939a51343ad3b1cc74945d75fc1f718bd097d1696f0224a4044c1d05a"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/proton-fixture.nix",
+      "before_sha256": null,
+      "after_sha256": "fa0bf88e65b933d36b30b54843924ebb7dd680e53572e63aad40c81f380ccf08"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/readback.nix",
+      "before_sha256": null,
+      "after_sha256": "e5c716fb9ed8da145f17777c194ec966dc2dbaf11737e6456cc426c344219131"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/verify-delivery.py",
+      "before_sha256": null,
+      "after_sha256": "2b83cb53ca0067d94b0869fa912774faed275a2f3909db1e74dd775a473c6aa6"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/unit/python/browser_proton_vpn_r3r2.unit.test.py",
+      "before_sha256": null,
+      "after_sha256": "b0952cd4e4cae9b3e7e494c64bf39333d6fc1a10fc712e0b25442cd378b364e7"
+    }
+  ],
+  "sourceCandidateDigest": "676e27bd07da9b27aaed4f34623c8bd39eb012708ec65e7d4d93355598930d3d",
+  "selected": false,
+  "candidateCommit": null,
+  "candidateTree": null,
+  "modifiedR3R2NativeGraph": "PENDING",
+  "independentReview": "PENDING_DISPATCHER_POST_WORK_REVIEW",
+  "sourceBindingConsulted": {
+    "owner": "browser-ux",
+    "path": "delivery/primary-cutover/SOURCE-BINDINGS.json",
+    "sha256": "0e8b72e1f88be2c6e2776c59a1b37a6268ea8c9f6e34970e9b5c476af726fee8"
+  },
+  "digestAlgorithm": "SHA256 of compact sorted-key JSON records array"
+}

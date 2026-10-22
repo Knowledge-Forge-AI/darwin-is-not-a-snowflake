@@ -1,0 +1,35 @@
+{
+  "retainedR3R2": {
+    "recordsVerifiedBeforeEdit": 50,
+    "digest": "7a15c1ccc9605cca07b3871be7ac2eb7bf498f7eebe03778db3fbf8caaf4aec1"
+  },
+  "producedR3R3": {
+    "records": 74,
+    "digest": "3bc0b76f61ad3ba4bcf45748a42a393719905eade61f532187595461f5f6f256",
+    "revision": "UNCOMMITTED_NOT_SELECTED",
+    "independentReview": "PENDING_DISPATCHER_POST_WORK_REVIEW"
+  },
+  "coreDiffSha256": "e0f90ea11bc20733d53ff0104e4e8460fa0e152f91e90fbb1ae562b5300ee4a5",
+  "ownerPatchSha256": "ec25e718efac5acb676dacee1aafa381e184a644adb43f23409ffb4ddd650ff7",
+  "oldEvidenceRewritten": false,
+  "revisedR3R3": {
+    "records": 91,
+    "digest": "f784382e937897b1a0f4c795b8846aa739a025a5f8e1bd6a6a5104f45ed9404b",
+    "revision": "UNCOMMITTED_NOT_SELECTED",
+    "independentReview": "PENDING_FINAL_INDEPENDENT_REVIEW",
+    "dispatcherPostWorkReviewReceivedForProducer": true,
+    "secondIndependentReviewObtained": false,
+    "revisionDiffSha256": "48f21abc3e4f87583408f717542aa7823e8ef1bddb7e8b6dcac1fec1aa1b3fa2"
+  },
+  "producerBinding": {
+    "head": "79021c01e63464020f2e1b447a6f4ec488699ae4",
+    "kind": "git_tree",
+    "tree": "daedf5d8297ac10f10d2d3dafe52f3649791482e"
+  },
+  "currentWorktreeBindingAtStageEntry": {
+    "head": "79021c01e63464020f2e1b447a6f4ec488699ae4",
+    "kind": "git_tree",
+    "tree": "daedf5d8297ac10f10d2d3dafe52f3649791482e"
+  },
+  "bindingUse": "dispatcher receipt plus live source/SHA verification; no recreated identity prerequisite"
+}

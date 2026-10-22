@@ -1,0 +1,100 @@
+{
+  "schema": "owner-patch-r3r3-v1",
+  "owner": "browser-ux",
+  "patchKind": "single cumulative replacement against live owner preimages; apply once instead of R3/R3R2 patches",
+  "liveOwnerModified": false,
+  "priorPatchSha256": "3921f50ceb56d85ac06b7b0757c362e86e2a44ebbc49858deb21e5a5776e9286",
+  "patchSha256": "ec25e718efac5acb676dacee1aafa381e184a644adb43f23409ffb4ddd650ff7",
+  "paths": [
+    {
+      "path": "config/browser/extension-contributions-r3r3.nix",
+      "before_sha256": null,
+      "after_sha256": "b9d525cafba41843cfdf51cb52793076353e2144b9c19b63eeeaf81cec8e0aa2"
+    },
+    {
+      "path": "config/browser/roles-r3.nix",
+      "before_sha256": null,
+      "after_sha256": "be62e4ff506fb1924c322a0748085b93bfb7a65ab87c8ec26e31bbb969ec9f33"
+    },
+    {
+      "path": "delivery/proton-vpn-floorp.md",
+      "before_sha256": null,
+      "after_sha256": "b2a13e521e29af1d082b80d977486ca847c17dbd53167772b8995416b75d0dbe"
+    },
+    {
+      "path": "delivery/rollout.py",
+      "before_sha256": "9ea9a136ca3ccb794be3920cedb7a2428503600fb8b7a637e78c9a93ad8b8acc",
+      "after_sha256": "edbeb6a8cefb8e339d0bd600dd122bf2493a6d55d3906a6972ea949625d80b77"
+    },
+    {
+      "path": "flake.nix",
+      "before_sha256": "cb6b902bc2299a116756b43fac5914fe6cb9ec92eab2d8a1c2ca8fd337b88d28",
+      "after_sha256": "d9d4e52a3751053e15f25f3c3259c90832f3e030b42de8def1e9c00a441f92fb"
+    },
+    {
+      "path": "lib/application-claims.nix",
+      "before_sha256": "bd00395d27756364dc35acd0e6b246afa6bf62f3662c3c84a9e13ee6f66db101",
+      "after_sha256": "0d090c4e4a9a5683b9b858fd652cb4578abe2108ab4eaf8dc7813d3566cf2325"
+    },
+    {
+      "path": "modules/default.nix",
+      "before_sha256": "9e172667715e0ae0a7cb61c8f87752cea5c08f4e36a1eda83614a0cf0fc843e0",
+      "after_sha256": "9986813a9fb228ad5a846f25ffba96a9af53f19d272c7a4c30dd10441e150588"
+    },
+    {
+      "path": "modules/roles-r3.nix",
+      "before_sha256": null,
+      "after_sha256": "bc5cc6043ce8aa5ffa3c1a31ab879e9552269f24210286a3f67e1d260d16a676"
+    },
+    {
+      "path": "tests/composition-delivery-contracts.nix",
+      "before_sha256": "6c8874c5789e800ec4b908301b170e4a1dce60cbf0c9bfd29a3c19483f05ad26",
+      "after_sha256": "f26ca514761057979d0dfa7a808352a336e0d5f998e069c155eac44371935e98"
+    },
+    {
+      "path": "tests/contracts.nix",
+      "before_sha256": "2128c5f27360d709b97341193a371f046cbd6ef28f2b92c10be35188474784b5",
+      "after_sha256": "7320c4399bfd213fa0d29e2336dbcef4925e0ed84032bab5196a5a3d3c411b97"
+    },
+    {
+      "path": "tests/delivery-rollout.test.py",
+      "before_sha256": "57113663501fba743c7054fb2e6761ffacb71a39b5524e09524ef59b99220f08",
+      "after_sha256": "d8fa366723f0af3b341c7aafee6ae5a83bd27c28c006c7e6fe7ee484483831dc"
+    },
+    {
+      "path": "tests/dormant-contracts.nix",
+      "before_sha256": "ea83a3aaad5311713fa6bb755e90e964b78fa6570aa747d564846b179324d8a1",
+      "after_sha256": "121098326aa755a1d572264b6488409f62cca23a4590165cd608602962b62e54"
+    },
+    {
+      "path": "tests/roles-r3.nix",
+      "before_sha256": null,
+      "after_sha256": "3e17af1904b844a8350ced16a94ae48bdf4fb7de45981327c158556e3885132c"
+    },
+    {
+      "path": "tests/roles-r3.test.py",
+      "before_sha256": null,
+      "after_sha256": "13bd5dda0b55147a5d52fddea88dae0c71687a9a820dce7de5b3cdfae4ee1419"
+    },
+    {
+      "path": "tests/source-only-roster.json",
+      "before_sha256": "2b3af47dad870c7536144f6a86f69e12910d7a15ccf54032d2ad73ed17b161e0",
+      "after_sha256": "987766ac46e511110ee333a184281474b90cc8280c25d16f329f1204a9123ebd"
+    }
+  ],
+  "unchangedDependencies": [
+    {
+      "path": "config/browser/extension-policy.nix",
+      "sha256": "fccc84df9688b327381a298bcabd510d20350dc1bedb89a8f13c68025d2c5323"
+    },
+    {
+      "path": "config/browser/apple-proton.nix",
+      "sha256": "dd19be0ab8787304f31417e5fc90df62ca72d150fc04526b80ccb09516937efb"
+    },
+    {
+      "path": "config/browser/apple-proton-extensions.json",
+      "sha256": "8a6439027cf2357fdb87f7b439236e139018f7f8128cabb8c262a8503f2295d0"
+    }
+  ],
+  "adoption": "HELD_SEPARATE_REVIEWED_RELEASE_REQUIRED"
+}

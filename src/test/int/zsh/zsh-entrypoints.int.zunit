@@ -1,0 +1,93 @@
+#!/usr/bin/env zunit
+# nix-darwin-test-source-target: bin/codex-restore
+# nix-darwin-test-source-target: libexec/codex-dr/restore.zsh
+# nix-darwin-test-source-target: libexec/git-gui/git-gui
+# nix-darwin-test-source-target: libexec/nix-unit-tests/run
+# nix-darwin-test-source-target: tools/bootstrap/bootstrap-macos
+
+@setup {
+  test_tmp_root="$(mktemp -d)"
+  fake_bin="$test_tmp_root/bin"
+  fake_repo="$test_tmp_root/repo"
+  fake_out="$test_tmp_root/out"
+  command_log="$test_tmp_root/commands.log"
+  repo_dir="$(cd "$testdir/../../../.." && pwd)"
+  base_path="/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
+  mkdir -p "$fake_bin" "$fake_repo/src/test/unit/nix" "$fake_repo/src/test/int/nix"
+  : > "$command_log"
+
+  write_fake_command() {
+    local command_path="$1"
+    local command_body="$2"
+    {
+      print -r -- '#!/usr/bin/env zsh'
+      print -r -- 'set -e'
+      print -r -- "$command_body"
+    } > "$command_path"
+    chmod +x "$command_path"
+  }
+}
+
+@teardown {
+  rm -rf "$test_tmp_root"
+}
+
+@test 'codex restore entrypoints expose disaster recovery help without mutating state' {
+  codex_restore_output="$("$repo_dir/bin/codex-restore" --help)"
+  codex_restore_exit="$?"
+
+  assert "$codex_restore_exit" equals 0
+  assert "$codex_restore_output" contains "Usage: codex-restore --confirm"
+  assert "$codex_restore_output" contains "--skip-self-heal"
+}
+
+@test 'codex restore implementations expose matching host-safe help paths' {
+  codex_restore_output="$("$repo_dir/libexec/codex-dr/restore.zsh" --help)"
+  codex_restore_exit="$?"
+
+  assert "$codex_restore_exit" equals 0
+  assert "$codex_restore_output" contains "Usage: codex-restore --confirm"
+}
+
+@test 'bootstrap macos exposes fresh-machine bootstrap help without installing tools' {
+  output="$("$repo_dir/tools/bootstrap/bootstrap-macos" --help)"
+  exit_code="$?"
+
+  assert "$exit_code" equals 0
+  assert "$output" contains "Establish the nix-darwin bootstrap foundation."
+  assert "$output" contains "--local-root PATH"
+  assert "$output" contains "It does not run composition bootstrap, build a Darwin system, switch,"
+  assert "$(print -r -- "$output" | grep -c darwin-rebuild || true)" equals 0
+  assert "$(print -r -- "$output" | grep -c -- '--config' || true)" equals 0
+}
+
+@test 'git gui package wrapper dispatches through rendered executable' {
+  packaged_git_gui="$fake_bin/packaged-git-gui"
+  rendered_git_gui="$fake_bin/git-gui"
+  write_fake_command "$packaged_git_gui" 'print -r -- "$*" >> "$COMMAND_LOG"'
+  sed "s|@GIT_GUI@|$packaged_git_gui|g" "$repo_dir/libexec/git-gui/git-gui" > "$rendered_git_gui"
+  chmod +x "$rendered_git_gui"
+
+  COMMAND_LOG="$command_log" PATH="$fake_bin:$base_path" "$rendered_git_gui" --classic --blame
+
+  assert "$(cat "$command_log")" same_as "--classic --blame"
+}
+
+@test 'nix unit package runner executes unit and integration nix suites' {
+  fake_nix_unit="$fake_bin/nix-unit"
+  rendered_runner="$fake_bin/nix-unit-runner"
+  write_fake_command "$fake_nix_unit" 'print -r -- "$*" >> "$COMMAND_LOG"'
+  sed "s|@NIX_UNIT@|$fake_nix_unit|g" "$repo_dir/libexec/nix-unit-tests/run" > "$rendered_runner"
+  chmod +x "$rendered_runner"
+  touch "$fake_repo/src/test/unit/nix/a.unit.test.nix"
+  touch "$fake_repo/src/test/int/nix/a.int.test.nix"
+
+  TMPDIR="$test_tmp_root/tmp" \
+    COMMAND_LOG="$command_log" \
+    PATH="$fake_bin:$base_path" \
+    "$rendered_runner" "$fake_repo" aarch64-darwin "$fake_out"
+
+  assert "$fake_out" is_file
+  assert "$(cat "$command_log")" contains "--arg repoRoot $fake_repo --argstr system aarch64-darwin $fake_repo/src/test/unit/nix/a.unit.test.nix"
+  assert "$(cat "$command_log")" contains "--arg repoRoot $fake_repo --argstr system aarch64-darwin $fake_repo/src/test/int/nix/a.int.test.nix"
+}

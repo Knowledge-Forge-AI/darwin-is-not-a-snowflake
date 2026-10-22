@@ -1,0 +1,46 @@
+{
+  "observedDate": "2026-10-13",
+  "chromium": {
+    "id": "jplgfhpmjnbigmhklmmbgecoobifkmpa",
+    "vendor": "https://protonvpn.com/download-chrome-extension",
+    "store": "https://chromewebstore.google.com/detail/proton-vpn-fast-secure/jplgfhpmjnbigmhklmmbgecoobifkmpa",
+    "updateUrl": "https://clients2.google.com/service/update2/crx",
+    "verification": "vendor download link resolves to official ID; update URL is requested official route"
+  },
+  "gecko": {
+    "id": "vpn@proton.ch",
+    "amoAddonId": 2786243,
+    "amoMetadataUrl": "https://addons.mozilla.org/api/v5/addons/addon/proton-vpn-firefox-extension/",
+    "retainedOwnerCatalog": {
+      "owner": "browser-ux",
+      "path": "config/browser/apple-proton-extensions.json",
+      "sha256": "8a6439027cf2357fdb87f7b439236e139018f7f8128cabb8c262a8503f2295d0",
+      "metadataObservation": "2026-10-07",
+      "version": "1.3.6",
+      "xpiUrl": "https://addons.mozilla.org/firefox/downloads/file/4951998/proton_vpn_firefox_extension-1.3.6.xpi",
+      "xpiSha256": "sha256:552281ee274aeece0f83052f2fc6da3b526021b6739c3decb0390a9b5efc37a3",
+      "provenance": "Requested official publisher build; AMO metadata GUID matched signed XPI manifest; CWS vendor/store identity and official CRX update route"
+    },
+    "limitations": "Retained 2026-10-07 AMO/signed-manifest evidence only establishes the inherited ID. Producer main-ref corroboration is unpinned and insufficient for fresh adoption. Revision fetched the public listing, but AMO GUID/API/XPI and immutable upstream reference remain unavailable. No current signed package, auto-update behavior or browser install is qualified.",
+    "producerUnpinnedCorroboration": {
+      "url": "https://raw.githubusercontent.com/ProtonVPN/proton-vpn-browser-extension/main/webpack.config.js",
+      "manifestProperty": "adaptToFirefox: browser_specific_settings.gecko.id",
+      "value": "vpn@proton.ch",
+      "builder": "https://raw.githubusercontent.com/ProtonVPN/proton-vpn-browser-extension/main/webpack-ff.config.js",
+      "baseManifest": "https://raw.githubusercontent.com/ProtonVPN/proton-vpn-browser-extension/main/source/manifest.json",
+      "version": "1.3.6"
+    },
+    "revisionIdentityReadback": {
+      "status": "ADOPTION_HELD",
+      "amoGuid": "PENDING; HTTPS API inaccessible through web tool and provider urllib",
+      "pinnedManifestCorroboration": "PENDING; commit API/history inaccessible; no tag or commit invented",
+      "publicAmoListing": "FETCHED; product and version listing do not establish signed GUID",
+      "publicAmoListingUrl": "https://addons.mozilla.org/en-US/firefox/addon/proton-vpn-firefox-extension/",
+      "beforeAdoption": [
+        "fetch authenticated AMO metadata and assert guid == vpn@proton.ch",
+        "resolve an exact official upstream commit/tag and corroborate the Gecko builder at that immutable ref",
+        "observe LibreWolf signed add-on update settings and storage continuity in attended readback"
+      ]
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "status": "PASS_SOURCE_PRESERVATION",
+  "startingSourceFiles": 713,
+  "changedExistingPaths": [
+    "config/browser/README.md",
+    "modules/browsers.nix"
+  ],
+  "allOtherStartingFilesByteIdentical": true,
+  "retainedEvidenceFilesVerifiedUnchanged": 120,
+  "indexByteIdentical": true,
+  "locksChanged": false,
+  "externalOwnerPreimagesAndDependencies": "PASS",
+  "browserProfilesReadOrWritten": false,
+  "runtimeActivated": false,
+  "nativeGraphQualified": false,
+  "automationAndYouTubeSources": "BYTE_IDENTICAL_TO_START",
+  "scratchException": "task scratch in permitted temporary root because configured shared root is outside writable sandbox",
+  "scratchRetention": "terminal evidence retained for operator inspection; no live browser/process resources created"
+}

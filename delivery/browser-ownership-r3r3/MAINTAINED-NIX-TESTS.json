@@ -1,0 +1,33 @@
+{
+  "scope": "evaluation only; no build or install",
+  "records": [
+    {
+      "check": "src/test/unit/nix/core-browser-ownership.unit.test.nix",
+      "exitCode": 0,
+      "failedTests": []
+    },
+    {
+      "check": "patched Browser UX role contracts",
+      "exitCode": 0,
+      "checks": {
+        "roles-r3-convenience-boundary": "roles-r3-convenience-boundary",
+        "roles-r3-owner-cut": "roles-r3-owner-cut"
+      }
+    },
+    {
+      "check": "src/test/unit/nix/browser-baseline.unit.test.nix",
+      "status": "ENVIRONMENT_DENIED",
+      "exitCode": 1,
+      "scope": "native flake package set evaluation",
+      "failedTests": null
+    },
+    {
+      "check": "src/test/int/nix/browser-baseline.int.test.nix",
+      "status": "ENVIRONMENT_DENIED",
+      "exitCode": 1,
+      "scope": "native flake package set evaluation",
+      "failedTests": null
+    }
+  ],
+  "correctedInvocation": "unsupported libPath parameter removed before native attempts; initial command error was a driver error"
+}

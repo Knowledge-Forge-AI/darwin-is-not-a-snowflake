@@ -1,0 +1,39 @@
+{
+  "schema": "bux-r3r4-preservation-v1",
+  "modifiedExistingCorePaths": [
+    "config/browser/README.md",
+    "config/browser/roles-r3.json",
+    "docs/adr/2026/10/0002-browser-role-ownership-r3.md",
+    "modules/browsers.nix",
+    "src/test/unit/nix/core-browser-ownership.unit.test.nix"
+  ],
+  "unrelatedCoreDrift": [],
+  "newPathsOutsideR3R4": [],
+  "historicalDeliveryByteDrift": [],
+  "ownerByteDrift": {
+    "browser-ux": [],
+    "composition": []
+  },
+  "ownerNewPaths": {
+    "browser-ux": [],
+    "composition": []
+  },
+  "headUnchanged": true,
+  "indexUnchanged": true,
+  "operativeDecommissionStrings": [],
+  "nativeGraphQualified": false,
+  "profilesReadOrChanged": false,
+  "browserLaunched": false,
+  "activationPerformed": false,
+  "securityAdmissionDependencyAdded": false,
+  "scratchException": "shared scratch outside sandbox writable roots; one temporary sandbox-writable run retained; no live resources",
+  "revisionCloseChangedSourcePaths": [
+    "docs/adr/2026/10/0002-browser-role-ownership-r3.md",
+    "modules/browsers.nix",
+    "src/test/unit/nix/core-browser-ownership.unit.test.nix"
+  ],
+  "stage": "revise_close",
+  "coreInventoryComparedFiles": 22132,
+  "ownerVerification": "full tracked/untracked source copies compared with current owners; Git metadata not mutated",
+  "operativeScanScope": "maintained core reference/module/ADR plus manifest-selected owner Nix/Python/JSON postimages; historical and removed patch lines excluded"
+}

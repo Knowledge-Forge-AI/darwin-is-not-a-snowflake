@@ -1,0 +1,185 @@
+{
+  "schema": "owner-patch-r3r4-v1",
+  "owner": "browser-ux",
+  "patchKind": "single cumulative replacement against current local owner preimages; apply once instead of historical patches",
+  "historicalPatchSha256": "ec25e718efac5acb676dacee1aafa381e184a644adb43f23409ffb4ddd650ff7",
+  "patchSha256": "32347d8cd54e70f7c803aa3ab4ada0edaf0d90098831ad0190a0856164b9c7b9",
+  "paths": [
+    {
+      "path": "config/browser/extension-contributions-r3r3.nix",
+      "before_sha256": null,
+      "after_sha256": "b9d525cafba41843cfdf51cb52793076353e2144b9c19b63eeeaf81cec8e0aa2"
+    },
+    {
+      "path": "config/browser/roles-r3.nix",
+      "before_sha256": null,
+      "after_sha256": "d6307a676d5d3c046a98753f7a2c23b2cdef63773956a97c290bf77af588e034"
+    },
+    {
+      "path": "delivery/proton-vpn-floorp.md",
+      "before_sha256": null,
+      "after_sha256": "b2a13e521e29af1d082b80d977486ca847c17dbd53167772b8995416b75d0dbe"
+    },
+    {
+      "path": "delivery/rollout.py",
+      "before_sha256": "9ea9a136ca3ccb794be3920cedb7a2428503600fb8b7a637e78c9a93ad8b8acc",
+      "after_sha256": "edbeb6a8cefb8e339d0bd600dd122bf2493a6d55d3906a6972ea949625d80b77"
+    },
+    {
+      "path": "delivery/vivaldi-visual-reference.md",
+      "before_sha256": null,
+      "after_sha256": "633b5eb793c6649aa66fb870339a3f4f19e1c2931710f06ee796cdcca8c9a784"
+    },
+    {
+      "path": "flake.nix",
+      "before_sha256": "cb6b902bc2299a116756b43fac5914fe6cb9ec92eab2d8a1c2ca8fd337b88d28",
+      "after_sha256": "0cf6c9389f1346dbf1d42ba8e3093eb28fe1ed91457aa16efa6e5c74c3f26503"
+    },
+    {
+      "path": "lib/application-claims.nix",
+      "before_sha256": "bd00395d27756364dc35acd0e6b246afa6bf62f3662c3c84a9e13ee6f66db101",
+      "after_sha256": "4334e077ff96cca5198ff3b3451f39e25517d54acb76c3ff23efb38bc65e6191"
+    },
+    {
+      "path": "modules/default.nix",
+      "before_sha256": "9e172667715e0ae0a7cb61c8f87752cea5c08f4e36a1eda83614a0cf0fc843e0",
+      "after_sha256": "c25dfa85bc1f196475e153d5f9c5aa1261b4e24ce6cf88133bbea404f665256b"
+    },
+    {
+      "path": "modules/roles-r3.nix",
+      "before_sha256": null,
+      "after_sha256": "dc5723a4c4412f597f2cfa27ae42cd32de74dc8aa875aaa846b549c584322652"
+    },
+    {
+      "path": "tests/composition-delivery-contracts.nix",
+      "before_sha256": "6c8874c5789e800ec4b908301b170e4a1dce60cbf0c9bfd29a3c19483f05ad26",
+      "after_sha256": "f26ca514761057979d0dfa7a808352a336e0d5f998e069c155eac44371935e98"
+    },
+    {
+      "path": "tests/contracts.nix",
+      "before_sha256": "2128c5f27360d709b97341193a371f046cbd6ef28f2b92c10be35188474784b5",
+      "after_sha256": "06139d8515d0766bf929bab150769800dc1ecd00a730205c52d32bcad0c12f4b"
+    },
+    {
+      "path": "tests/delivery-rollout.test.py",
+      "before_sha256": "57113663501fba743c7054fb2e6761ffacb71a39b5524e09524ef59b99220f08",
+      "after_sha256": "d8fa366723f0af3b341c7aafee6ae5a83bd27c28c006c7e6fe7ee484483831dc"
+    },
+    {
+      "path": "tests/dormant-contracts.nix",
+      "before_sha256": "ea83a3aaad5311713fa6bb755e90e964b78fa6570aa747d564846b179324d8a1",
+      "after_sha256": "121098326aa755a1d572264b6488409f62cca23a4590165cd608602962b62e54"
+    },
+    {
+      "path": "tests/roles-r3.nix",
+      "before_sha256": null,
+      "after_sha256": "9db0b7c12a670dad028ce3295d43936945186523be69ee9fa66e94f90975abb6"
+    },
+    {
+      "path": "tests/roles-r3.test.py",
+      "before_sha256": null,
+      "after_sha256": "f0082854bbcc30065098d4918126f375311cbb7ee178083c2df5264cd05133fd"
+    },
+    {
+      "path": "tests/source-only-roster.json",
+      "before_sha256": "2b3af47dad870c7536144f6a86f69e12910d7a15ccf54032d2ad73ed17b161e0",
+      "after_sha256": "64f68e0e459cb695c518dd66f77c9c16669cc35ee485e0019fd24d160c7eb2d3"
+    }
+  ],
+  "unchangedDependencies": [
+    {
+      "path": "config/browser/apple-proton-extensions.json",
+      "sha256": "8a6439027cf2357fdb87f7b439236e139018f7f8128cabb8c262a8503f2295d0"
+    },
+    {
+      "path": "config/browser/apple-proton.nix",
+      "sha256": "dd19be0ab8787304f31417e5fc90df62ca72d150fc04526b80ccb09516937efb"
+    },
+    {
+      "path": "config/browser/chrome-clear-new-tab-external-extension.json",
+      "sha256": "5bcd92f712b450ecb20eb390f957216d488e5dc0c4abbb2cbf4dd6b570b11edc"
+    },
+    {
+      "path": "config/browser/chrome-policy-defaults.nix",
+      "sha256": "c44025a660ab941f32bbf33f4b14259061c07a9dab394379aef2e61320963c69"
+    },
+    {
+      "path": "config/browser/extension-policy.nix",
+      "sha256": "fccc84df9688b327381a298bcabd510d20350dc1bedb89a8f13c68025d2c5323"
+    },
+    {
+      "path": "config/browser/families/chromium.nix",
+      "sha256": "f8433f90f2a934eb81f1a5bedeaeffabb3362f95f547837eddca055c8a0d79f5"
+    },
+    {
+      "path": "config/browser/families/gecko.nix",
+      "sha256": "3aef12124405d6574a687de2701e7ec5ae26a9b1ed9324af5ba5239c2d31cf7b"
+    },
+    {
+      "path": "config/browser/firefox-policies.json",
+      "sha256": "575427106192c45e17c2b6766f1b88cfbf6b70372d5e481990035ad31c6eb9b7"
+    },
+    {
+      "path": "config/browser/firefox-policy-defaults.nix",
+      "sha256": "098ff207de819ba509e0852e1c4fd2ffd991508acce5c5d274a56ab7fed0c047"
+    },
+    {
+      "path": "config/browser/keepassxc-chrome-native-messaging.json",
+      "sha256": "caeb4e3cb79acacbce541a44bd8845cab31986dbb41ef9108b1bc38dc60ce1fc"
+    },
+    {
+      "path": "config/browser/keepassxc-firefox-native-messaging.json",
+      "sha256": "71644e9a2a157449b44ea929fce6443ed97a0f3a63309075f136942cbfe0185e"
+    },
+    {
+      "path": "config/browser/primary-cutover.nix",
+      "sha256": "e30c4c8e711fc347afabd6de8f5b019a0365e907b7c21f13e978a3353a736f5c"
+    },
+    {
+      "path": "config/browser/replacements/capabilities.nix",
+      "sha256": "9480f82b3305fb25076e9cd64a171a3b1d796f11e4dd572d2dadf5f6c2d3abc7"
+    },
+    {
+      "path": "config/browser/replacements/default.nix",
+      "sha256": "eaaba5a5411fb906225cf519a5a21d34681db64529951f5cbd12d43ea0880cd3"
+    },
+    {
+      "path": "config/browser/replacements/floorp-search.nix",
+      "sha256": "c4d558f3a3dd5784c4f43dacc851147d44f729713628ce753f7ece2a23e2e353"
+    },
+    {
+      "path": "config/browser/replacements/floorp.nix",
+      "sha256": "75f2c2f61624c4746b08bf2712c45e249c04bc5466a1ebdaad07aa0fc723db27"
+    },
+    {
+      "path": "config/browser/replacements/mail-resolution.json",
+      "sha256": "e8110f1d75a70633528f4ff6420da6b98aca0b0fde5d2587615bb176c8e3e1ae"
+    },
+    {
+      "path": "config/browser/replacements/runtime-issues.json",
+      "sha256": "59d03d09a4a703c36e2da7ce8469c678a971d7385f2329197576c278b27ef681"
+    },
+    {
+      "path": "config/browser/replacements/static-evidence.json",
+      "sha256": "e9fb07cc696885aa4cb92122d509cce9baf4faf0b338689b4630e4e34be9654d"
+    },
+    {
+      "path": "config/browser/replacements/system1-catalog.json",
+      "sha256": "826180593be57f5ff535d5bbba9ff43b7b6be819d0d43c32ce367155c04b1946"
+    },
+    {
+      "path": "config/browser/replacements/vivaldi.nix",
+      "sha256": "257f5f759cad84abcb4f6153632c0bf5c9d54cdb40159e3ac6d74b3477a03c67"
+    },
+    {
+      "path": "config/browser/safari.nix",
+      "sha256": "357881761576ce1b2aa6e24bb7377837f3f50710b46883874bfbcd9299f30f68"
+    },
+    {
+      "path": "flake.lock",
+      "sha256": "0028bcb1134d77aab31a662ea61b6d6a44ee70541a8aa20752ca5030dfd7fa86"
+    }
+  ],
+  "liveOwnerModified": false,
+  "adoption": "HELD_SEPARATE_MANAGER_DISPOSITION_AND_CLOSURE_PLAN_REQUIRED"
+}

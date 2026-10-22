@@ -1,0 +1,8 @@
+{
+  "schema": "dinas-paths-v1",
+  "workspace_root": "$HOME/custom workspace's root",
+  "nbin_root": "$HOME/.local/nbin",
+  "nbin_dev_root": "$HOME/.local/nbin-dev",
+  "ai_index_root": "$HOME/navigation",
+  "dinas_root": "$HOME/.local/share/dinas"
+}

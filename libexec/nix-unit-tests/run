@@ -1,0 +1,34 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+
+repo_root="$1"
+system="$2"
+out_path="$3"
+mkdir -p "$TMPDIR"
+nix_unit_runtime_dir="$(mktemp -d "$TMPDIR/nix-darwin-nix-unit.XXXXXX")"
+trap 'rm -rf "$nix_unit_runtime_dir"' EXIT
+mkdir -p "$nix_unit_runtime_dir/conf" "$nix_unit_runtime_dir/gc-roots"
+
+export NIX_CONFIG="experimental-features = nix-command flakes"
+export NIX_CONF_DIR="$nix_unit_runtime_dir/conf"
+export HOME="$TMPDIR"
+export XDG_CACHE_HOME="$TMPDIR/cache"
+
+run_nix_test_dir() {
+  local test_dir="$1"
+  local test_file
+
+  [ -d "$test_dir" ] || return 0
+
+  while IFS= read -r test_file; do
+    @NIX_UNIT@ \
+      --gc-roots-dir "$nix_unit_runtime_dir/gc-roots" \
+      --arg repoRoot "$repo_root" \
+      --argstr system "$system" \
+      "$test_file"
+  done < <(find "$test_dir" -type f -name '*.nix' | sort)
+}
+
+run_nix_test_dir "$repo_root/src/test/unit/nix"
+run_nix_test_dir "$repo_root/src/test/int/nix"
+touch "$out_path"

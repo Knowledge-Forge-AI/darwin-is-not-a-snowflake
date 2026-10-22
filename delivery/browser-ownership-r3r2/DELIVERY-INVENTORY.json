@@ -1,0 +1,144 @@
+{
+  "schema": "browser-r3r2-delivery-inventory-v1",
+  "records": [
+    {
+      "path": "COMPATIBILITY-MATRIX.md",
+      "before_sha256": null,
+      "after_sha256": "b8909b10bbbfeb2f67c1e07de521fbd29879c9dcce78bf458da4ae85d5a822bf"
+    },
+    {
+      "path": "CONNECTED-SOURCE-TESTS.json",
+      "before_sha256": null,
+      "after_sha256": "046b4e0918af22138954cdc8129e10875fa922791fdb428b554f73b309d538b4"
+    },
+    {
+      "path": "CORE-SOURCE-DIFF.patch",
+      "before_sha256": null,
+      "after_sha256": "218cde8d8e89aec39f22cc396895ee64a979f2b5fe31c1e2cbe5ea3f3ffcfa87"
+    },
+    {
+      "path": "GUARD-TESTS.json",
+      "before_sha256": null,
+      "after_sha256": "2fdffbd60b1e343a7f7d61afe10e55c6123dba94e6da05fb1b9e24ec2a09dbe4"
+    },
+    {
+      "path": "HOST-READBACK.md",
+      "before_sha256": null,
+      "after_sha256": "1707673f847a2f652cfe33cceb7ce0ced080d20201a8339e65ca556ea17bdb34"
+    },
+    {
+      "path": "IDENTITY-EVIDENCE.json",
+      "before_sha256": null,
+      "after_sha256": "7dfd5a7b6a8c4762ba3ab6d79ff54d070d8fd5baa16d7b0da783bd0bd4bb574e"
+    },
+    {
+      "path": "MAINTAINED-NIX-TESTS.json",
+      "before_sha256": null,
+      "after_sha256": "095ee00f92220f2b5e0751b0cdd26b1196ce9dacc564604eeed3a2a982ba8739"
+    },
+    {
+      "path": "MANAGER-REVIEW.md",
+      "before_sha256": null,
+      "after_sha256": "b440b6adcdf90f75433ff8ac44406438fc437a0167224b165e67a14addaf38c4"
+    },
+    {
+      "path": "NATIVE-READBACK.json",
+      "before_sha256": null,
+      "after_sha256": "11f870c16dcb63d3130f35a9e17e20d4df5d43412281ad124252936047dc8be8"
+    },
+    {
+      "path": "PATCH-VERIFICATION.json",
+      "before_sha256": null,
+      "after_sha256": "72a4f17dbc2f5690fbb86cb31a0a0844100f0166395b91f4fc13cdeaa7eb2dfd"
+    },
+    {
+      "path": "PLAN.md",
+      "before_sha256": null,
+      "after_sha256": "77f64aafe6c54df476e6b5560a8b745222adba934b312f06fc55350dfb6602de"
+    },
+    {
+      "path": "PRESERVATION.json",
+      "before_sha256": null,
+      "after_sha256": "84a59df335039850d0e9d406de0cd2466124fe9463ff352f8702a5e4e2b08053"
+    },
+    {
+      "path": "PRIOR-NATIVE-R3R1.json",
+      "before_sha256": null,
+      "after_sha256": "42bd294021cd34ce261a62ece6cdce82b43598354b43597034ed951f326b4c3e"
+    },
+    {
+      "path": "PROTON-FIXTURE-TESTS.json",
+      "before_sha256": null,
+      "after_sha256": "43a3d8b7f3e72de1aaee045b5611d5c4b80ecf6884c2e9faba315e2482984377"
+    },
+    {
+      "path": "SOURCE-BINDINGS.json",
+      "before_sha256": null,
+      "after_sha256": "796cdf968486bced787f72b5b8e517ab5518c256a39989f881d0352b9e9f7187"
+    },
+    {
+      "path": "STATIC-CHECKS.json",
+      "before_sha256": null,
+      "after_sha256": "67c9cc4b3d2676e089f508dbd6ad1b77c3d58ea126a038d68c38abc096bd24ea"
+    },
+    {
+      "path": "VALIDATION.json",
+      "before_sha256": null,
+      "after_sha256": "673f0b690d205e5993e32bc75cc30f90fb6f1e8ea523705310f478e42a930d62"
+    },
+    {
+      "path": "WORKER-STATUS.json",
+      "before_sha256": null,
+      "after_sha256": "e21f72e845edbc11bb072961b4f50926da9da5ce8b658aea6c2d2ef5efc404ec"
+    },
+    {
+      "path": "WRAPPER-PROVENANCE.json",
+      "before_sha256": null,
+      "after_sha256": "3ebeec6aa785d7b529a3ba855aa60ae2f1cb0dc537f1a7bd691adc34e5720c98"
+    },
+    {
+      "path": "browser-ux-manifest.json",
+      "before_sha256": null,
+      "after_sha256": "4ac831fbf5e86059591357cdb8d6362c3f25a9d65ab7d7789e1c79d2180ce493"
+    },
+    {
+      "path": "browser-ux.patch",
+      "before_sha256": null,
+      "after_sha256": "3921f50ceb56d85ac06b7b0757c362e86e2a44ebbc49858deb21e5a5776e9286"
+    },
+    {
+      "path": "native-readback.py",
+      "before_sha256": null,
+      "after_sha256": "527b911daec0c23cf83ee656a52251a6de7a0a3239881c2cefc2ff57f65fe36e"
+    },
+    {
+      "path": "prepare-readback.py",
+      "before_sha256": null,
+      "after_sha256": "72a45b7939a51343ad3b1cc74945d75fc1f718bd097d1696f0224a4044c1d05a"
+    },
+    {
+      "path": "preserved/modules/browsers.nix",
+      "before_sha256": null,
+      "after_sha256": "f5f4377b16339bc342580516223d5f094122e24a28e9e2ab8e53fa3103ef8f08"
+    },
+    {
+      "path": "proton-fixture.nix",
+      "before_sha256": null,
+      "after_sha256": "fa0bf88e65b933d36b30b54843924ebb7dd680e53572e63aad40c81f380ccf08"
+    },
+    {
+      "path": "readback.nix",
+      "before_sha256": null,
+      "after_sha256": "e5c716fb9ed8da145f17777c194ec966dc2dbaf11737e6456cc426c344219131"
+    },
+    {
+      "path": "verify-delivery.py",
+      "before_sha256": null,
+      "after_sha256": "2b83cb53ca0067d94b0869fa912774faed275a2f3909db1e74dd775a473c6aa6"
+    }
+  ],
+  "sourceCandidateDigest": "676e27bd07da9b27aaed4f34623c8bd39eb012708ec65e7d4d93355598930d3d",
+  "review": "PENDING_DISPATCHER_POST_WORK_REVIEW",
+  "selfAndChecksumExcluded": true,
+  "pathInventory": "all listed delivery artifacts were absent before R3R2; source preimages are retained and bound separately"
+}

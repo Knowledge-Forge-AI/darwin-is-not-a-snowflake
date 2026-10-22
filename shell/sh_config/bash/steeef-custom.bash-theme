@@ -1,0 +1,129 @@
+# Bash port of steeef-custom.zsh-theme.
+
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+
+steeef_prompt_color() {
+  printf '\\[\\033[%sm\\]' "$1"
+}
+
+steeef_prompt_reset() {
+  printf '\\[\\033[0m\\]'
+}
+
+steeef_setup_colors() {
+  local color_count
+  color_count=0
+  if command -v tput >/dev/null 2>&1 && [ -n "${TERM:-}" ]; then
+    color_count="$(tput colors 2>/dev/null || printf '0')"
+  fi
+
+  if [ "${color_count:-0}" -ge 256 ] 2>/dev/null; then
+    STEEEF_TURQUOISE="$(steeef_prompt_color '38;5;81')"
+    STEEEF_ORANGE="$(steeef_prompt_color '38;5;166')"
+    STEEEF_HOTPINK="$(steeef_prompt_color '38;5;161')"
+    STEEEF_LIGHTAMBER="$(steeef_prompt_color '38;5;220')"
+    STEEEF_PHOSGREEN="$(steeef_prompt_color '38;5;83')"
+    STEEEF_BLUE="$(steeef_prompt_color '34')"
+  else
+    STEEEF_TURQUOISE="$(steeef_prompt_color '36')"
+    STEEEF_ORANGE="$(steeef_prompt_color '33')"
+    STEEEF_HOTPINK="$(steeef_prompt_color '31')"
+    STEEEF_LIGHTAMBER="$(steeef_prompt_color '33')"
+    STEEEF_PHOSGREEN="$(steeef_prompt_color '32')"
+    STEEEF_BLUE="$(steeef_prompt_color '34')"
+  fi
+
+  STEEEF_RESET="$(steeef_prompt_reset)"
+  STEEEF_UNSTAGED="${STEEEF_ORANGE}●${STEEEF_LIGHTAMBER}"
+  STEEEF_STAGED="${STEEEF_PHOSGREEN}●${STEEEF_LIGHTAMBER}"
+  STEEEF_UNTRACKED="${STEEEF_HOTPINK}●${STEEEF_LIGHTAMBER}"
+}
+
+steeef_virtualenv_info() {
+  [ -n "${VIRTUAL_ENV:-}" ] || return 0
+  printf '(%s%s%s) ' "${STEEEF_BLUE}" "${VIRTUAL_ENV##*/}" "${STEEEF_RESET}"
+}
+
+steeef_title_path() {
+  if [ -n "${HOME:-}" ] && [ "$PWD" = "$HOME" ]; then
+    printf '~'
+  elif [ -n "${HOME:-}" ] && [[ "$PWD" == "$HOME"/* ]]; then
+    printf '~/%s' "${PWD#"$HOME"/}"
+  else
+    printf '%s' "$PWD"
+  fi
+}
+
+steeef_title_host() {
+  hostname -s 2>/dev/null || printf '%s' "${HOSTNAME%%.*}"
+}
+
+steeef_set_window_title() {
+  printf '\033]0;%s@%s:%s\a' "${USER:-$(id -un)}" "$(steeef_title_host)" "$(steeef_title_path)"
+}
+
+steeef_git_action() {
+  local git_dir common_dir
+  git_dir="$(git rev-parse --git-dir 2>/dev/null)" || return 0
+  common_dir="$(git rev-parse --git-common-dir 2>/dev/null)" || common_dir="$git_dir"
+
+  if [ -d "$git_dir/rebase-merge" ] || [ -d "$git_dir/rebase-apply" ]; then
+    printf 'rebase'
+  elif [ -f "$common_dir/MERGE_HEAD" ]; then
+    printf 'merge'
+  elif [ -f "$common_dir/CHERRY_PICK_HEAD" ]; then
+    printf 'cherry-pick'
+  elif [ -f "$common_dir/REVERT_HEAD" ]; then
+    printf 'revert'
+  elif [ -f "$common_dir/BISECT_LOG" ]; then
+    printf 'bisect'
+  fi
+}
+
+steeef_git_branch() {
+  git symbolic-ref --quiet --short HEAD 2>/dev/null \
+    || git rev-parse --short HEAD 2>/dev/null
+}
+
+steeef_git_info() {
+  git rev-parse --is-inside-work-tree >/dev/null 2>&1 || return 0
+
+  local action branch markers
+  branch="$(steeef_git_branch)" || return 0
+  markers=""
+
+  if ! git diff --quiet --ignore-submodules=dirty -- 2>/dev/null; then
+    markers+="${STEEEF_UNSTAGED}"
+  fi
+  if ! git diff --cached --quiet --ignore-submodules=dirty -- 2>/dev/null; then
+    markers+="${STEEEF_STAGED}"
+  fi
+  if git status --porcelain --untracked-files=normal --ignore-submodules=dirty 2>/dev/null |
+      grep -q '^?? '; then
+    markers+="${STEEEF_UNTRACKED}"
+  fi
+
+  printf '(%s%s%s%s)' \
+    "${STEEEF_TURQUOISE}" \
+    "$branch" \
+    "${STEEEF_LIGHTAMBER}" \
+    "$markers"
+
+  action="$(steeef_git_action)"
+  if [ -n "$action" ]; then
+    printf '(%s%s%s)' "${STEEEF_PHOSGREEN}" "$action" "${STEEEF_LIGHTAMBER}"
+  fi
+
+  printf ' '
+}
+
+steeef_prompt_command() {
+  local git_info virtualenv_info
+  steeef_set_window_title
+  git_info="$(steeef_git_info)"
+  virtualenv_info="$(steeef_virtualenv_info)"
+  PS1=$'\n'"${STEEEF_LIGHTAMBER}"'\w '"${git_info}${virtualenv_info}"$'\n''\$'"${STEEEF_RESET}"' '
+}
+
+steeef_setup_colors
+PROMPT_COMMAND=steeef_prompt_command

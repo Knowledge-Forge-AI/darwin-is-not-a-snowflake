@@ -1,0 +1,238 @@
+--- a/config/browser/roles-r3.nix
++++ b/config/browser/roles-r3.nix
+@@ -52,6 +52,16 @@
+   };
+   braveAutomation = { extensions = {}; credentialManagers = []; sync = false; };
+   braveYoutube = { physicalWriter = "core retained"; ownershipCut = "HELD"; destinationWriterEnabled = false; };
+-  vivaldi = { state = "DECOMMISSIONED_NOT_DELETED"; profileWriter = false; mailOAuthTroubleshooting = false; };
++  vivaldi = {
++    state = "VIVALDI_VISUAL_REFERENCE_RETAINED_DECOMMISSION_HELD";
++    primaryRole = false;
++    package = "vivaldi";
++    profileWriter = false;
++    mailOAuthTroubleshooting = false;
++    preserve = [ "app/executable" "settings/extensions" "Mail/Calendar/Feeds/OAuth"
++      "unsent/local data" "credentials" "imported bookmarks/preferences" ];
++    retirement = "EXPLICIT_OPERATOR_APPROVAL_REQUIRED";
++    visualMigration = "DEFERRED_DISPOSABLE_FLOORP_PROFILE_FIRST";
++  };
+   retiredR1Cutover = "configuration retained for continuity; target runtime selects R3 rather than primaryCutover/replacements";
+ }
+--- /dev/null
++++ b/delivery/vivaldi-visual-reference.md
+@@ -0,0 +1,17 @@
++# Retained Vivaldi visual reference
++
++Vivaldi remains installed and runnable, outside the seven primary browser roles.
++Floorp remains the preferred power-user browser. Retain existing rendering,
++managed policies, extensions, settings, Mail/Calendar/Feeds, OAuth, unsent/local
++data, credentials and imported bookmarks. Later retirement requires explicit
++operator approval and a separately reviewed source release. No feeds-only
++transition or new profile writer is selected.
++
++Future qualification is separate: catalogue only operator-selected Vivaldi UI
++effects during attended observation; distinguish Gecko browser chrome
++(`userChrome.css`) from page content (`userContent.css`); test a faithful recreation
++in a disposable Floorp profile first. Confirm supported mechanisms and each
++browser version's behavior without assuming parity. Study another Gecko role
++only after an explicit operator preference. This source phase includes no
++Vivaldi source copying, CSS extraction, screenshots, private-profile inspection,
++GUI automation, TCC access or profile mutation.
+--- a/flake.nix
++++ b/flake.nix
+@@ -52,14 +52,14 @@
+         deployPreconditions = [
+           "R3 supersedes target-host R1. Final source and exact owner patches require manager review before adoption; all browser deployment is mechanically held in core."
+           "Core owns stock Brave, LibreWolf, Orion and Safari privacy. Browser UX owns Floorp and per-profile convenience intent; Brave automation receives no convenience or credential extensions."
+-          "Preserve Chrome/Clear New Tab storage and Brave YouTube core writer, profiles, artwork and wallpaper source. Vivaldi is decommissioned without uninstall, data deletion or mail/OAuth work."
++          "Preserve Chrome/Clear New Tab storage and Brave YouTube core writer, profiles, artwork and wallpaper source. Vivaldi remains installed and unchanged as a runnable visual reference outside the seven primary roles; later retirement requires explicit operator approval."
+           "Apple Passwords password/TOTP/passkey compatibility precedes native-manager suppression. Unsupported fork integration stays held; preserve credential stores and recovery vaults."
+         ];
+         qualificationNotes = [
+           "Real composed graph, package acquisition, effective per-profile search/privacy/blockers/extensions and representative Brave automation remain native/attended qualification. No source declaration proves effectiveness."
+         ];
+         targetHostGeneration = {
+-          homebrewCasks = [ "floorp" ];
++          homebrewCasks = [ "vivaldi" "floorp" ];
+           effectiveQualification = "HELD";
+         };
+         # Legacy/non-target baseline; target package ownership is declared above.
+--- a/lib/application-claims.nix
++++ b/lib/application-claims.nix
+@@ -48,6 +48,6 @@
+ {
+   inherit inventory replacementInventory applicationClaims replacementApplicationClaims;
+   applicationClaimsForHost = { hostName, ... }:
+-    if hostName == "example-primary" then project [ replacementInventory.floorp ] else [ ];
++    if hostName == "example-primary" then project [ replacementInventory.vivaldi replacementInventory.floorp ] else [ ];
+   applicationClaimsFor = replacements: applicationClaims ++ replacementApplicationClaims replacements;
+ }
+--- a/modules/default.nix
++++ b/modules/default.nix
+@@ -352,11 +352,22 @@
+       "browser-ux" = {
+         rolesR3 = if rolesR3Active then r3Config."browser-ux".rolesR3 else { enable = false; };
+         primaryCutover = if rolesR3Active then r3Config."browser-ux".primaryCutover else legacyConfig."browser-ux".primaryCutover;
+-        replacementRendering = if rolesR3Active then r3Config."browser-ux".replacementRendering else legacyConfig."browser-ux".replacementRendering;
++        replacementRendering = if rolesR3Active then r3Config."browser-ux".replacementRendering // {
++          vivaldi = legacyConfig."browser-ux".replacementRendering.vivaldi;
++        } else legacyConfig."browser-ux".replacementRendering;
+         replacementApplicationClaims = if rolesR3Active then r3Config."browser-ux".replacementApplicationClaims else legacyConfig."browser-ux".replacementApplicationClaims;
+       };
+     }
+     (lib.mkIf rolesR3Active (builtins.removeAttrs r3Config [ "browser-ux" ]))
++    (lib.mkIf rolesR3Active {
++      # Preserve the existing Vivaldi policy/convenience selection through core's
++      # sole physical writer. No profile or productivity preference transition.
++      programs.browserBaseline = {
++        vivaldiPolicyOwnership = legacyConfig.programs.browserBaseline.replacementPolicyOwnership;
++      } // lib.optionalAttrs (legacyConfig.programs.browserBaseline ? vivaldi) {
++        vivaldi = legacyConfig.programs.browserBaseline.vivaldi;
++      };
++    })
+     (lib.mkIf (!rolesR3Active) (builtins.removeAttrs legacyConfig [ "browser-ux" ]))
+   ];
+ }
+--- a/modules/roles-r3.nix
++++ b/modules/roles-r3.nix
+@@ -12,7 +12,7 @@
+   programs.browserBaseline.extensionContributions =
+     import ../config/browser/extension-contributions-r3r3.nix;
+ } // lib.optionalAttrs hasHomebrew {
+-  homebrew.casks = [ "floorp" ];
++  homebrew.casks = [ "vivaldi" "floorp" ];
+ } // lib.optionalAttrs hasAssertions {
+   assertions = [
+     {
+@@ -22,13 +22,18 @@
+     }
+     {
+       assertion = (config.homebrew.onActivation.cleanup or "none") == "none";
+-      message = "Browser R3 decommissioning preserves installed apps and profiles; Homebrew cleanup must remain none.";
++      message = "Vivaldi visual reference retention preserves installed apps and profiles; Homebrew cleanup must remain none.";
++    }
++    {
++      assertion = (config."browser-ux".configuration.replacements.vivaldi.enable or false)
++        && !(builtins.elem "vivaldi" (config."browser-ux".configuration.primaryCutover.retiredBrowsers or []));
++      message = "Vivaldi visual reference must remain selected; any retirement requires explicit operator approval and a separate source release.";
+     }
+   ];
+ } // {
+   "browser-ux" = {
+     rolesR3 = intent;
+-    replacementRendering = { floorp = null; vivaldi = null; };
++    replacementRendering = { floorp = null; }; # default module carries the existing Vivaldi rendering.
+     replacementApplicationClaims = claims.applicationClaimsForHost { hostName = "example-primary"; };
+     primaryCutover = { enable = false; supersededBy = intent.schema; };
+   };
+--- a/tests/contracts.nix
++++ b/tests/contracts.nix
+@@ -1587,7 +1587,7 @@
+     assert releaseCandidate.hostGeneration.activationScripts == [ ];
+     assert releaseCandidate.hostGeneration.launchdDefinitions == [ ];
+     assert lib.any (text: lib.hasInfix "mechanically held in core" text) releaseCandidate.deployPreconditions;
+-    assert lib.any (text: lib.hasInfix "Vivaldi is decommissioned" text) releaseCandidate.deployPreconditions;
++    assert lib.any (text: lib.hasInfix "Vivaldi remains installed and unchanged" text) releaseCandidate.deployPreconditions;
+     assert lib.any (text: lib.hasInfix "Apple Passwords password/TOTP/passkey" text) releaseCandidate.deployPreconditions;
+     assert lib.any (text: lib.hasInfix "no convenience or credential extensions" text) releaseCandidate.deployPreconditions;
+     assert lib.any (text: lib.hasInfix "Real composed graph" text) releaseCandidate.qualificationNotes;
+--- a/tests/roles-r3.nix
++++ b/tests/roles-r3.nix
+@@ -7,23 +7,34 @@
+     config = { networking.hostName = "example-primary";
+       programs.browserBaseline = { rolesR3 = true; corePolicyOwnership = true; };
+       homebrew.onActivation.cleanup = "none";
++      "browser-ux".configuration.replacements.vivaldi.enable = true;
+     };
+   };
++  referenceRefusal = configuration: cleanup: let rejected = import ../modules/roles-r3.nix {
++    inherit lib;
++    config = { programs.browserBaseline = { rolesR3 = true; corePolicyOwnership = true; };
++      "browser-ux" = { inherit configuration; }; homebrew.onActivation.cleanup = cleanup; };
++  }; in !lib.all (a: a.assertion) rejected.assertions && rejected.homebrew.casks == [ "vivaldi" "floorp" ];
+   check = name: predicate: assert predicate; pkgs.runCommandLocal name {} ''touch "$out"'';
+   chromeIds = builtins.attrNames roles.braveDaily.extensions;
+ in {
+   roles-r3-owner-cut = check "roles-r3-owner-cut" (
+-    target.homebrew.casks == ["floorp"]
++    target.homebrew.casks == ["vivaldi" "floorp"]
+     && target.programs.browserBaseline ? extensionContributions && !(target ? system)
+     && lib.all (row: row.owner == "browser-ux" && row.policy == {}
+       && !row.automaticInstallation && !row.autoConnect)
+       target.programs.browserBaseline.extensionContributions
+     && provenance.inventory == [] && provenance.applicationClaims == []
+-    && map (c: c.id) (provenance.applicationClaimsForHost { hostName = "example-primary"; }) == ["bundle:app.floorp.Floorp"]
++    && map (c: c.id) (provenance.applicationClaimsForHost { hostName = "example-primary"; }) == ["bundle:com.vivaldi.Vivaldi" "bundle:app.floorp.Floorp"]
+     && provenance.applicationClaimsForHost { hostName = "example-workstation"; } == []
+     && lib.all (a: a.assertion) target.assertions
+     && !target."browser-ux".primaryCutover.enable
+-    && target."browser-ux".replacementRendering == { floorp = null; vivaldi = null; }
++    && target."browser-ux".replacementRendering == { floorp = null; }
++  );
++  roles-r3-reference-retirement-refused = check "roles-r3-reference-retirement-refused" (
++    referenceRefusal { replacements.vivaldi.enable = false; } "none"
++    && referenceRefusal { replacements.vivaldi.enable = true; primaryCutover.retiredBrowsers = [ "vivaldi" ]; } "none"
++    && referenceRefusal { replacements.vivaldi.enable = true; } "zap"
+   );
+   roles-r3-convenience-boundary = check "roles-r3-convenience-boundary" (
+     builtins.length chromeIds == 7
+@@ -36,7 +47,8 @@
+     && roles.orion.extensions == roles.braveDaily.extensions
+     && !roles.braveDaily.widevine.enabled
+     && lib.all (item: !item.automaticInstallation) (builtins.attrValues roles.braveDaily.extensions)
+-    && roles.vivaldi.state == "DECOMMISSIONED_NOT_DELETED"
++    && roles.vivaldi.state == "VIVALDI_VISUAL_REFERENCE_RETAINED_DECOMMISSION_HELD"
++    && !roles.vivaldi.primaryRole && roles.vivaldi.retirement == "EXPLICIT_OPERATOR_APPROVAL_REQUIRED"
+     && !roles.braveYoutube.destinationWriterEnabled
+   );
+ }
+--- a/tests/roles-r3.test.py
++++ b/tests/roles-r3.test.py
+@@ -2,6 +2,7 @@
+ import importlib.util
+ from pathlib import Path
+ import sys
++from types import SimpleNamespace
+ import unittest
+ from unittest import mock
+ 
+@@ -14,17 +15,25 @@
+ 
+ class RoleHoldTests(unittest.TestCase):
+     def test_apply_held_before_any_effect(self):
+-        with mock.patch.object(ROLLOUT, "check") as check, mock.patch.object(ROLLOUT, "backup") as backup:
++        args = SimpleNamespace(browser=["vivaldi"], attended=True, backup=Path("/fixture/reference-backup"))
++        with mock.patch.object(ROLLOUT, "check") as check, mock.patch.object(ROLLOUT, "backup") as backup, \
++             mock.patch.object(ROLLOUT, "selected_browsers") as selection, \
++             mock.patch.object(ROLLOUT.subprocess, "run") as writer:
+             with self.assertRaisesRegex(ValueError, "R3_DEPLOYMENT_HELD"):
+-                ROLLOUT.execute(object())
++                ROLLOUT.execute(args)
+             check.assert_not_called()
+             backup.assert_not_called()
++            selection.assert_not_called()
++            writer.assert_not_called()
+ 
+     def test_rollback_held_before_read_or_effect(self):
+-        with mock.patch.object(ROLLOUT.subprocess, "run") as run:
++        args = SimpleNamespace(browser=["vivaldi"], attended=True, backup=Path("/fixture/reference-backup"))
++        with mock.patch.object(ROLLOUT.subprocess, "run") as run, \
++             mock.patch.object(Path, "read_text") as read:
+             with self.assertRaisesRegex(ValueError, "R3_LEGACY_ROLLBACK_HELD"):
+-                ROLLOUT.rollback(object())
++                ROLLOUT.rollback(args)
+             run.assert_not_called()
++            read.assert_not_called()
+ 
+ 
+ if __name__ == "__main__":
+--- a/tests/source-only-roster.json
++++ b/tests/source-only-roster.json
+@@ -187,5 +187,6 @@
+   "config/browser/roles-r3.nix",
+   "modules/roles-r3.nix",
+   "tests/roles-r3.nix",
+-  "tests/roles-r3.test.py"
++  "tests/roles-r3.test.py",
++  "delivery/vivaldi-visual-reference.md"
+ ]

@@ -1,0 +1,48 @@
+{
+  "schema": "bux-r3r4-preservation-claim-matrix-v1",
+  "inactive": {
+    "target": "same packages, casks, policy/storage/activation bytes and claims as accepted baseline; office apps retained",
+    "predecessor": "same source/claims; no global browser freeze"
+  },
+  "activeHeld": {
+    "vivaldi": {
+      "cask": "vivaldi",
+      "claim": "bundle:com.vivaldi.Vivaldi",
+      "app": "Vivaldi.app",
+      "appOwner": "browser-ux",
+      "installationWriter": "browser-ux:modules/roles-r3.nix",
+      "compositionCaskWriter": false,
+      "policyPhysicalWriter": "core:modules/browsers.nix retained",
+      "referenceOutsideSevenPrimaryRoles": true,
+      "retirement": "explicit operator approval and separate source release required",
+      "renderingPoliciesExtensions": "carry current local selection without retraction",
+      "preserve": [
+        "executable access",
+        "preferences",
+        "Mail/Calendar/Feeds",
+        "OAuth",
+        "unsent/local data",
+        "credentials",
+        "extensions",
+        "imported bookmarks"
+      ],
+      "profileWriter": false,
+      "retractionOwnership": "legacy ownership carried through Vivaldi-only flag; common legacy Vivaldi/Floorp flag unchanged while inactive"
+    },
+    "floorp": "preferred power-user; active R3R3 policy selection and attended activation unchanged; no new plist deletion; existing package/extension ownership retained",
+    "brave": "one stock package; daily/automation/YouTube disjoint role intent unchanged",
+    "braveYoutube": "core app writer and CNT Chrome wallpaper/IndexedDB preserved",
+    "chrome": "legacy policies/CNT/NMH and MCP fallback preserved",
+    "safari": "Wipr/search/credential attestation unchanged",
+    "librewolf": "stock hardening/bundled uBO and cask policy unchanged",
+    "orion": "unsupported integration stays held",
+    "protonVpn": "R3R3 per-ID owners and held unsupported Orion unchanged",
+    "credentials": "native stores, password/TOTP/passkey proof and recovery unchanged",
+    "office": "both hosts preserved",
+    "deployment": "existing assertion and guards stop before effects"
+  },
+  "visualMigration": "future user-selected effects; Gecko chrome/content split; disposable Floorp first; no implementation",
+  "sourceOnly": true,
+  "targetReadback": "PENDING_ORDINARY_USER",
+  "runtimeClaims": "no profile/executable/policy effectiveness observation performed"
+}

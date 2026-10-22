@@ -1,0 +1,711 @@
+--- a/config/browser/README.md
++++ b/config/browser/README.md
+@@ -80,3 +80,15 @@
+ See [R3 handoff](../../delivery/browser-ownership-r3/MANAGER-REVIEW.md),
+ [host qualification plan](../../delivery/browser-ownership-r3/HOST-QUALIFICATION-PLAN.md)
+ and [R3 ADR](../../docs/adr/2026/10/0002-browser-role-ownership-r3.md).
++
++## R3R3 Proton VPN delivery
++
++The current source-only successor is
++[`proton-vpn-r3r3.nix`](proton-vpn-r3r3.nix), with the core-owned
++[`attended installer procedure`](proton-vpn-install.md) and
++[`R3R3 handoff`](../../delivery/browser-ownership-r3r3/README.md).
++It merges per-ID core security and Browser UX convenience inputs into one
++attended plan; it writes no Proton policy or profile data. Installation,
++enabled state and tunnel protection remain unobserved. The R3R2 catalog and
++its same-browser hold are retained historical evidence, superseded by R3R3's
++per-role, per-ID ownership contract. R3 remains disabled and mechanically held.
+--- /dev/null
++++ b/config/browser/proton-vpn-install.md
+@@ -0,0 +1,86 @@
++# Core Proton VPN attended installation
++
++Status: source prepared, runtime inactive. This procedure is held until a
++separate approved source release and attended installation authorization.
++Core owns Proton VPN on Brave daily and LibreWolf. Browser UX owns convenience
++extensions on those browsers and the whole Floorp suite. Extension ownership
++is per role and ID; it does not give another repository a policy writer.
++
++Use the existing installed application and the intended existing daily profile.
++The operation below installs into that profile only. Repeat in another profile
++only with separate authorization. Do not use automation, private windows,
++YouTube, Orion, or legacy Chrome as the installation target.
++
++1. Before adding anything, record the browser version, an anonymous local
++   profile label, existing extension IDs and enabled states, forced-policy IDs,
++   and whether Clear New Tab wallpaper and password-manager behavior work.
++   Keep paths, screenshots, credentials and raw profile data local. Record
++   policy values before and after locally; report only equality. Inspect
++   `brave://policy` or `about:policies`. If installation is blocked by policy,
++   stop; do not remove restrictions or overwrite `ExtensionSettings`.
++   If Proton is already present, skip all Add actions and observe it without
++   reinstalling. Record `OBSERVED_EXISTING`; otherwise use `ADDED_THIS_SESSION`
++   only after the actual Add action. Confirm both inventories are complete;
++   explicitly confirm an empty extension or forced-policy inventory if observed.
++2. For Brave daily, open the official
++   [Proton VPN Web Store listing](https://chromewebstore.google.com/detail/proton-vpn-fast-secure/jplgfhpmjnbigmhklmmbgecoobifkmpa)
++   in that profile. Check Proton as publisher and ID
++   `jplgfhpmjnbigmhklmmbgecoobifkmpa`. Click **Add to Brave** (the label may say
++   **Add to Chrome**), inspect permissions, and confirm **Add extension**.
++   This is the installer action; merely opening the listing installs nothing.
++   Keep the official Web Store update route
++   `https://clients2.google.com/service/update2/crx`; no unpacked build,
++   external manifest, pinned downgrade, or alternate update server.
++3. For LibreWolf, first run the R3R3 HTTPS identity kit as an ordinary user.
++   Require fresh AMO `guid=vpn@proton.ch`, current XPI manifest ID/version and
++   AMO SHA256 agreement. The immutable upstream builder is corroboration only.
++   Then open the official
++   [AMO listing](https://addons.mozilla.org/en-US/firefox/addon/proton-vpn-firefox-extension/)
++   in the intended LibreWolf profile. Check Proton AG and click **Add to
++   Firefox**, inspect permissions, and approve **Add**. Let the browser enforce
++   signing; inspect `about:support`/add-on details for the installed ID,
++   version, active state and valid signing. If unavailable or incompatible,
++   retain the held result. Never turn off signing, load a temporary add-on,
++   modify `extensions.json`, remove bundled uBO, or inject Firefox policies.
++4. Do not log in or connect. Keep private-window permission at its existing
++   default. Inspect any auto-connect control without enabling it. If the
++   logged-out UI cannot attest auto-connect, record `UNOBSERVABLE_LOGGED_OUT`;
++   connection readiness stays pending. Preserve existing Proton settings if
++   already installed; never reset them silently.
++5. In `brave://extensions` (Details) or `about:addons` plus `about:support`,
++   read the exact ID, version and enabled state. Compare the existing extension
++   and forced-policy inventory, wallpaper, credentials, Shields/hardening,
++   policy values and DNS preferences with the baseline. Submit only the
++   sanitized R3R3 presence observation to the readback validator. A successful
++   result means observed installed presence, not a protected tunnel.
++   For LibreWolf, pass the identity kit JSON as `--identity-evidence` and copy
++   its XPI SHA256 into `identitySha256`. The observed installed version must
++   match that receipt. Refresh identity during the session (within 24 hours).
++   If AMO updates between readback and Add, refresh the receipt and compare
++   again; do not downgrade or reinstall. The receipt links the observed version
++   to the fetched package; it is not independent inspection of installed bytes.
++6. Stop on any removed/disabled existing extension, changed forced policy,
++   wallpaper or credential regression. Do not delete profiles or extension
++   storage to recover. If this session added Proton, an attended disable of
++   that one new add-on is the bounded rollback; uninstall/data deletion needs
++   a separate preservation decision. If Proton was already present, do not
++   reinstall, downgrade, reset or claim this procedure installed it.
++
++Proton documents Brave and LibreWolf support, browser-only traffic coverage,
++and Firefox DNS caveats in its
++[installation guide](https://protonvpn.com/support/browser-extensions).
++No `network.trr.mode` or other DoH setting is changed here. The later connection
++canary must characterize normal/private DNS, DoH, proxy exceptions, WebRTC,
++IPv4/IPv6, and interaction with an already active system VPN. Keep public IPs
++and resolver addresses local; record only whether routes changed as expected.
++
++Brave policy audit: Chromium `ExtensionSettings` can override other extension
++policies, including force lists. A platform/user policy is not an isolation
++boundary for one chosen daily profile. Its effective precedence and propagation
++must be observed in every affected profile before policy adoption. This phase
++uses attended installation and emits no Proton managed settings. See
++[Google's policy reference](https://support.google.com/chrome/a/answer/9867568)
++and [Brave's policy guide](https://support.brave.com/hc/en-us/articles/360039248271-Group-Policy).
++Firefox `allowed` permits an install but does not perform one;
++`normal_installed` and `force_installed` install automatically, so neither is
++selected here. See [Mozilla's reference](https://mozilla.github.io/policy-templates/#extensionsettings).
+--- /dev/null
++++ b/config/browser/proton-vpn-r3r3.nix
+@@ -0,0 +1,62 @@
++# Core-owned future attended delivery, separate from retained historical R3R2.
++let
++  chromium = {
++    id = "jplgfhpmjnbigmhklmmbgecoobifkmpa";
++    storeUrl = "https://chromewebstore.google.com/detail/proton-vpn-fast-secure/jplgfhpmjnbigmhklmmbgecoobifkmpa";
++    updateUrl = "https://clients2.google.com/service/update2/crx";
++  };
++  gecko = {
++    id = "vpn@proton.ch";
++    storeUrl = "https://addons.mozilla.org/en-US/firefox/addon/proton-vpn-firefox-extension/";
++    updateUrl = "https://addons.mozilla.org/firefox/downloads/latest/proton-vpn-firefox-extension/latest.xpi";
++    identity = "PENDING_FRESH_AMO_GUID_XPI_AND_BROWSER_SIGNING_READBACK";
++  };
++  entry = role: extension: status: extension // {
++    inherit role status;
++    owner = "core";
++    purpose = "security";
++    name = "Proton VPN";
++    method = if builtins.elem role ["brave-daily" "librewolf"]
++      then "ATTENDED_OFFICIAL_STORE" else status;
++    automaticInstallation = false;
++    automaticSignIn = false;
++    autoConnect = false;
++    policy = {};
++  } // (if builtins.elem role ["brave-daily" "librewolf"]
++    then { procedure = ./proton-vpn-install.md; } else {});
++  preserved = role: id: purpose: name: {
++    inherit role id purpose name;
++    owner = "core";
++    method = "PRESERVE_EXISTING_OR_COMPATIBILITY_HELD_INTENT";
++    status = "NO_INSTALLATION_CHANGE";
++    automaticInstallation = false; automaticSignIn = false; autoConnect = false;
++    policy = {};
++  };
++in {
++  schema = "browser-proton-vpn-r3r3-v1";
++  selected = false;
++  deployment = "HELD_SOURCE_RELEASE_REQUIRED";
++  availabilityEffect = "SOURCE_OWNED_ATTENDED_INSTALLATION_PREPARED_RUNTIME_INACTIVE";
++  extensions = { inherit chromium gecko; };
++  contributions = [
++    (entry "brave-daily" chromium "ATTENDED_INSTALLATION_HELD_PENDING_RELEASE_AND_READBACK")
++    (entry "librewolf" gecko "ATTENDED_INSTALLATION_HELD_PENDING_IDENTITY_RELEASE_AND_READBACK")
++    (entry "brave-youtube" chromium "WRAPPER_PROJECTION_HELD")
++    (entry "orion" chromium "REQUESTED_COMPATIBILITY_HELD")
++    (preserved "brave-youtube" "felphkbfjadmcejnibcmcncimlappdde" "convenience" "Wrapper Clear New Tab")
++    (preserved "brave-daily" "pejdijmoenmkgeppbflobdenhhabjlaj" "credentials" "Apple Passwords")
++    (preserved "librewolf" "uBlock0@raymondhill.net" "blocker" "Bundled uBlock Origin")
++    (preserved "librewolf" "password-manager-firefox-extension@apple.com" "credentials" "Apple Passwords")
++    (preserved "orion" "uBlock0@raymondhill.net" "blocker" "Compatibility-held uBlock Origin")
++    (preserved "orion" "pejdijmoenmkgeppbflobdenhhabjlaj" "credentials" "Compatibility-held Apple Passwords")
++  ];
++  automation = {
++    status = "AUTOMATION_EXTENSION_NOT_APPLICABLE_BY_DESIGN";
++    extensionAvailable = false;
++    persistentInstallTarget = false;
++    extensionsEnabled = false;
++    ordinaryAgentAvailabilityBlockedByVpn = false;
++    customContext = "SEPARATE_OPTIONAL_APPROVED_TASK";
++    chromeMcpFallback = "UNCHANGED_UNTIL_SEPARATELY_PROVEN_BRAVE_CUTOVER";
++  };
++}
+--- /dev/null
++++ b/lib/browser-extension-ownership.nix
+@@ -0,0 +1,60 @@
++# Semantic ownership is per (browser role, extension ID); physical writers are
++# per destination. This merge emits data only and cannot install an extension.
++{ lib }:
++let
++  allowedRoles = [ "brave-daily" "librewolf" "orion" "floorp" "brave-youtube" ];
++  securityIds = [ "jplgfhpmjnbigmhklmmbgecoobifkmpa" "vpn@proton.ch"
++    "ddkjiahejlhfcafbddmgiahcphecmpfh" "uBlock0@raymondhill.net"
++    "pejdijmoenmkgeppbflobdenhhabjlaj" "password-manager-firefox-extension@apple.com"
++    "oboonakemofpalcgghocfoadofidjkkk" "keepassxc-browser@keepassxc.org" ];
++  expectedOwner = row:
++    if row.role == "floorp" then "browser-ux"
++    else if row.role == "brave-youtube" then "core" # Retained wrapper/theme/CNT.
++    else if builtins.elem row.id securityIds then "core"
++    else if row.purpose == "convenience" then "browser-ux" else "core";
++  validId = row: builtins.match
++    (if builtins.elem row.role [ "brave-daily" "brave-youtube" ] then "[a-p]{32}"
++      else "[a-zA-Z0-9{}@._-]+") row.id != null;
++  valid = row:
++    builtins.elem row.role allowedRoles
++    && builtins.elem row.purpose [ "security" "blocker" "credentials" "convenience" ]
++    && row.owner == expectedOwner row
++    && (!(builtins.elem row.id securityIds) || row.purpose != "convenience")
++    && validId row && row.id != "" && row.id != "*"
++    && !(row.automaticInstallation or false)
++    && !(row.automaticSignIn or false) && !(row.autoConnect or false)
++    && (row.policy or {}) == {};
++  merge = rows: builtins.foldl' (state: row:
++    let
++      key = "${row.role}/${row.id}";
++      duplicate = builtins.hasAttr key state.entries;
++      errors = lib.optional duplicate "DUPLICATE_EXTENSION_ID:${key}"
++        ++ lib.optional (!valid row) "INVALID_EXTENSION_OWNER_OR_EFFECT:${key}";
++    in {
++      errors = state.errors ++ errors;
++      entries = if duplicate || errors != [] then state.entries
++        else state.entries // { ${key} = row; };
++    }) { entries = {}; errors = []; } rows;
++in {
++  inherit merge;
++  # For later, separately authorized policy adoption: never replace an existing
++  # ID, wildcard, forced setting or unrelated leaf. Duplicate IDs are rejected
++  # even when values agree; two writers cannot own one leaf.
++  preservingPolicyMerge = existing: additions:
++    let
++      forcedIds = map (entry: builtins.head (lib.splitString ";" entry))
++        (existing.ExtensionInstallForcelist or []);
++      existingIds = builtins.attrNames (existing.ExtensionSettings or {})
++        ++ forcedIds ++ (existing.Extensions.Locked or []);
++      collisions = lib.intersectLists existingIds (builtins.attrNames additions);
++      unknownInstallIdentities = (existing.Extensions.Install or []) != [];
++      # Grouped IDs, wildcard and update_url selectors can overlap individual
++      # IDs. Hold them until a separately reviewed selector-aware adoption.
++      unsupportedSelectors = lib.any (key: key == "*" || lib.hasInfix "," key
++        || lib.hasPrefix "update_url:" key) (builtins.attrNames (existing.ExtensionSettings or {}));
++      invalidAdditions = lib.any (key: builtins.match "[a-p]{32}|[a-zA-Z0-9{}._-]+@[a-zA-Z0-9._-]+" key == null)
++        (builtins.attrNames additions);
++    in if collisions != [] || invalidAdditions || unknownInstallIdentities || unsupportedSelectors then
++      throw "EXTENSION_POLICY_LEAF_COLLISION"
++    else existing // { ExtensionSettings = (existing.ExtensionSettings or {}) // additions; };
++}
+--- /dev/null
++++ b/libexec/browser-extension-delivery/readback.py
+@@ -0,0 +1,107 @@
++"""Validate sanitized attended observations; never read a browser or install/connect."""
++import argparse
++from datetime import datetime, timezone
++import json
++from pathlib import Path
++import re
++
++CHROMIUM = "jplgfhpmjnbigmhklmmbgecoobifkmpa"
++GECKO = "vpn@proton.ch"
++ROLES = {"brave-daily": (CHROMIUM, "core"), "librewolf": (GECKO, "core"),
++         "floorp": (GECKO, "browser-ux")}
++
++
++def validate_identity(observation, evidence):
++    if not isinstance(evidence, dict) or evidence.get("status") != "FRESH_PACKAGE_IDENTITY_OBSERVED_SIGNING_PENDING":
++        return ["FRESH_AMO_XPI_IDENTITY_REQUIRED"]
++    package = evidence.get("xpi")
++    if not isinstance(package, dict):
++        return ["FRESH_AMO_XPI_IDENTITY_REQUIRED"]
++    errors = []
++    digest = package.get("sha256")
++    if (package.get("guid") != GECKO or package.get("version") != observation.get("version")
++            or not isinstance(digest, str) or not re.fullmatch("[0-9a-f]{64}", digest)
++            or digest != observation.get("identitySha256")
++            or package.get("signatureContainerPresent") is not True):
++        errors.append("AMO_XPI_VERSION_OR_RECEIPT_MISMATCH")
++    try:
++        timestamp = datetime.fromisoformat(evidence["observedAtUtc"])
++        age = (datetime.now(timezone.utc) - timestamp).total_seconds()
++        if not -300 <= age <= 86400:
++            errors.append("AMO_XPI_IDENTITY_STALE_REFRESH_REQUIRED")
++    except (KeyError, TypeError, ValueError):
++        errors.append("AMO_XPI_IDENTITY_TIMESTAMP_REQUIRED")
++    return errors
++
++
++def validate_baselines(observation, identity):
++    errors = []
++    before, after = observation.get("existingBefore"), observation.get("existingAfter")
++    if (observation.get("extensionBaselineComplete") is not True
++            or not isinstance(before, dict) or not isinstance(after, dict)):
++        errors.append("EXTENSION_BASELINE_REQUIRED")
++    else:
++        if not before and observation.get("emptyExtensionBaselineConfirmed") is not True:
++            errors.append("EMPTY_EXTENSION_BASELINE_UNCONFIRMED")
++        if any(after.get(key) != state for key, state in before.items()):
++            errors.append("EXISTING_EXTENSION_REMOVED_OR_CHANGED")
++        action = "OBSERVED_EXISTING" if identity in before else "ADDED_THIS_SESSION"
++        if observation.get("installationAction") != action:
++            errors.append("INSTALLATION_ACTION_MISMATCH")
++    forced_before, forced_after = observation.get("forcedBefore"), observation.get("forcedAfter")
++    if (observation.get("forcedPolicyBaselineComplete") is not True
++            or not isinstance(forced_before, list) or forced_before != forced_after):
++        errors.append("FORCED_EXTENSION_POLICY_CHANGED_OR_UNOBSERVED")
++    elif not forced_before and observation.get("emptyForcedBaselineConfirmed") is not True:
++        errors.append("EMPTY_FORCED_BASELINE_UNCONFIRMED")
++    return errors
++
++
++def validate(observation, identity_evidence=None):
++    if not isinstance(observation, dict):
++        return ["MALFORMED_OBSERVATION"]
++    errors = []
++    role = observation.get("role")
++    if role not in ROLES:
++        return ["ROLE_INSTALLATION_HELD_OR_NOT_APPLICABLE"]
++    identity, owner = ROLES[role]
++    if observation.get("id") != identity or observation.get("semanticOwner") != owner:
++        errors.append("IDENTITY_OR_OWNER_MISMATCH")
++    if not isinstance(observation.get("version"), str) or not observation["version"].strip():
++        errors.append("INSTALLED_VERSION_REQUIRED")
++    for flag in ("attended", "profileConfirmed", "officialStore", "enabled",
++                 "policiesUnchanged", "wallpaperPreserved", "credentialsPreserved",
++                 "hardeningPreserved", "dnsUnchanged"):
++        if observation.get(flag) is not True:
++            errors.append("OBSERVATION_REQUIRED:" + flag)
++    for flag in ("signedInDuringCanary", "connectionAttempted", "connected"):
++        if observation.get(flag) is not False:
++            errors.append("UNAUTHORIZED_LOGIN_OR_CONNECTION:" + flag)
++    if observation.get("autoConnect") not in ("OFF", "UNOBSERVABLE_LOGGED_OUT"):
++        errors.append("AUTO_CONNECT_NOT_HELD")
++    errors += validate_baselines(observation, identity)
++    if role != "brave-daily":
++        errors += validate_identity(observation, identity_evidence)
++        if observation.get("browserSignatureValid") is not True:
++            errors.append("BROWSER_SIGNATURE_ATTESTATION_REQUIRED")
++    return errors
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("observation", type=Path)
++    parser.add_argument("--identity-evidence", type=Path,
++                        help="Fresh identity-readback.py JSON receipt, required for Gecko roles")
++    args = parser.parse_args()
++    observation = json.loads(args.observation.read_text())
++    evidence = json.loads(args.identity_evidence.read_text()) if args.identity_evidence else None
++    errors = validate(observation, evidence)
++    print(json.dumps({"status": "FAIL" if errors else "ATTENDED_PRESENCE_OBSERVED",
++                      "errors": errors, "protected": False, "connectionQualified": False,
++                      "installationPerformed": not errors and observation.get("installationAction") == "ADDED_THIS_SESSION",
++                      "evidenceAuthority": "operator observations, not independent runtime inspection"}))
++    return 1 if errors else 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+--- a/modules/browsers.nix
++++ b/modules/browsers.nix
+@@ -5,6 +5,8 @@
+   legacyChromePolicyDefaults = import ../config/browser/chrome-policy-legacy-defaults.nix;
+   coreChromePolicyDefaults = import ../config/browser/chrome-policy-defaults.nix;
+   coreOwnership = builtins.fromJSON (builtins.readFile ../config/browser/core-ownership.json);
++  protonDelivery = import ../config/browser/proton-vpn-r3r3.nix;
++  extensionOwnership = import ../lib/browser-extension-ownership.nix { inherit lib; };
+   roleOwnership = builtins.fromJSON (builtins.readFile ../config/browser/roles-r3.json);
+   coreWriterFile = toString ./browsers.nix;
+   # Resolve the framework aggregate from option declaration provenance, not
+@@ -19,6 +21,15 @@
+ 
+   cfg = config.programs.browserBaseline;
+   options_ = options.programs.browserBaseline;
++  extensionDelivery = extensionOwnership.merge
++    (protonDelivery.contributions ++ cfg.extensionContributions);
++  extensionDeliveryViolations = lib.optionals cfg.rolesR3 (
++    map (message: { type = "extension-semantic-ownership";
++      option = "programs.browserBaseline.extensionContributions"; inherit message;
++    }) extensionDelivery.errors
++    ++ lib.optionals (options_.extensionContributions.highestPrio != 1500)
++      (checkPriorityViolations options_.extensionContributions)
++  );
+ 
+   # Release requires a subsequent reviewed source change, not an option override
+   # or a kit checkbox. The proposed uBOL-only policy can uninstall formerly forced
+@@ -513,7 +524,8 @@
+     ++ floorpReservedKeyViolations
+     ++ floorpNullValueViolations
+     ++ vivaldiNullValueViolations
+-    ++ coreOwnershipViolations;
++    ++ coreOwnershipViolations
++    ++ extensionDeliveryViolations;
+ 
+   # Effective contribution resolution
+   effectiveChromePreferences =
+@@ -1022,6 +1034,17 @@
+       };
+     };
+ 
++    extensionContributions = lib.mkOption {
++      type = lib.types.listOf (lib.types.attrsOf lib.types.anything);
++      default = [];
++      description = ''
++        Per-role, per-ID semantic extension data for R3 attended delivery.
++        Core owns security/credentials on core-installed browsers; Browser UX
++        owns convenience there and the Floorp suite. Core alone renders the
++        combined plan. This option writes no policies or profile data.
++      '';
++    };
++
+     floorp = {
+       policies = lib.mkOption {
+         type = lib.types.attrsOf lib.types.anything;
+@@ -1065,9 +1088,25 @@
+       policyDefinitionOwner = if cfg.corePolicyOwnership then "core" else "contribution-seam";
+       ownershipContract = if cfg.rolesR3 then roleOwnership else coreOwnership;
+       rolesR3 = if cfg.rolesR3 then roleOwnership else null;
+-      # Per-profile availability intent only; never a global install/proxy policy.
+-      protonVpnR3R2 = if cfg.rolesR3 then builtins.fromJSON
+-        (builtins.readFile ../config/browser/proton-vpn-r3r2.json) else null;
++      # Historical compatibility surface; rejected ownership claims are not current.
++      protonVpnR3R2 = if cfg.rolesR3 then {
++        current = false;
++        status = "SUPERSEDED_HISTORICAL_R3R2";
++        supersededBy = "protonVpnR3R3";
++      } else null;
++      protonVpnR3R3 = if cfg.rolesR3 then protonDelivery else null;
++      extensionDeliveryR3R3 = if cfg.rolesR3 && guardViolations == [] then {
++        schema = "browser-extension-delivery-r3r3-v1";
++        semanticEntries = extensionDelivery.entries;
++        physicalPolicyWriter = null; # Attended per-profile installs, no new policy.
++        canonicalPlanWriter = "core:modules/browsers.nix";
++        runtimeInstalled = false;
++        attendedPlan = pkgs.writeText "browser-extension-installation-r3r3.json"
++          (builtins.toJSON (lib.mapAttrs (_: row: row // lib.optionalAttrs (row ? procedure) {
++            procedure = builtins.readFile row.procedure;
++          }) extensionDelivery.entries));
++        presenceReadback = ../libexec/browser-extension-delivery/readback.py;
++      } else null;
+       automationBrowser = if cfg.rolesR3 then automationBrowser else null;
+       deploymentHeld = coreDeploymentHeld;
+       deploymentHoldMessage = coreDeploymentHoldMessage;
+--- a/src/test/unit/nix/core-browser-ownership.unit.test.nix
++++ b/src/test/unit/nix/core-browser-ownership.unit.test.nix
+@@ -3,6 +3,8 @@
+ # nix-darwin-test-source-target: config/browser/core-ownership.json
+ # nix-darwin-test-source-target: config/browser/roles-r3.json
+ # nix-darwin-test-source-target: libexec/browser-automation/launch.py
++# nix-darwin-test-source-target: lib/browser-extension-ownership.nix
++# nix-darwin-test-source-target: config/browser/proton-vpn-r3r3.nix
+ # Module fixture only: render packages record text, never build or activate.
+ { repoRoot, system, libPath ? null }:
+ let
+@@ -43,7 +45,79 @@
+   # Ownership rejection must be independent of the intentional deployment hold.
+   rejects = module: (evaluateActive [module]).system.build.browserBaseline.guardViolations != [];
+   targetCount = target: builtins.length (builtins.filter (row: row.target == target) bb.attendedTargets);
++  ownership = import (repoRoot + "/lib/browser-extension-ownership.nix") { inherit lib; };
++  vpn = builtins.head bb.protonVpnR3R3.contributions;
++  cnt = { role = "brave-daily"; id = "felphkbfjadmcejnibcmcncimlappdde";
++    owner = "browser-ux"; purpose = "convenience"; };
++  policy = { ExtensionSettings.${vpn.id}.installation_mode = "force_installed";
++    DisableTelemetry = true; };
++  additions = { "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".installation_mode = "normal_installed"; };
+ in {
++  testDistinctSemanticOwnersComposeThroughOnePlan = {
++    expr = let r = (evaluateActive [{ programs.browserBaseline.extensionContributions = [cnt]; }])
++      .system.build.browserBaseline; d = r.extensionDeliveryR3R3;
++    in { errors = r.guardViolations; owner = d.semanticEntries."${cnt.role}/${cnt.id}".owner;
++      vpnOwner = d.semanticEntries."${vpn.role}/${vpn.id}".owner;
++      writer = d.canonicalPlanWriter; physicalPolicyWriter = d.physicalPolicyWriter;
++      runtimeInstalled = d.runtimeInstalled; };
++    expected = { errors = []; owner = "browser-ux"; vpnOwner = "core";
++      writer = "core:modules/browsers.nix"; physicalPolicyWriter = null; runtimeInstalled = false; };
++  };
++  testSemanticDuplicatesOwnersEffectsAndPriorityAreRejected = {
++    expr = map (rows: rejects { programs.browserBaseline.extensionContributions = rows; }) [
++      [vpn] [(cnt // { owner = "core"; })]
++      [(vpn // { role = "floorp"; id = "new@fixture.invalid"; })]
++      [(cnt // { id = vpn.id; })]
++      [(cnt // { automaticInstallation = true; })]
++      [(cnt // { automaticSignIn = true; })] [(cnt // { autoConnect = true; })]
++      [(cnt // { policy.ExtensionSettings = {}; })]
++      (lib.mkForce [])
++    ];
++    expected = lib.replicate 9 true;
++  };
++  testHeldRolesHaveNoInstallerProcedure = {
++    expr = let plan = builtins.fromJSON bb.extensionDeliveryR3R3.attendedPlan.text;
++      held = map (role: plan."${role}/${vpn.id}") ["brave-youtube" "orion"];
++    in map (row: row.method == row.status && !(row ? procedure)) held;
++    expected = [true true];
++  };
++  testHistoricalR3R2IsExplicitlySuperseded = {
++    expr = { current = bb.protonVpnR3R2.current or true; by = bb.protonVpnR3R2.supersededBy or null;
++      oldConflictsAbsent = !(bb.protonVpnR3R2 ? heldBrowserOwnerConflicts); };
++    expected = { current = false; by = "protonVpnR3R3"; oldConflictsAbsent = true; };
++  };
++  testYoutubeWrapperConvenienceHasOneCoreOwner = {
++    expr = let row = cnt // { role = "brave-youtube"; owner = "core"; };
++      delivery = bb.extensionDeliveryR3R3;
++    in { accepted = (ownership.merge [row]).errors == [];
++      otherOwnerRejected = (ownership.merge [ (row // { owner = "browser-ux"; }) ]).errors != [];
++      sourceOwned = (delivery.semanticEntries."brave-youtube/${cnt.id}".owner or null) == "core"; };
++    expected = { accepted = true; otherOwnerRejected = true; sourceOwned = true; };
++  };
++  testPolicyMergePreservesDisjointExistingLeaves = {
++    expr = let merged = ownership.preservingPolicyMerge policy additions;
++    in { forced = merged.ExtensionSettings.${vpn.id}; telemetry = merged.DisableTelemetry;
++      added = merged.ExtensionSettings.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; };
++    expected = { forced.installation_mode = "force_installed"; telemetry = true;
++      added.installation_mode = "normal_installed"; };
++  };
++  testPolicyMergeRejectsCollisionsAndUnboundedSelectors = {
++    expr = map (existing: !(builtins.tryEval (ownership.preservingPolicyMerge existing additions)).success) [
++      { ExtensionSettings = additions; }
++      { ExtensionInstallForcelist = ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa;https://example.invalid/update"]; }
++      { Extensions.Locked = ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"]; }
++      { Extensions.Install = ["https://example.invalid/moving.xpi"]; }
++      { ExtensionSettings."${vpn.id},aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" = {}; }
++      { ExtensionSettings."update_url:https://clients2.google.com/service/update2/crx" = {}; }
++      { ExtensionSettings."*" = {}; }
++    ];
++    expected = lib.replicate 7 true;
++  };
++  testPolicyMergeRejectsNonIdAdditions = {
++    expr = map (key: !(builtins.tryEval (ownership.preservingPolicyMerge {} { ${key} = {}; })).success)
++      ["*" "${vpn.id},aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" "update_url:https://example.invalid" "invalid/path"];
++    expected = lib.replicate 4 true;
++  };
+   testR3RetainsChromeStorageInputsAndUsesOneBravePackage = {
+     expr = let c = evaluateActive [];
+       r = c.system.build.browserBaseline;
+--- /dev/null
++++ b/src/test/unit/python/browser_proton_vpn_r3r3.unit.test.py
+@@ -0,0 +1,188 @@
++"""Attended presence, fresh package identity and preservation negatives; no browser."""
++import copy
++from datetime import datetime, timedelta, timezone
++import hashlib
++import importlib.util
++import io
++import json
++from pathlib import Path
++import tempfile
++import unittest
++from unittest.mock import patch
++import zipfile
++
++ROOT = Path(__file__).resolve().parents[4]
++
++
++def load(name, relative):
++    spec = importlib.util.spec_from_file_location(name, ROOT / relative)
++    module = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(module)
++    return module
++
++
++PRESENCE = load("presence", "libexec/browser-extension-delivery/readback.py")
++IDENTITY = load("identity", "delivery/browser-ownership-r3r3/identity-readback.py")
++
++
++class PresenceTests(unittest.TestCase):
++    def setUp(self):
++        self.observation = {
++            "role": "brave-daily", "id": PRESENCE.CHROMIUM, "semanticOwner": "core",
++            "version": "observed-version", "attended": True, "profileConfirmed": True,
++            "officialStore": True, "enabled": True, "policiesUnchanged": True,
++            "wallpaperPreserved": True, "credentialsPreserved": True,
++            "hardeningPreserved": True, "dnsUnchanged": True,
++            "signedInDuringCanary": False, "connectionAttempted": False, "connected": False,
++            "autoConnect": "UNOBSERVABLE_LOGGED_OUT",
++            "existingBefore": {"cnt": "enabled", "keepassxc": "enabled"},
++            "existingAfter": {"cnt": "enabled", "keepassxc": "enabled"},
++            "forcedBefore": ["cnt", "keepassxc"], "forcedAfter": ["cnt", "keepassxc"],
++            "extensionBaselineComplete": True, "forcedPolicyBaselineComplete": True,
++            "installationAction": "ADDED_THIS_SESSION",
++        }
++
++    def identity_evidence(self):
++        return {"status": "FRESH_PACKAGE_IDENTITY_OBSERVED_SIGNING_PENDING",
++                "observedAtUtc": datetime.now(timezone.utc).isoformat(),
++                "xpi": {"guid": PRESENCE.GECKO, "version": "observed-version",
++                        "sha256": "a" * 64, "signatureContainerPresent": True}}
++
++    def test_empty_baselines_need_explicit_complete_observation(self):
++        row = dict(self.observation, existingBefore={}, existingAfter={}, forcedBefore=[], forcedAfter=[])
++        self.assertTrue(PRESENCE.validate(row))
++        row.update(emptyExtensionBaselineConfirmed=True, emptyForcedBaselineConfirmed=True)
++        self.assertEqual(PRESENCE.validate(row), [])
++        for flag in ("extensionBaselineComplete", "forcedPolicyBaselineComplete"):
++            self.assertTrue(PRESENCE.validate(dict(row, **{flag: False})))
++
++    def test_existing_proton_cannot_be_claimed_added(self):
++        row = copy.deepcopy(self.observation)
++        row["existingBefore"][PRESENCE.CHROMIUM] = "enabled"
++        row["existingAfter"][PRESENCE.CHROMIUM] = "enabled"
++        self.assertIn("INSTALLATION_ACTION_MISMATCH", PRESENCE.validate(row))
++        row["installationAction"] = "OBSERVED_EXISTING"
++        self.assertEqual(PRESENCE.validate(row), [])
++
++    def test_presence_is_separate_from_connection(self):
++        self.assertEqual(PRESENCE.validate(self.observation), [])
++
++    def test_cli_binds_receipt_and_does_not_claim_existing_installation(self):
++        row = dict(self.observation, role="librewolf", id=PRESENCE.GECKO,
++                   browserSignatureValid=True, identitySha256="a" * 64)
++        row["existingBefore"] = {PRESENCE.GECKO: "enabled"}
++        row["existingAfter"] = dict(row["existingBefore"])
++        row["installationAction"] = "OBSERVED_EXISTING"
++        with tempfile.TemporaryDirectory() as directory:
++            observation = Path(directory) / "observation.json"
++            receipt = Path(directory) / "receipt.json"
++            observation.write_text(json.dumps(row))
++            receipt.write_text(json.dumps(self.identity_evidence()))
++            for flags, expected in (([], 1), (["--identity-evidence", str(receipt)], 0)):
++                output = io.StringIO()
++                with patch("sys.argv", ["readback", str(observation), *flags]), patch("sys.stdout", output):
++                    self.assertEqual(PRESENCE.main(), expected)
++                result = json.loads(output.getvalue())
++                self.assertFalse(result["installationPerformed"])
++                self.assertFalse(result["protected"])
++                self.assertFalse(result["connectionQualified"])
++
++    def test_malformed_observation_refused(self):
++        for row in (None, [], "invalid"):
++            self.assertEqual(PRESENCE.validate(row), ["MALFORMED_OBSERVATION"])
++
++    def test_auto_install_login_connect_and_other_roles_refused(self):
++        for key in ("attended", "profileConfirmed", "officialStore"):
++            row = dict(self.observation, **{key: False})
++            self.assertTrue(PRESENCE.validate(row))
++        for key in ("signedInDuringCanary", "connectionAttempted", "connected"):
++            row = dict(self.observation, **{key: True})
++            self.assertTrue(PRESENCE.validate(row))
++        for role in ("brave-automation", "brave-youtube", "orion", "chrome", "safari"):
++            self.assertEqual(PRESENCE.validate(dict(self.observation, role=role)),
++                             ["ROLE_INSTALLATION_HELD_OR_NOT_APPLICABLE"])
++
++    def test_missing_version_or_wrong_id_owner_refused(self):
++        for key, value in (("version", None), ("version", ""), ("id", "other"),
++                           ("semanticOwner", "browser-ux"), ("autoConnect", "ON")):
++            self.assertTrue(PRESENCE.validate(dict(self.observation, **{key: value})))
++
++    def test_existing_extension_and_forced_policy_changes_refused(self):
++        for key, value in (("existingAfter", {"cnt": "enabled"}),
++                           ("existingAfter", {"cnt": "disabled", "keepassxc": "enabled"}),
++                           ("forcedAfter", ["cnt"]), ("forcedBefore", None)):
++            self.assertTrue(PRESENCE.validate(dict(self.observation, **{key: value})))
++        for key in ("policiesUnchanged", "wallpaperPreserved", "credentialsPreserved",
++                    "hardeningPreserved", "dnsUnchanged"):
++            self.assertTrue(PRESENCE.validate(dict(self.observation, **{key: False})))
++
++    def test_gecko_needs_current_identity_and_browser_signature(self):
++        for role, owner in (("librewolf", "core"), ("floorp", "browser-ux")):
++            row = dict(self.observation, role=role, id=PRESENCE.GECKO, semanticOwner=owner)
++            self.assertIn("FRESH_AMO_XPI_IDENTITY_REQUIRED", PRESENCE.validate(row))
++            row.update(freshAmoXpiIdentity=True, browserSignatureValid=True, identitySha256="a" * 64)
++            self.assertIn("FRESH_AMO_XPI_IDENTITY_REQUIRED", PRESENCE.validate(row))
++            self.assertEqual(PRESENCE.validate(row, self.identity_evidence()), [])
++            row["browserSignatureValid"] = False
++            self.assertIn("BROWSER_SIGNATURE_ATTESTATION_REQUIRED", PRESENCE.validate(row, self.identity_evidence()))
++
++    def test_gecko_version_receipt_and_freshness_must_match(self):
++        row = dict(self.observation, role="librewolf", id=PRESENCE.GECKO,
++                   browserSignatureValid=True, identitySha256="a" * 64)
++        for field, value in (("guid", "wrong"), ("version", "newer-version"),
++                             ("sha256", "b" * 64), ("sha256", "invalid"),
++                             ("signatureContainerPresent", False)):
++            evidence = self.identity_evidence(); evidence["xpi"][field] = value
++            self.assertTrue(PRESENCE.validate(row, evidence))
++        for timestamp in (None, "invalid", "2026-01-01T00:00:00",
++                          (datetime.now(timezone.utc) - timedelta(days=2)).isoformat(),
++                          (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()):
++            evidence = self.identity_evidence(); evidence["observedAtUtc"] = timestamp
++            self.assertTrue(PRESENCE.validate(row, evidence))
++
++
++class IdentityTests(unittest.TestCase):
++    def package(self, guid="vpn@proton.ch", version="1.0", signed=True):
++        output = io.BytesIO()
++        with zipfile.ZipFile(output, "w") as archive:
++            archive.writestr("manifest.json", json.dumps({"version": version,
++                             "browser_specific_settings": {"gecko": {"id": guid}}}))
++            if signed:
++                for name in ("mozilla.rsa", "mozilla.sf", "manifest.mf"):
++                    archive.writestr("META-INF/" + name, "synthetic container; not a signature")
++        data = output.getvalue()
++        amo = {"guid": "vpn@proton.ch", "current_version": {"version": "1.0",
++               "file": {"hash": "sha256:" + hashlib.sha256(data).hexdigest()}}}
++        return amo, data
++
++    def test_hash_guid_and_version_consistency_does_not_attest_signing(self):
++        amo, data = self.package()
++        result = IDENTITY.xpi_identity(amo, data)
++        self.assertFalse(result["cryptographicSignatureVerified"])
++        self.assertEqual(result["browserSignatureVerification"], "REQUIRED_ON_ATTENDED_INSTALL")
++
++    def test_slug_wrong_guid_hash_version_and_unsigned_package_refused(self):
++        amo, data = self.package()
++        for field, value in (("guid", "proton-vpn-firefox-extension"),):
++            bad = copy.deepcopy(amo); bad[field] = value
++            with self.assertRaises(ValueError):
++                IDENTITY.xpi_identity(bad, data)
++        bad = copy.deepcopy(amo); bad["current_version"]["file"]["hash"] = "sha256:wrong"
++        with self.assertRaises(ValueError):
++            IDENTITY.xpi_identity(bad, data)
++        for args in (("wrong-guid", "1.0", True), ("vpn@proton.ch", "2.0", True),
++                     ("vpn@proton.ch", "1.0", False)):
++            amo, data = self.package(*args)
++            with self.assertRaises(ValueError):
++                IDENTITY.xpi_identity(amo, data)
++
++    def test_https_and_official_origin_required(self):
++        for url in ("http://addons.mozilla.org/file", "https://example.invalid/xpi",
++                    "https://addons.mozilla.org@evil.invalid/file"):
++            with self.assertRaises(ValueError):
++                IDENTITY.official_https(url)
++        IDENTITY.official_https(IDENTITY.AMO)
++
++
++if __name__ == "__main__":
++    unittest.main()

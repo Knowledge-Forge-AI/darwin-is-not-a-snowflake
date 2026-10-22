@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd)"
+
+# shellcheck source=/dev/null
+source "$repo_dir/shell/sh_config/bash/steeef-custom.bash-theme"
+
+steeef_setup_colors
+TERM=dumb steeef_setup_colors
+export VIRTUAL_ENV="${VIRTUAL_ENV:-/tmp/theme-coverage-venv}"
+steeef_virtualenv_info >/dev/null
+
+if [ -n "${HOME:-}" ]; then
+  mkdir -p "$HOME/subdir"
+  cd "$HOME"
+  steeef_title_path >/dev/null
+  cd "$HOME/subdir"
+  steeef_title_path >/dev/null
+fi
+
+steeef_title_path >/dev/null
+steeef_title_host >/dev/null
+steeef_set_window_title >/dev/null
+
+if [ -n "${THEME_TEST_GIT_DIR:-}" ] && [ -n "${THEME_TEST_COMMON_DIR:-}" ]; then
+  mkdir -p "$THEME_TEST_GIT_DIR" "$THEME_TEST_COMMON_DIR"
+  : > "$THEME_TEST_COMMON_DIR/MERGE_HEAD"
+  steeef_git_info >/dev/null || true
+  for action in rebase merge cherry-pick revert bisect; do
+    rm -rf "$THEME_TEST_GIT_DIR/rebase-merge" "$THEME_TEST_GIT_DIR/rebase-apply" \
+      "$THEME_TEST_COMMON_DIR/MERGE_HEAD" "$THEME_TEST_COMMON_DIR/CHERRY_PICK_HEAD" \
+      "$THEME_TEST_COMMON_DIR/REVERT_HEAD" "$THEME_TEST_COMMON_DIR/BISECT_LOG"
+    case "$action" in
+      rebase) mkdir -p "$THEME_TEST_GIT_DIR/rebase-merge" ;;
+      merge) : > "$THEME_TEST_COMMON_DIR/MERGE_HEAD" ;;
+      cherry-pick) : > "$THEME_TEST_COMMON_DIR/CHERRY_PICK_HEAD" ;;
+      revert) : > "$THEME_TEST_COMMON_DIR/REVERT_HEAD" ;;
+      bisect) : > "$THEME_TEST_COMMON_DIR/BISECT_LOG" ;;
+    esac
+    steeef_git_action >/dev/null || true
+  done
+fi
+
+steeef_git_action >/dev/null || true
+steeef_git_branch >/dev/null || true
+steeef_git_info >/dev/null || true
+steeef_prompt_command

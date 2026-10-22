@@ -1,0 +1,120 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+CORE_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(CORE_DIR / "libexec"))
+
+from dinas_foundation.reconcile_plan import create_reconcile_plan
+from dinas_foundation.reconciler import (
+    DevError,
+    ReconcileError,
+    operator_home,
+    reconcile_ai_index,
+    reconcile_nbin,
+    reconcile_nbin_dev,
+)
+from nix_darwin_local.config import ControlConfig, load_control_config, load_projected_paths
+from nix_darwin_local.paths import ConfigError, validate_safe_managed_root
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="DINAS activation reconciler")
+    parser.add_argument("--config", help="Path to nix-darwin.toml", default=None)
+    parser.add_argument("--paths-json", help="Generated DINAS paths projection", default=None)
+    parser.add_argument("--nbin-root", help="Projected current namespace root", default=None)
+    parser.add_argument("--nbin-dev-root", help="Projected development namespace root", default=None)
+    parser.add_argument("--ai-index-root", help="Projected AI convenience index root", default=None)
+    parser.add_argument("--namespaces-json", help="JSON map of namespaces to target bin paths", default="{}")
+    parser.add_argument("--dev-namespaces-json", help="JSON map of dev namespaces to target paths", default="{}")
+    parser.add_argument("--check", action="store_true", help="Run non-mutating preflight check and emit JSON plan")
+    try:
+        args = parser.parse_args(argv)
+    except SystemExit as err:
+        return err.code if isinstance(err.code, int) else 2
+
+    home = operator_home()
+    try:
+        direct_roots = (args.nbin_root, args.nbin_dev_root, args.ai_index_root)
+        if args.config and args.paths_json:
+            raise ConfigError("--config and --paths-json are mutually exclusive")
+        if (args.config or args.paths_json) and any(direct_roots):
+            raise ConfigError("config, projection, and direct root inputs are mutually exclusive")
+        if any(direct_roots) and not all(direct_roots):
+            raise ConfigError("all three projected root arguments are required together")
+        if all(direct_roots):
+            roots = tuple(Path(value) for value in direct_roots)
+            for label, root in zip(("nbin_root", "nbin_dev_root", "ai_index_root"), roots, strict=True):
+                validate_safe_managed_root(root, home, f"paths.{label}")
+            if roots[0] == roots[1]:
+                raise ConfigError("paths.nbin_root and paths.nbin_dev_root must be distinct")
+            cfg = ControlConfig(
+                nbin_root=roots[0],
+                nbin_dev_root=roots[1],
+                ai_index_root=roots[2],
+                present=True,
+            )
+        elif args.paths_json:
+            cfg = load_projected_paths(Path(args.paths_json), operator_home=home)
+        else:
+            cfg_path = Path(args.config).expanduser() if args.config else home / ".local/nix-darwin/config/nix-darwin.toml"
+            cfg = load_control_config(cfg_path, operator_home=home)
+
+        try:
+            namespaces = json.loads(args.namespaces_json)
+            dev_namespaces = json.loads(args.dev_namespaces_json)
+        except json.JSONDecodeError as err:
+            raise ConfigError(f"invalid JSON payload: {err}")
+
+        if not isinstance(namespaces, dict) or not isinstance(dev_namespaces, dict):
+            raise ConfigError("namespace payloads must be JSON objects")
+
+    except (ConfigError, ValueError) as error:
+        print(f"dinas-reconcile: {error}", file=sys.stderr)
+        return 2
+
+    if args.check:
+        plan = create_reconcile_plan(
+            nbin_root=cfg.nbin_root,
+            namespaces=namespaces,
+            nbin_dev_root=cfg.nbin_dev_root,
+            dev_namespaces=dev_namespaces,
+            ai_root=cfg.ai_index_root,
+            home=home,
+        )
+        print(json.dumps(plan.to_dict(), indent=2, sort_keys=True))
+        if not plan.eligible:
+            print("dinas-reconcile: preflight blockers detected:", file=sys.stderr)
+            for blocker in plan.blockers:
+                print(f"  BLOCKER: {blocker}", file=sys.stderr)
+            return 1
+        if plan.warnings:
+            print("dinas-reconcile: WARNING - command collisions detected:", file=sys.stderr)
+            for warning in plan.warnings:
+                print(f"  {warning}", file=sys.stderr)
+        return 0
+
+    try:
+        collision_report = reconcile_nbin(
+            cfg.nbin_root,
+            namespaces,
+        )
+        if collision_report.has_collisions:
+            print("dinas-reconcile: WARNING - command collisions detected:", file=sys.stderr)
+            for cmd, nss in collision_report.collisions.items():
+                print(f"  {cmd}: {', '.join(nss)}", file=sys.stderr)
+
+        reconcile_nbin_dev(cfg.nbin_dev_root, dev_namespaces)
+        reconcile_ai_index(cfg.ai_index_root, home)
+        return 0
+    except (DevError, ReconcileError, OSError) as error:
+        print(f"dinas-reconcile: {error}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

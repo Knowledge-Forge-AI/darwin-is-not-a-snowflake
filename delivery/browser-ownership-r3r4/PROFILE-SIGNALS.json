@@ -1,0 +1,186 @@
+{
+  "method": "APG fallback owned statement/local/argument counts; not an external analyzer",
+  "pythonVersion": "3.13.12 observed local runner",
+  "pythonLevel": "Orange: bounded native evaluation has related statement/local/control-flow signals; explicit local decision retains one cohesive readback with fixed argv, 60-second limits, source binding before/after, sanitized output and no shell or new dependencies",
+  "nixLevel": "Orange: existing large module receives a Vivaldi-only ownership flag with default false; unchanged shared legacy behavior, inactive source/claim equivalence and held activation confirmed by fixtures; rollback is exact core delta and unadopted owner patch",
+  "legacyBoundary": "large core module and existing owner module receive narrow fixes only; fixture uses existing inert boundaries",
+  "pythonFiles": [
+    {
+      "path": "native-readback.py",
+      "physicalLines": 109,
+      "functions": [
+        {
+          "name": "source_errors",
+          "ownedStatements": 8,
+          "conservativeLocalsIncludingComprehensionTargets": 5,
+          "arguments": 1
+        },
+        {
+          "name": "sanitize",
+          "ownedStatements": 10,
+          "conservativeLocalsIncludingComprehensionTargets": 3,
+          "arguments": 2
+        },
+        {
+          "name": "inactive_contract",
+          "ownedStatements": 1,
+          "conservativeLocalsIncludingComprehensionTargets": 1,
+          "arguments": 1
+        },
+        {
+          "name": "evaluate",
+          "ownedStatements": 18,
+          "conservativeLocalsIncludingComprehensionTargets": 14,
+          "arguments": 3
+        },
+        {
+          "name": "main",
+          "ownedStatements": 18,
+          "conservativeLocalsIncludingComprehensionTargets": 9,
+          "arguments": 0
+        }
+      ]
+    },
+    {
+      "path": "prepare-readback.py",
+      "physicalLines": 86,
+      "functions": [
+        {
+          "name": "copy_source",
+          "ownedStatements": 14,
+          "conservativeLocalsIncludingComprehensionTargets": 5,
+          "arguments": 2
+        },
+        {
+          "name": "apply_patch",
+          "ownedStatements": 2,
+          "conservativeLocalsIncludingComprehensionTargets": 1,
+          "arguments": 3
+        },
+        {
+          "name": "prepare_owner",
+          "ownedStatements": 12,
+          "conservativeLocalsIncludingComprehensionTargets": 4,
+          "arguments": 4
+        },
+        {
+          "name": "main",
+          "ownedStatements": 23,
+          "conservativeLocalsIncludingComprehensionTargets": 5,
+          "arguments": 0
+        }
+      ]
+    },
+    {
+      "path": "reproduce-patches.py",
+      "physicalLines": 63,
+      "functions": [
+        {
+          "name": "reproduce",
+          "ownedStatements": 20,
+          "conservativeLocalsIncludingComprehensionTargets": 10,
+          "arguments": 3
+        },
+        {
+          "name": "main",
+          "ownedStatements": 12,
+          "conservativeLocalsIncludingComprehensionTargets": 5,
+          "arguments": 0
+        }
+      ]
+    },
+    {
+      "path": "verify-fixtures.py",
+      "physicalLines": 126,
+      "functions": [
+        {
+          "name": "run",
+          "ownedStatements": 4,
+          "conservativeLocalsIncludingComprehensionTargets": 1,
+          "arguments": 2
+        },
+        {
+          "name": "all_true",
+          "ownedStatements": 3,
+          "conservativeLocalsIncludingComprehensionTargets": 1,
+          "arguments": 1
+        },
+        {
+          "name": "expression",
+          "ownedStatements": 3,
+          "conservativeLocalsIncludingComprehensionTargets": 4,
+          "arguments": 2
+        },
+        {
+          "name": "verify_guards",
+          "ownedStatements": 15,
+          "conservativeLocalsIncludingComprehensionTargets": 8,
+          "arguments": 3
+        },
+        {
+          "name": "verify_contracts",
+          "ownedStatements": 16,
+          "conservativeLocalsIncludingComprehensionTargets": 7,
+          "arguments": 2
+        },
+        {
+          "name": "verify_syntax",
+          "ownedStatements": 18,
+          "conservativeLocalsIncludingComprehensionTargets": 6,
+          "arguments": 2
+        },
+        {
+          "name": "main",
+          "ownedStatements": 17,
+          "conservativeLocalsIncludingComprehensionTargets": 9,
+          "arguments": 0
+        }
+      ]
+    },
+    {
+      "path": "verify-source.py",
+      "physicalLines": 64,
+      "functions": [
+        {
+          "name": "digest",
+          "ownedStatements": 1,
+          "conservativeLocalsIncludingComprehensionTargets": 0,
+          "arguments": 1
+        },
+        {
+          "name": "check_paths",
+          "ownedStatements": 8,
+          "conservativeLocalsIncludingComprehensionTargets": 3,
+          "arguments": 3
+        },
+        {
+          "name": "load_ledger",
+          "ownedStatements": 1,
+          "conservativeLocalsIncludingComprehensionTargets": 0,
+          "arguments": 1
+        },
+        {
+          "name": "core_errors",
+          "ownedStatements": 13,
+          "conservativeLocalsIncludingComprehensionTargets": 7,
+          "arguments": 1
+        },
+        {
+          "name": "owner_errors",
+          "ownedStatements": 1,
+          "conservativeLocalsIncludingComprehensionTargets": 0,
+          "arguments": 3
+        },
+        {
+          "name": "main",
+          "ownedStatements": 11,
+          "conservativeLocalsIncludingComprehensionTargets": 6,
+          "arguments": 0
+        }
+      ]
+    }
+  ],
+  "rationale": "Artifact-only helpers implement the authorized source/readback handoff; focused fixture, exact replay, tamper refusals and native environment-denial classification were exercised. Future live qualification remains held. Rollback discards the unadopted R3R4 handoff and reverses only its exact core delta.",
+  "observedRevisionRunner": "Python 3.13.12",
+  "observedRevisionNix": "2.31.5"
+}

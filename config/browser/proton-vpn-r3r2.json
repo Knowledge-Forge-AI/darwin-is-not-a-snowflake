@@ -1,0 +1,122 @@
+{
+  "schema": "core-proton-vpn-r3r2-v1",
+  "selected": false,
+  "deployment": "HELD_SOURCE_RELEASE_REQUIRED",
+  "scope": "browser-only HTTPS VPN proxy; native clients are outside extension coverage",
+  "extensions": {
+    "chromium": {
+      "name": "Proton VPN",
+      "id": "jplgfhpmjnbigmhklmmbgecoobifkmpa",
+      "storeUrl": "https://chromewebstore.google.com/detail/proton-vpn-fast-secure/jplgfhpmjnbigmhklmmbgecoobifkmpa",
+      "updateUrl": "https://clients2.google.com/service/update2/crx"
+    },
+    "gecko": {
+      "name": "Proton VPN",
+      "id": "vpn@proton.ch",
+      "storeUrl": "https://addons.mozilla.org/en-US/firefox/addon/proton-vpn-firefox-extension/",
+      "installUrl": "https://addons.mozilla.org/firefox/downloads/latest/proton-vpn-firefox-extension/latest.xpi",
+      "identityEvidence": "delivery/browser-ownership-r3r2/IDENTITY-EVIDENCE.json",
+      "updates": "official signed AMO route; no version downgrade or signing bypass"
+    }
+  },
+  "roles": {
+    "brave-daily": {
+      "automaticInstallation": false,
+      "automaticSignIn": false,
+      "autoConnectDefault": false,
+      "autoConnectEnforcement": "NONE; attended setting readback required before any later use",
+      "deliveredPolicies": {},
+      "profileMutation": false,
+      "effectiveReadback": "PENDING_ATTENDED",
+      "installedVersion": null,
+      "extension": "chromium",
+      "extensionOwner": "core",
+      "status": "MANUAL_OFFICIAL_STORE_AVAILABILITY",
+      "delivery": "per-profile attended official-store add; no machine-wide policy",
+      "preserve": "existing profile, Shields, extension storage and preferences"
+    },
+    "brave-automation": {
+      "automaticInstallation": false,
+      "automaticSignIn": false,
+      "autoConnectDefault": false,
+      "autoConnectEnforcement": "extension absent; no persistent VPN context is supplied",
+      "deliveredPolicies": {},
+      "profileMutation": false,
+      "effectiveReadback": "NOT_APPLICABLE_EPHEMERAL_EXTENSION_DISABLED",
+      "installedVersion": null,
+      "extension": "chromium",
+      "extensionOwner": "core",
+      "status": "AUTOMATION_AVAILABILITY_HELD",
+      "delivery": "not available in the retained launcher: fresh empty user-data root per launch and extensions disabled; separate approved design required",
+      "defaultInstalledExtensions": [],
+      "ordinaryTestsUseVpn": false,
+      "persistentInstallTarget": false,
+      "extensionsEnabled": false
+    },
+    "librewolf": {
+      "automaticInstallation": false,
+      "automaticSignIn": false,
+      "autoConnectDefault": false,
+      "autoConnectEnforcement": "NONE; attended setting readback required before any later use",
+      "deliveredPolicies": {},
+      "profileMutation": false,
+      "effectiveReadback": "PENDING_ATTENDED",
+      "installedVersion": null,
+      "extension": "gecko",
+      "extensionOwner": "core",
+      "status": "MANUAL_OFFICIAL_STORE_AVAILABILITY",
+      "delivery": "per-profile attended official-store add; no machine-wide policy",
+      "preserve": "bundled uBlock Origin, hardening, Apple Passwords, existing extension storage and browser signing enforcement",
+      "dnsPolicy": "UNCHANGED; DNS/DoH route characterization required; no network.trr.mode override"
+    },
+    "brave-youtube": {
+      "automaticInstallation": false,
+      "automaticSignIn": false,
+      "autoConnectDefault": false,
+      "autoConnectEnforcement": "NONE; attended setting readback required before any later use",
+      "deliveredPolicies": {},
+      "profileMutation": false,
+      "effectiveReadback": "PENDING_ATTENDED",
+      "installedVersion": null,
+      "extension": "chromium",
+      "extensionOwner": "core",
+      "status": "WRAPPER_PROJECTION_HELD",
+      "delivery": "separate attended manual-store availability proposal after wrapper qualification; no stock profile cloning or extension DB writes",
+      "stockProfileInheritance": "UNPROVEN; distinct bundle identity, copied renamed binary and dedicated user-data root",
+      "autoConnectReason": "preserve playback and battery reliability"
+    },
+    "orion": {
+      "automaticInstallation": false,
+      "automaticSignIn": false,
+      "autoConnectDefault": false,
+      "autoConnectEnforcement": "NONE; attended setting readback required before any later use",
+      "deliveredPolicies": {},
+      "profileMutation": false,
+      "effectiveReadback": "PENDING_ATTENDED",
+      "installedVersion": null,
+      "extensionOwner": "core",
+      "engine": "WebKit",
+      "status": "REQUESTED_COMPATIBILITY_HELD",
+      "capability": "PROXY_API_UNQUALIFIED",
+      "installed": false,
+      "canary": "at most one later attended scratch-profile check only after supported API/new release evidence; require public-IP and DNS route change",
+      "fallback": "existing system Proton VPN app separately; no app changes"
+    }
+  },
+  "excluded": [
+    "Safari",
+    "Tor",
+    "Mullvad",
+    "Vivaldi",
+    "legacy Chrome"
+  ],
+  "profileStorageWrites": false,
+  "proxyPolicyWrites": false,
+  "availabilityEffect": "INTENT_ONLY_NO_NEW_RUNTIME_CAPABILITY",
+  "heldBrowserOwnerConflicts": [
+    "brave-daily",
+    "librewolf",
+    "orion"
+  ],
+  "singleOwnerQualification": "HELD_RECONCILIATION_REQUIRED; retained R3 Browser UX convenience definitions conflict with installer ownership"
+}

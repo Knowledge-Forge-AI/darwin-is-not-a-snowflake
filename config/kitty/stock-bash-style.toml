@@ -1,0 +1,67 @@
+# Stock Kitty enhanced Bash default. Only the stock shell/app uses these.
+# Override locally at ~/.local/nix-darwin/config/kitty-bash.toml.
+# No need to edit the Nix module when trying another color scheme.
+schema = 1
+
+[palette]
+# RGB versions of the DINAS steeef roles. The five indexed roles match xterm;
+# venv uses pure blue rather than the host theme's palette-relative SGR 34.
+path = "#ffd700"
+branch = "#5fd7ff"
+venv = "#0000ff"
+unstaged = "#d75f00"
+staged = "#5fff5f"
+untracked = "#d7005f"
+
+[terminal]
+# Preserve the existing Kitty macOS Terminal Basic-derived scheme.
+foreground = "#33ff00"
+background = "#000000"
+cursor = "#33ff00"
+selection_background = "#314f78"
+selection_foreground = "#ffffff"
+
+# Optional full 16-color ANSI palette. Uncomment keys to override only those
+# entries in the *stock Kitty* app. Nothing changes in Kitty Bash/Zsh.
+# [ansi]
+# color0 = "#000000"
+# color1 = "#cc5555"
+# color2 = "#55cc88"
+# color3 = "#dddd88"
+# color4 = "#6688dd"
+# color5 = "#aa77dd"
+# color6 = "#77bbbb"
+# color7 = "#eeeeee"
+# color8 = "#777777"
+# color9 = "#ff7777"
+# color10 = "#77ee99"
+# color11 = "#ffff99"
+# color12 = "#88aaff"
+# color13 = "#cc99ff"
+# color14 = "#99eeee"
+# color15 = "#ffffff"
+
+[completion]
+style = "align-nowrap"
+align_min = 4
+align_max = 64
+max_lines = 12
+
+[ble.faces]
+# Faces provided by pinned ble.sh 0.4.0-devel3: ghost suggestions and menu
+# filter text. The completion module is imported before its faces are styled.
+# No background on auto_complete: avoid the upstream light-gray rectangle.
+auto_complete = "fg=#89939f,italic"
+menu_filter_input = "fg=#ffffff,bg=#344c61"
+menu_filter_fixed = "fg=#a7d5d0,bold"
+# Uncomment and customize any of these supported faces to control the rest.
+# syntax_command = "fg=#aad5aa"
+# syntax_quoted = "fg=#a5d9c1"
+# syntax_varname = "fg=#c5a2db"
+# syntax_error = "fg=#ffffff,bg=#833548"
+# syntax_comment = "fg=#9aa5b1"
+# command_builtin = "fg=#decba4"
+# command_alias = "fg=#d4a6d0"
+# filename_directory = "fg=#aac2f0,underline"
+# filename_executable = "fg=#b3e4be,bold"
+# region = "fg=#ffffff,bg=#3e526d"

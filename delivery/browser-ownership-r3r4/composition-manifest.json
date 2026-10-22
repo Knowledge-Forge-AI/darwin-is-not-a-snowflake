@@ -1,0 +1,40 @@
+{
+  "schema": "owner-patch-r3r4-v1",
+  "owner": "composition",
+  "patchKind": "single cumulative replacement against current local owner preimages; apply once instead of historical patches",
+  "historicalPatchSha256": "9cfb35eeeb4b845b21a0c0fc90f22900290cf9ace6b8d6638640632c7d8c3f19",
+  "patchSha256": "ee4007cbb4badb00f657e5fc752196f6732452eea2ddd6823a2dcce196021198",
+  "paths": [
+    {
+      "path": "flake.nix",
+      "before_sha256": "033961e360dcef12587205c0994878583b3bb35b60a60b4a6f80ac52bfb0b61f",
+      "after_sha256": "7c6c6f8379e5122242ae260dfa0fcf556031bacc7fee85ffca79cc119ed494f3"
+    },
+    {
+      "path": "lib/browser-ux-host-selection.nix",
+      "before_sha256": "64f28be6ce75b8f842fffedcbf69e0132ed6294a5dcd00062ee97b8939a7c291",
+      "after_sha256": "1b90259edfa7e0651774d4f16f8c27a90f98b22c00e3231e27caa009ef703888"
+    },
+    {
+      "path": "tests/browser-role-r3.nix",
+      "before_sha256": null,
+      "after_sha256": "41c90dcbd3f3a217e75ab456a1196cb6204c3c78db6f0ef2a36665396214e11f"
+    }
+  ],
+  "unchangedDependencies": [
+    {
+      "path": "flake.lock",
+      "sha256": "95ee3c93803e98d35d28d040cb76894380ca13f34b166429fdf4659140e04f7d"
+    },
+    {
+      "path": "lib/promotion.nix",
+      "sha256": "6e9d0a42909512e0a4615a638c17404426e38acb9fe0aac46193dd5886c7d81d"
+    },
+    {
+      "path": "tests/browser-ux-host-transition.nix",
+      "sha256": "ab78fa3297f703137ad26b145af8a8722761e48241af3149015dfc62c811930a"
+    }
+  ],
+  "liveOwnerModified": false,
+  "adoption": "HELD_SEPARATE_MANAGER_DISPOSITION_AND_CLOSURE_PLAN_REQUIRED"
+}

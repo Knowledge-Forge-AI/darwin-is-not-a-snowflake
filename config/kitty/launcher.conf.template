@@ -1,0 +1,3 @@
+include /Users/@USER_NAME@/.config/kitty/kitty.conf
+shell @SHELL_COMMAND@
+startup_session launcher.session

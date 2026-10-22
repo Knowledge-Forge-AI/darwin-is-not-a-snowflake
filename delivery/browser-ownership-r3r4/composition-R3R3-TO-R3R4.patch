@@ -1,0 +1,11 @@
+--- a/lib/browser-ux-host-selection.nix
++++ b/lib/browser-ux-host-selection.nix
+@@ -25,7 +25,7 @@
+     };
+ 
+   # Inactive R3 preserves legacy installation selection. Active R3 delegates
+-  # Floorp installation to Browser UX and retains decommissioned Vivaldi state.
++  # Vivaldi reference and Floorp installation to Browser UX alone.
+   casksForHost = host: projection:
+     if rolesR3Selected || host != targetHost then [ ]
+     else (lib.optional (selected host projection "vivaldi") "vivaldi")

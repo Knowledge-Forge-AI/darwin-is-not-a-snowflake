@@ -1,0 +1,3 @@
+# Managed by nix-darwin: kitty-stock-bash v1
+@BASH_FRAGMENT@
+shell @LAUNCH@

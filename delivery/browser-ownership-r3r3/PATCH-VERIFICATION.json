@@ -1,0 +1,10 @@
+{
+  "livePreimages": "PASS",
+  "freshScratchForward": "PASS",
+  "freshScratchReverseCheck": "PASS",
+  "exactPostimageFiles": 15,
+  "externalOwnerMutated": false,
+  "patchAdopted": false,
+  "coreDeltaForwardAndReverseCheck": "PASS",
+  "coreDeltaExactPostimages": 7
+}

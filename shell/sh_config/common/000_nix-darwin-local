@@ -1,0 +1,2 @@
+# Machine-local nix-darwin state is outside the immutable repository tree.
+export NIX_DARWIN_LOCAL="${NIX_DARWIN_LOCAL:-$HOME/.local/nix-darwin}"

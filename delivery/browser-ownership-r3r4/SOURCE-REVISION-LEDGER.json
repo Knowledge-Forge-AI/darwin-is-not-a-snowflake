@@ -1,0 +1,33 @@
+{
+  "schema": "bux-r3r4-source-revision-ledger-v1",
+  "historicalR3R3Digest": "f784382e937897b1a0f4c795b8846aa739a025a5f8e1bd6a6a5104f45ed9404b",
+  "sourceCandidateDigest": "9b8d6a2722d658e830023f8fe660734606a51649100b7f4f9b27457b4e897393",
+  "sourceRecords": 118,
+  "coreDeltaSha256": "3e37a6b08d92a5c2d168600faa2f85b2a44063a3c07333a56794d5ea5a6cbdf1",
+  "browserUxCumulativeSha256": "32347d8cd54e70f7c803aa3ab4ada0edaf0d90098831ad0190a0856164b9c7b9",
+  "compositionCumulativeSha256": "ee4007cbb4badb00f657e5fc752196f6732452eea2ddd6823a2dcce196021198",
+  "revision": "UNCOMMITTED_NOT_SELECTED",
+  "independentReview": "PENDING_FINAL_INDEPENDENT_REVIEW",
+  "nativeStatus": "ENVIRONMENT_DENIED",
+  "modifiedExistingCorePaths": [
+    "config/browser/README.md",
+    "config/browser/roles-r3.json",
+    "docs/adr/2026/10/0002-browser-role-ownership-r3.md",
+    "modules/browsers.nix",
+    "src/test/unit/nix/core-browser-ownership.unit.test.nix"
+  ],
+  "sourceAdoption": "SEPARATE_MANAGER_DISPOSITION_AND_NEW_CLOSURE_HASH_PLAN_REQUIRED",
+  "soleDispatcherWorkReviewReceived": true,
+  "secondIndependentReviewObtained": false,
+  "readbackSourceFix": {
+    "scope": "INVOCATION_ONLY_LOCALCONFIG_FLAKE_OVERRIDE_REMOVED",
+    "originalSourceCandidateDigest": "3f76ce7fe01b2abc887eda823f2c5a244a9bc56a3ba8c50f3952ed7dc23b8279",
+    "originalNativeScriptSHA256": "14a6ccba3eded12529e4292036c5eda2b40da94fc9106c0c1a05c8fe3c6b4ff6",
+    "correctedNativeScriptSHA256": "2e4274e31f171fb4668c7af75f596a067997d74db0006c54acc56f73a6e37c8b",
+    "sourceCorrectionInputfixEvidenceSHA256": "a4212dd1f03d09b091a1ca7c83a8ed8bd7becdfc42243f9cc76392627d9707ec",
+    "correctedExternalNativeReadback": "R3R4_NATIVE_INPUTFIX_PASS_SOURCE_SCRIPT_PATCH_PENDING",
+    "postSourcePatchNativeRerun": "PENDING",
+    "sourceCommitted": false,
+    "activeR3Qualified": false
+  }
+}

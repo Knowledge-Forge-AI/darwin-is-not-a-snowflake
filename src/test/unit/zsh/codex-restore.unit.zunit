@@ -1,0 +1,136 @@
+#!/usr/bin/env zunit
+# nix-darwin-test-source-target: bin/codex-restore
+# nix-darwin-test-source-target: libexec/codex-dr/restore.zsh
+
+@setup {
+  test_tmp_root="$(mktemp -d)"
+  fake_bin="$test_tmp_root/bin"
+  fake_home="$test_tmp_root/home"
+  fake_codex_home="$fake_home/.codex"
+  fake_backup_root="$test_tmp_root/arq-backups/codex"
+  fake_work_dir="$test_tmp_root/work"
+  command_log="$test_tmp_root/commands.log"
+  repo_dir="$(cd "$testdir/../../../.." && pwd)"
+  restore_script="$repo_dir/bin/codex-restore"
+  base_path="/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
+  plan_uuid="PLAN-UUID"
+  folder_uuid="FOLDER-UUID"
+  mkdir -p "$fake_bin" "$fake_home" "$fake_backup_root"
+  : > "$command_log"
+
+  write_fake_command() {
+    local command_path="$1"
+    local command_body="$2"
+    {
+      print -r -- '#!/usr/bin/env zsh'
+      print -r -- 'set -euo pipefail'
+      print -r -- "$command_body"
+    } > "$command_path"
+    chmod +x "$command_path"
+  }
+
+  write_fake_command "$fake_bin/arq_restore" 'print -r -- "arq_restore $* PWD=$PWD" >> "$COMMAND_LOG"
+case "${1:-}" in
+  addtarget)
+    exit 0
+    ;;
+  restore)
+    if [ "${ARQ_RESTORE_FAIL:-0}" = 1 ]; then
+      exit 42
+    fi
+    restore_root="$PWD/${4:?folder uuid required}"
+    mkdir -p "$restore_root/usr/docs"
+    print -r -- "restored config" > "$restore_root/config.toml"
+    print -r -- "restored docs" > "$restore_root/usr/docs/README.md"
+    exit 0
+    ;;
+  deletetarget)
+    exit 0
+    ;;
+esac
+exit 3'
+
+  write_fake_command "$fake_bin/codex-tooling-self-heal" 'print -r -- "self-heal CODEX_HOME=$CODEX_HOME $*" >> "$COMMAND_LOG"'
+
+  run_restore() {
+    COMMAND_LOG="$command_log" \
+      CODEX_RESTORE_USER_HOME="$fake_home" \
+      CODEX_RESTORE_CODEX_HOME="$fake_codex_home" \
+      CODEX_RESTORE_ARQ_BACKUP_ROOT="$fake_backup_root" \
+      CODEX_RESTORE_ARQ_RESTORE_BIN="$fake_bin/arq_restore" \
+      CODEX_RESTORE_SELF_HEAL_BIN="$fake_bin/codex-tooling-self-heal" \
+      CODEX_RESTORE_PLAN_UUID="$plan_uuid" \
+      CODEX_RESTORE_FOLDER_UUID="$folder_uuid" \
+      CODEX_RESTORE_TARGET_NICKNAME="codex-test-target" \
+      CODEX_RESTORE_WORK_DIR="$fake_work_dir" \
+      CODEX_RESTORE_TIMESTAMP="20260625T000000Z" \
+      PATH="$fake_bin:$base_path" \
+      "$restore_script" "$@"
+  }
+}
+
+@teardown {
+  rm -rf "$test_tmp_root"
+}
+
+@test 'codex-restore refuses destructive restore without confirmation' {
+  set +e
+  output="$(run_restore </dev/null 2>&1)"
+  exit_code="$?"
+  set -e
+
+  assert "$exit_code" equals 2
+  assert "$output" contains "restore is destructive"
+  assert "$(cat "$command_log")" does_not_contain "arq_restore"
+}
+
+@test 'codex-restore restores into override location and runs self-heal' {
+  mkdir -p "$fake_codex_home"
+  print -r -- "old config" > "$fake_codex_home/config.toml"
+
+  output="$(run_restore --confirm)"
+  exit_code="$?"
+
+  assert "$exit_code" equals 0
+  assert "$output" contains "Codex restore complete: $fake_codex_home"
+  assert "$(cat "$fake_codex_home/config.toml")" same_as "restored config"
+  assert "$(cat "$fake_codex_home.before-codex-restore.20260625T000000Z/config.toml")" same_as "old config"
+  assert "$(cat "$command_log")" contains "arq_restore addtarget codex-test-target local $fake_backup_root"
+  assert "$(cat "$command_log")" contains "arq_restore restore codex-test-target $plan_uuid $folder_uuid"
+  assert "$(cat "$command_log")" contains "arq_restore deletetarget codex-test-target"
+  assert "$(cat "$command_log")" contains "self-heal CODEX_HOME=$fake_codex_home --apply"
+}
+
+@test 'codex-restore preserves existing codex home when arq restore fails' {
+  mkdir -p "$fake_codex_home"
+  print -r -- "old config" > "$fake_codex_home/config.toml"
+
+  set +e
+  output="$(ARQ_RESTORE_FAIL=1 run_restore --confirm 2>&1)"
+  exit_code="$?"
+  set -e
+
+  assert "$exit_code" equals 42
+  assert "$(cat "$fake_codex_home/config.toml")" same_as "old config"
+  assert "$(cat "$command_log")" contains "arq_restore deletetarget codex-test-target"
+  assert "$(cat "$command_log")" does_not_contain "self-heal"
+}
+
+@test 'codex-restore requires explicit backup configuration before effects' {
+  set +e
+  output="$(env -u CODEX_RESTORE_ARQ_BACKUP_ROOT -u CODEX_RESTORE_PLAN_UUID -u CODEX_RESTORE_FOLDER_UUID \
+    CODEX_RESTORE_USER_HOME="$fake_home" \
+    CODEX_RESTORE_CODEX_HOME="$fake_codex_home" \
+    CODEX_RESTORE_ARQ_RESTORE_BIN="$fake_bin/arq_restore" \
+    CODEX_RESTORE_WORK_DIR="$fake_work_dir" \
+    COMMAND_LOG="$command_log" PATH="$fake_bin:$base_path" \
+    "$restore_script" --confirm --skip-self-heal 2>&1)"
+  exit_code="$?"
+  set -e
+
+  assert "$exit_code" equals 1
+  assert "$output" contains "explicit backup root, plan UUID and folder UUID are required"
+  assert "$(cat "$command_log")" is_empty
+  assert "$([[ -e "$fake_codex_home" ]] && print present || print absent)" same_as "absent"
+  assert "$([[ -e "$fake_work_dir" ]] && print present || print absent)" same_as "absent"
+}

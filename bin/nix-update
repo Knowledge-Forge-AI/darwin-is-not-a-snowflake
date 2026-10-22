@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import os
+import sys
+from pathlib import Path
+
+
+def locate_core() -> Path | None:
+    candidates: list[Path] = []
+    parent_dir = Path(__file__).resolve().parent.parent
+    # Promotion is a packaged repository coordinator; it needs no core checkout.
+    if sys.argv[1:2] == ["promote"] and (
+        parent_dir / "libexec/nix_darwin_local/launcher.py"
+    ).is_file():
+        return parent_dir
+    configured = os.environ.get("NIX_DARWIN_FLAKE_DIR", "")
+    if configured:
+        candidates.append(Path(configured).expanduser())
+    # Bind execution to these product bytes, including archives and store roots.
+    candidates.append(parent_dir)
+    candidates.append(Path.home() / ".local/nix-darwin/darwin-is-not-a-snowflake")
+    for candidate in candidates:
+        resolved = candidate.resolve(strict=False)
+        if (resolved / "flake.nix").is_file() and (
+            resolved / "libexec/nix_darwin_local/launcher.py"
+        ).is_file():
+            return resolved
+    return None
+
+
+CORE_DIR = locate_core()
+if CORE_DIR is None:
+    print("nix-update: unable to locate darwin-is-not-a-snowflake core.", file=sys.stderr)
+    print("Set NIX_DARWIN_FLAKE_DIR for a copied launcher.", file=sys.stderr)
+    raise SystemExit(1)
+
+sys.path.insert(0, str(CORE_DIR / "libexec"))
+
+from nix_darwin_local.launcher import main
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(CORE_DIR))

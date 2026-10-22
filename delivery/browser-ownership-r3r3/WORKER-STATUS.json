@@ -1,0 +1,10 @@
+{
+  "schema": "browser-r3r3-internal-workers-v1",
+  "gemini": "used",
+  "task": "bounded read-only owner/seam mapping",
+  "result": "accepted as internal mapping only",
+  "cleanupProven": true,
+  "dispatcherCheckpointSatisfied": false,
+  "luna": "declined: no additional independent work needed",
+  "sonnet": "declined: no external review authority in produce stage"
+}

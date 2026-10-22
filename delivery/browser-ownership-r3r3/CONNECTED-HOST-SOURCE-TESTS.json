@@ -1,0 +1,79 @@
+{
+  "scope": "actual current core/owner/composition source and default controls; inert packages/writers; not native graph",
+  "readback": {
+    "activeChecks": {
+      "activationHeld": true,
+      "allHelpersHeld": true,
+      "assertionHeld": true,
+      "automationHeld": true,
+      "claimsPredecessor": true,
+      "claimsTarget": true,
+      "overrideRejected": true,
+      "partialSelectorHeld": true,
+      "preservingChrome": true,
+      "sevenRoles": true
+    },
+    "checks": {
+      "predecessor": {
+        "activation": true,
+        "assertionsPass": true,
+        "casks": true,
+        "chrome": true,
+        "extensions": true,
+        "firefox": true,
+        "helpers": true,
+        "inactive": true,
+        "legacyPlistBytes": true,
+        "nativeHosts": true,
+        "noAutomation": true,
+        "noPrivacyPackages": true,
+        "oneWriter": true,
+        "packages": true,
+        "targets": true
+      },
+      "target": {
+        "activation": true,
+        "assertionsPass": true,
+        "casks": true,
+        "chrome": true,
+        "extensions": true,
+        "firefox": true,
+        "helpers": true,
+        "inactive": true,
+        "legacyPlistBytes": true,
+        "nativeHosts": true,
+        "noAutomation": true,
+        "noPrivacyPackages": true,
+        "oneWriter": true,
+        "packages": true,
+        "targets": true
+      }
+    },
+    "inventoryChecks": {
+      "activeTarget": {
+        "claimCount": true,
+        "claimsValid": true,
+        "declaredCasksClaimed": true,
+        "noStaleCaskClaims": true,
+        "officePreserved": true
+      },
+      "defaultInventory": true,
+      "predecessor": {
+        "baselineEntries": true,
+        "claimCount": true,
+        "declaredCasksClaimed": true,
+        "inactiveClaimsValid": true,
+        "noStaleCaskClaims": true
+      },
+      "predecessorIgnoresR3": true,
+      "target": {
+        "baselineEntries": true,
+        "claimCount": true,
+        "declaredCasksClaimed": true,
+        "inactiveClaimsValid": true,
+        "noStaleCaskClaims": true
+      }
+    },
+    "nativeGraphQualified": false
+  }
+}

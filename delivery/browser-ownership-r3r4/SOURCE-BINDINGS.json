@@ -1,0 +1,731 @@
+{
+  "schema": "browser-r3r4-source-binding-v1",
+  "records": [
+    {
+      "owner": "core",
+      "path": "config/browser/README.md",
+      "before_sha256": "2a1d563dd1fa965f084043f3395b7130395fc81728db13c3a8431276092369ef",
+      "after_sha256": "ada546d02255f5ffbe29a29200f35afd1d08f834e5d04ab99a73b21652c3b99e"
+    },
+    {
+      "owner": "core",
+      "path": "config/browser/chrome-policy-defaults.nix",
+      "before_sha256": "ff22184f01da5165a1ef0031300875951e56e6eeb7a9b0716e6347cbb19f7d5c",
+      "after_sha256": "ff22184f01da5165a1ef0031300875951e56e6eeb7a9b0716e6347cbb19f7d5c"
+    },
+    {
+      "owner": "core",
+      "path": "config/browser/chrome-policy-legacy-defaults.nix",
+      "before_sha256": "94f387b949cf5948f9c8bd2ac794553358d7e77477e1cc3afefc4b5e6bb06c4c",
+      "after_sha256": "94f387b949cf5948f9c8bd2ac794553358d7e77477e1cc3afefc4b5e6bb06c4c"
+    },
+    {
+      "owner": "core",
+      "path": "config/browser/chrome-policy-legacy.plist",
+      "before_sha256": "ddf5cbe47a6e5cbb8f41e71e13b29015896abd8d63860736d557f613ba8502fa",
+      "after_sha256": "ddf5cbe47a6e5cbb8f41e71e13b29015896abd8d63860736d557f613ba8502fa"
+    },
+    {
+      "owner": "core",
+      "path": "config/browser/chrome-policy.plist",
+      "before_sha256": "e5ddd98e9396e797407787b7319e2cfa7ee197f92c3bbe3b3a23c488b47bc10f",
+      "after_sha256": "e5ddd98e9396e797407787b7319e2cfa7ee197f92c3bbe3b3a23c488b47bc10f"
+    },
+    {
+      "owner": "core",
+      "path": "config/browser/core-ownership.json",
+      "before_sha256": "668722817bf07900420bf529e2f61260f8e44e9c3527c53bb20d981cb8165bf7",
+      "after_sha256": "668722817bf07900420bf529e2f61260f8e44e9c3527c53bb20d981cb8165bf7"
+    },
+    {
+      "owner": "core",
+      "path": "config/browser/proton-vpn-install.md",
+      "before_sha256": "3e64d9ef7b8fd05bf614a2d951358a38bac0ba628152dba3dacbc84e56f2550c",
+      "after_sha256": "3e64d9ef7b8fd05bf614a2d951358a38bac0ba628152dba3dacbc84e56f2550c"
+    },
+    {
+      "owner": "core",
+      "path": "config/browser/proton-vpn-r3r2.json",
+      "before_sha256": "7bffac09044af439fd8c305f8d90541abe2110d08e31c33ac08fc0aad471ff09",
+      "after_sha256": "7bffac09044af439fd8c305f8d90541abe2110d08e31c33ac08fc0aad471ff09"
+    },
+    {
+      "owner": "core",
+      "path": "config/browser/proton-vpn-r3r3.nix",
+      "before_sha256": "6215db99a866312516d07bd291f518a1c4e80e849289ec29d000cdbccb6e02c7",
+      "after_sha256": "6215db99a866312516d07bd291f518a1c4e80e849289ec29d000cdbccb6e02c7"
+    },
+    {
+      "owner": "core",
+      "path": "config/browser/roles-r3.json",
+      "before_sha256": "84006e49beb70963d5a2ed20d73acb53e77909d6ed06e81ae5babfdca37a921c",
+      "after_sha256": "ed2163c18eb2bd86c812a5f7c43063440b3ce3781e1d6b9dd8aa634fd3efb86f"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3/agent-central.patch",
+      "before_sha256": "6ccf81cc8aa4ab629e24ec08884ab655f1aa6405ad5080636f852de070ecf832",
+      "after_sha256": "6ccf81cc8aa4ab629e24ec08884ab655f1aa6405ad5080636f852de070ecf832"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3/browser-ux.patch",
+      "before_sha256": "b96ee8ea0394326d38995fc5949779d0fff2f4404abff8ce908eb89669b346de",
+      "after_sha256": "b96ee8ea0394326d38995fc5949779d0fff2f4404abff8ce908eb89669b346de"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r1/composition.patch",
+      "before_sha256": "9cfb35eeeb4b845b21a0c0fc90f22900290cf9ace6b8d6638640632c7d8c3f19",
+      "after_sha256": "9cfb35eeeb4b845b21a0c0fc90f22900290cf9ace6b8d6638640632c7d8c3f19"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r1/native-readback.py",
+      "before_sha256": "bd3829cb7437105453664bfa22ffd08309e022dca9eaa069c5cf1f63fa7e0e84",
+      "after_sha256": "bd3829cb7437105453664bfa22ffd08309e022dca9eaa069c5cf1f63fa7e0e84"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r1/readback.nix",
+      "before_sha256": "750ece120463ef0ab70490a9606e8ba0565c40efd5d64899a9d4c12e62c41909",
+      "after_sha256": "750ece120463ef0ab70490a9606e8ba0565c40efd5d64899a9d4c12e62c41909"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r1/source-fixture.nix",
+      "before_sha256": "158434ba8c5c85e4638b7ea267d4284dfe1de8d73aba9e4c6a083ffa70b9fc15",
+      "after_sha256": "158434ba8c5c85e4638b7ea267d4284dfe1de8d73aba9e4c6a083ffa70b9fc15"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r1/verify-source.py",
+      "before_sha256": "8c3a4792fb5323688254e006e887e530a69c3c8e75b5000a3a7078604798f6ef",
+      "after_sha256": "8c3a4792fb5323688254e006e887e530a69c3c8e75b5000a3a7078604798f6ef"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/COMPATIBILITY-MATRIX.md",
+      "before_sha256": "10ebea492c81d458a180d3c9721f083693ebfb5d23bc62291c34e9417f6080ff",
+      "after_sha256": "10ebea492c81d458a180d3c9721f083693ebfb5d23bc62291c34e9417f6080ff"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/CORE-SOURCE-DIFF.patch",
+      "before_sha256": "218cde8d8e89aec39f22cc396895ee64a979f2b5fe31c1e2cbe5ea3f3ffcfa87",
+      "after_sha256": "218cde8d8e89aec39f22cc396895ee64a979f2b5fe31c1e2cbe5ea3f3ffcfa87"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/DELIVERY-INVENTORY.json",
+      "before_sha256": "d59bfe364064e401a6d2cecef8c5db7db451610a1eaf4efa8540555ca86d2a65",
+      "after_sha256": "d59bfe364064e401a6d2cecef8c5db7db451610a1eaf4efa8540555ca86d2a65"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/HOST-READBACK.md",
+      "before_sha256": "0556cd2c297b609a62be3bd0c94412cc0529491fae9598e1b64053272a9bba5f",
+      "after_sha256": "0556cd2c297b609a62be3bd0c94412cc0529491fae9598e1b64053272a9bba5f"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/IDENTITY-EVIDENCE.json",
+      "before_sha256": "358f8eded097f24f1221155535ffeea95738747a7651365680d29c3b23d34487",
+      "after_sha256": "358f8eded097f24f1221155535ffeea95738747a7651365680d29c3b23d34487"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/MANAGER-REVIEW.md",
+      "before_sha256": "ee195da47442b2d601e0101651014b87ff9791246b50e42b4c1f946288d270c1",
+      "after_sha256": "ee195da47442b2d601e0101651014b87ff9791246b50e42b4c1f946288d270c1"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/PLAN.md",
+      "before_sha256": "fdcf9b8dd09959ca34d6d7b286b069f5c73c53105f392f5506080d3fcec11016",
+      "after_sha256": "fdcf9b8dd09959ca34d6d7b286b069f5c73c53105f392f5506080d3fcec11016"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/PRIOR-NATIVE-R3R1.json",
+      "before_sha256": "42bd294021cd34ce261a62ece6cdce82b43598354b43597034ed951f326b4c3e",
+      "after_sha256": "42bd294021cd34ce261a62ece6cdce82b43598354b43597034ed951f326b4c3e"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/REVISION-CORE-SOURCE-DIFF.patch",
+      "before_sha256": "9917988b12bad8c7668d0769998c5675256e98768e771f70df3dbd82adfc9dff",
+      "after_sha256": "9917988b12bad8c7668d0769998c5675256e98768e771f70df3dbd82adfc9dff"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/SHA256SUMS",
+      "before_sha256": "c12e16f23b50d898d27936b462e26a593cdc01523232ac8b4390767fb8786f61",
+      "after_sha256": "c12e16f23b50d898d27936b462e26a593cdc01523232ac8b4390767fb8786f61"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/SOURCE-BINDINGS.json",
+      "before_sha256": "796cdf968486bced787f72b5b8e517ab5518c256a39989f881d0352b9e9f7187",
+      "after_sha256": "796cdf968486bced787f72b5b8e517ab5518c256a39989f881d0352b9e9f7187"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/browser-ux-manifest.json",
+      "before_sha256": "4ac831fbf5e86059591357cdb8d6362c3f25a9d65ab7d7789e1c79d2180ce493",
+      "after_sha256": "4ac831fbf5e86059591357cdb8d6362c3f25a9d65ab7d7789e1c79d2180ce493"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/browser-ux.patch",
+      "before_sha256": "3921f50ceb56d85ac06b7b0757c362e86e2a44ebbc49858deb21e5a5776e9286",
+      "after_sha256": "3921f50ceb56d85ac06b7b0757c362e86e2a44ebbc49858deb21e5a5776e9286"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/native-readback.py",
+      "before_sha256": "19d629cce2e260cadd556aea8674f1f41fb3c37688135b4884c918a56040c4f7",
+      "after_sha256": "19d629cce2e260cadd556aea8674f1f41fb3c37688135b4884c918a56040c4f7"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/prepare-readback.py",
+      "before_sha256": "2c9d7c20b62d5798bd1fda73c8e06d64ddeac60bb7ffbdb54f439ad0974fe842",
+      "after_sha256": "2c9d7c20b62d5798bd1fda73c8e06d64ddeac60bb7ffbdb54f439ad0974fe842"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/proton-fixture.nix",
+      "before_sha256": "1c6f715de89b145738d90835ab1592045da3be2110b0ab6787e648f18b8ac43e",
+      "after_sha256": "1c6f715de89b145738d90835ab1592045da3be2110b0ab6787e648f18b8ac43e"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/readback.nix",
+      "before_sha256": "e5c716fb9ed8da145f17777c194ec966dc2dbaf11737e6456cc426c344219131",
+      "after_sha256": "e5c716fb9ed8da145f17777c194ec966dc2dbaf11737e6456cc426c344219131"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r2/verify-delivery.py",
+      "before_sha256": "2e2cbfdffa234a64035a673c266db8fd741db33ac3d304548787b5fd732f5497",
+      "after_sha256": "2e2cbfdffa234a64035a673c266db8fd741db33ac3d304548787b5fd732f5497"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/ATTENDED-CANARY.md",
+      "before_sha256": "f40f1d58d124ef6e12037ee7e14a0293257b31a5040df048e8c04715bf1d03a5",
+      "after_sha256": "f40f1d58d124ef6e12037ee7e14a0293257b31a5040df048e8c04715bf1d03a5"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/HOST-READBACK.md",
+      "before_sha256": "05c5ed1da94405b0fba6550298f722be9df5a7cbe85e4a03a1ef806acc4aa79a",
+      "after_sha256": "05c5ed1da94405b0fba6550298f722be9df5a7cbe85e4a03a1ef806acc4aa79a"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/IDENTITY-EVIDENCE.json",
+      "before_sha256": "983edd9426f615942c84348f598d7a0baf284bffa252372eaf7ca04938136bc9",
+      "after_sha256": "983edd9426f615942c84348f598d7a0baf284bffa252372eaf7ca04938136bc9"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/MANAGER-REVIEW.md",
+      "before_sha256": "830988525bf7e00f928d7961cd701a3a9b7ba8412a7fe5bd9696c1332566c6fa",
+      "after_sha256": "830988525bf7e00f928d7961cd701a3a9b7ba8412a7fe5bd9696c1332566c6fa"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/OWNER-MATRIX.json",
+      "before_sha256": "0eb0cc0723f9e9face17f90853920824439b4c750ab6276a17456cf12dac24dd",
+      "after_sha256": "0eb0cc0723f9e9face17f90853920824439b4c750ab6276a17456cf12dac24dd"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/PER-ID-PROVENANCE.json",
+      "before_sha256": "4a6df0ff0fd4d30424ecd07742346b1df07c96bf1e0f7f782d5f3cb10a231c68",
+      "after_sha256": "4a6df0ff0fd4d30424ecd07742346b1df07c96bf1e0f7f782d5f3cb10a231c68"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/PLAN.md",
+      "before_sha256": "acdb06b281bdaef73a293d43db4d441a1f491ee67df055282dc299ca410b3caf",
+      "after_sha256": "acdb06b281bdaef73a293d43db4d441a1f491ee67df055282dc299ca410b3caf"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/PRESERVATION-REPORT.md",
+      "before_sha256": "0fd78d1dd3870c59351d10905fec5c00763bfeb3e855f998f5529212fdf18e10",
+      "after_sha256": "0fd78d1dd3870c59351d10905fec5c00763bfeb3e855f998f5529212fdf18e10"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/PRIMARY-SOURCES.json",
+      "before_sha256": "6c9961b7c9df97202eab625b4bd065f37ecaf6850d788c14d47669559e5e12bc",
+      "after_sha256": "6c9961b7c9df97202eab625b4bd065f37ecaf6850d788c14d47669559e5e12bc"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/README.md",
+      "before_sha256": "ec4e05f3013caf9e8716150e24cebce0a333decac40fc3529c2b172ac0315948",
+      "after_sha256": "ec4e05f3013caf9e8716150e24cebce0a333decac40fc3529c2b172ac0315948"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/REVISION-DISPOSITION.md",
+      "before_sha256": "fb375bdd02d75e94bd5e1498379262a7aa5a83057b335008553ca8c0a1adf583",
+      "after_sha256": "fb375bdd02d75e94bd5e1498379262a7aa5a83057b335008553ca8c0a1adf583"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/REVISION-PRESERVATION.json",
+      "before_sha256": "09f270649a9cc3d0753d8fe153481144401f21655bc10852942bdba19caeadbd",
+      "after_sha256": "09f270649a9cc3d0753d8fe153481144401f21655bc10852942bdba19caeadbd"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/REVISION-SOURCE-DIFF.patch",
+      "before_sha256": "48f21abc3e4f87583408f717542aa7823e8ef1bddb7e8b6dcac1fec1aa1b3fa2",
+      "after_sha256": "48f21abc3e4f87583408f717542aa7823e8ef1bddb7e8b6dcac1fec1aa1b3fa2"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/REVISION-VERIFICATION.json",
+      "before_sha256": "b18394193a7e40b2848f711f1ccb6f76ef4e098d2171cef4e78bc2149a7f7841",
+      "after_sha256": "b18394193a7e40b2848f711f1ccb6f76ef4e098d2171cef4e78bc2149a7f7841"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/browser-ux-manifest.json",
+      "before_sha256": "34482a856383fd8c81016d7291658efe7b3a61cf08d6bc185da4425f2a47edbd",
+      "after_sha256": "34482a856383fd8c81016d7291658efe7b3a61cf08d6bc185da4425f2a47edbd"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/browser-ux.patch",
+      "before_sha256": "ec25e718efac5acb676dacee1aafa381e184a644adb43f23409ffb4ddd650ff7",
+      "after_sha256": "ec25e718efac5acb676dacee1aafa381e184a644adb43f23409ffb4ddd650ff7"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/identity-readback.py",
+      "before_sha256": "71810c1c112f25bdf421e991c9afb1933d64f8c4c5714ab24d47066712d5c9cd",
+      "after_sha256": "71810c1c112f25bdf421e991c9afb1933d64f8c4c5714ab24d47066712d5c9cd"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/native-readback.py",
+      "before_sha256": "4cb6ed097a86788c2b528443515cb22df3f081d6873a1541dc0561c579c2255f",
+      "after_sha256": "4cb6ed097a86788c2b528443515cb22df3f081d6873a1541dc0561c579c2255f"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/prepare-readback.py",
+      "before_sha256": "f43f884d1bcd43bdc21dc1ed76e4ac8c766055abf9b40c25588cc9ec8919727b",
+      "after_sha256": "f43f884d1bcd43bdc21dc1ed76e4ac8c766055abf9b40c25588cc9ec8919727b"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/presence-template.json",
+      "before_sha256": "77a6a90e4abfec1295ae99325314d9dc64fd762cb433e3705ec6f11d89ab0d64",
+      "after_sha256": "77a6a90e4abfec1295ae99325314d9dc64fd762cb433e3705ec6f11d89ab0d64"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/producer-evidence/CORE-SOURCE-DIFF.patch",
+      "before_sha256": "2a3f102c6606fd3b8d9171f72cd18cdae8b4ec87467b761a2c76766b844a61b6",
+      "after_sha256": "2a3f102c6606fd3b8d9171f72cd18cdae8b4ec87467b761a2c76766b844a61b6"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/producer-evidence/MANAGER-REVIEW.md",
+      "before_sha256": "ba3f5cd91c8cb57a74fa76760bd6c256a54b9145701bb9ccca98438fd432fde2",
+      "after_sha256": "ba3f5cd91c8cb57a74fa76760bd6c256a54b9145701bb9ccca98438fd432fde2"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/producer-evidence/OWNER-MATRIX.json",
+      "before_sha256": "95ecebe1b0e7d4e6dab8f95f9a1aa0adab863df4f186d172f9f5cf576843ac63",
+      "after_sha256": "95ecebe1b0e7d4e6dab8f95f9a1aa0adab863df4f186d172f9f5cf576843ac63"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/producer-evidence/PER-ID-PROVENANCE.json",
+      "before_sha256": "bf83c9ebdee22f6b73e38d9afb53f48ec54df10f6f1f857f6fc049cada0634c8",
+      "after_sha256": "bf83c9ebdee22f6b73e38d9afb53f48ec54df10f6f1f857f6fc049cada0634c8"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/producer-evidence/PRESERVATION-REPORT.md",
+      "before_sha256": "a973bc4f0e3eba62414c19c29077191771b5aceca33940d50db52127804a4e05",
+      "after_sha256": "a973bc4f0e3eba62414c19c29077191771b5aceca33940d50db52127804a4e05"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/producer-evidence/README.md",
+      "before_sha256": "257b6abd4ebe8f1fa832cd3fd9edd7780b51d7b30bc58c13e7d4d3803c7ff78e",
+      "after_sha256": "257b6abd4ebe8f1fa832cd3fd9edd7780b51d7b30bc58c13e7d4d3803c7ff78e"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/producer-evidence/SHA256SUMS",
+      "before_sha256": "2e37e20b489044353117a974476ddc2c77cae5b3bbc0ec4dd237e283eee867da",
+      "after_sha256": "2e37e20b489044353117a974476ddc2c77cae5b3bbc0ec4dd237e283eee867da"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/producer-evidence/SOURCE-BINDINGS.json",
+      "before_sha256": "8592ce234bdf866763cbb4f84b97f615f7ffa09e97de2e3ac20d776eb790084e",
+      "after_sha256": "8592ce234bdf866763cbb4f84b97f615f7ffa09e97de2e3ac20d776eb790084e"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/producer-evidence/SOURCE-REVISION-LEDGER.json",
+      "before_sha256": "0169d08eab90033368f5e444c87eb0c237f094e3a14404c575f384ff897a974a",
+      "after_sha256": "0169d08eab90033368f5e444c87eb0c237f094e3a14404c575f384ff897a974a"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/producer-evidence/TEST-RESULTS.json",
+      "before_sha256": "481584df07ed2567389c55d55467d713418e7bda6d3687a6ce2fdff33e101a9a",
+      "after_sha256": "481584df07ed2567389c55d55467d713418e7bda6d3687a6ce2fdff33e101a9a"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/producer-evidence/VALIDATION.json",
+      "before_sha256": "3e93fc407c64ba9c0518cf75b63ec8c0ac4d2c371ba2c97f079c15a107340516",
+      "after_sha256": "3e93fc407c64ba9c0518cf75b63ec8c0ac4d2c371ba2c97f079c15a107340516"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/producer-evidence/browser-ux-manifest.json",
+      "before_sha256": "143ecdaff90059db00d4c721b94fa6815efe9d9463983c710ab339ee77a589d0",
+      "after_sha256": "143ecdaff90059db00d4c721b94fa6815efe9d9463983c710ab339ee77a589d0"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/producer-evidence/browser-ux.patch",
+      "before_sha256": "61ac98aa1c2bf462b5d99209c53aea828e5efe814c61639647c9d7bee2df242c",
+      "after_sha256": "61ac98aa1c2bf462b5d99209c53aea828e5efe814c61639647c9d7bee2df242c"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/readback.nix",
+      "before_sha256": "a6881148c787c313a6beab5a98b583f8119c4f8789c1fabfd90b8e0efd515277",
+      "after_sha256": "a6881148c787c313a6beab5a98b583f8119c4f8789c1fabfd90b8e0efd515277"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/source-fixture.nix",
+      "before_sha256": "548bfd5435957863b7aef8309762b6db3828b1e2fc79154d045b30ea2a3b766b",
+      "after_sha256": "548bfd5435957863b7aef8309762b6db3828b1e2fc79154d045b30ea2a3b766b"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r3/verify-source.py",
+      "before_sha256": "3201993017ebd18cb874d302fea8cd367d8eff26a04c8e0812675fa25d951236",
+      "after_sha256": "3201993017ebd18cb874d302fea8cd367d8eff26a04c8e0812675fa25d951236"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/BASELINE-NATIVE.json",
+      "before_sha256": null,
+      "after_sha256": "3329c40f699912b2287fbbdc7946c70f3141186cf40e1784e4e130df2b33745e"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/CONFIGURATION-BINDING.json",
+      "before_sha256": null,
+      "after_sha256": "9298eced0c13fba5f793e93a2080decc53a3c7c7e71667812af5c0f8ad314208"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/CORE-SOURCE-DIFF.patch",
+      "before_sha256": null,
+      "after_sha256": "3e37a6b08d92a5c2d168600faa2f85b2a44063a3c07333a56794d5ea5a6cbdf1"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/HOST-READBACK.md",
+      "before_sha256": null,
+      "after_sha256": "2763b0abab24c7be4702f612783cdc714aa1cbbff81b3c7dae3616a1d7c61bc9"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/MANAGER-REVIEW.md",
+      "before_sha256": null,
+      "after_sha256": "8e37a01a846f04c90443ac039fee67b5f692411855ae8e0649619c8d6ff1f137"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/PLAN.md",
+      "before_sha256": null,
+      "after_sha256": "704af1b70cfcbac73c6abdb17be56da2c671f8941d19bb5151df58f92d8a31c2"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/PREFLIGHT.json",
+      "before_sha256": null,
+      "after_sha256": "eda04a0f996c27387d6ec7b013a7eeca3ab114e90e6384a70287197a393ff207"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/PRESERVATION-MATRIX.json",
+      "before_sha256": null,
+      "after_sha256": "3db86331f636ec0fa20d082caf38fba9dabd11d2964eee8401f402e1d5a4f2f8"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/README.md",
+      "before_sha256": null,
+      "after_sha256": "851532dac0fbbc22277f7c83c97e7caf7bdfc8c0269ec515e5a3c47fd79eeff8"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/REVIEW-DISPOSITION.json",
+      "before_sha256": null,
+      "after_sha256": "b1befaf556cb2e5c036957d7f933c8d20cef7650763669a0db456b1804c27926"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/WORKER-STATUS.json",
+      "before_sha256": null,
+      "after_sha256": "0c21553957c3f1151f1fa79b07f73145ec6bc128383a4a737e13fd3af3c2724a"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/browser-ux-R3R3-TO-R3R4.patch",
+      "before_sha256": null,
+      "after_sha256": "045cdc0ba8958d2f7d4c446383d906fba20a0c691eae817eb2b12551a54a12db"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/browser-ux-delta.json",
+      "before_sha256": null,
+      "after_sha256": "1b64cc06de6379c6edbd5bfc6a905ef8359e32e30ff010447bc6f67cfccabde9"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/browser-ux-manifest.json",
+      "before_sha256": null,
+      "after_sha256": "3a45202ba44fc04a11663ea3d2cc9cbba960cf0513b2cfdda9e3ca5fd78f1224"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/browser-ux.patch",
+      "before_sha256": null,
+      "after_sha256": "32347d8cd54e70f7c803aa3ab4ada0edaf0d90098831ad0190a0856164b9c7b9"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/composition-R3R3-TO-R3R4.patch",
+      "before_sha256": null,
+      "after_sha256": "a11d9a0491eff6f6f416ea93d9059dfe45f94f026e998646ee339cf3c7ae7038"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/composition-delta.json",
+      "before_sha256": null,
+      "after_sha256": "48fb33c27d318cd43ea946cce1561142b6660503bc167779e6acb0565bdae0e5"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/composition-manifest.json",
+      "before_sha256": null,
+      "after_sha256": "92b3ef9d9e17aa95833821441cbec090487f2d381e755b0273de689dd819199f"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/composition.patch",
+      "before_sha256": null,
+      "after_sha256": "ee4007cbb4badb00f657e5fc752196f6732452eea2ddd6823a2dcce196021198"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/core-delta.json",
+      "before_sha256": null,
+      "after_sha256": "7fc3e83a8829d0d4e9826a9e5e5fbca71464e29075946eadd9f8e96f4cfc3161"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/native-readback.py",
+      "before_sha256": null,
+      "after_sha256": "2e4274e31f171fb4668c7af75f596a067997d74db0006c54acc56f73a6e37c8b"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/prepare-readback.py",
+      "before_sha256": null,
+      "after_sha256": "9013dccb917e7fce3d005c6d1312408955aa362dd694f31d8e51f7551a50b605"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/readback.nix",
+      "before_sha256": null,
+      "after_sha256": "3f4d958f9364feb0da293d2bed7283d33642e46903942d14ad6e019a9295769b"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/reproduce-patches.py",
+      "before_sha256": null,
+      "after_sha256": "5075a39c4c8b718b5455b05d57c65e3f128ac49116425cadfe71ca2819de8863"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/source-fixture.nix",
+      "before_sha256": null,
+      "after_sha256": "7ddee79abe29373c0e2bcd5a1e8d635f2757df2426176bf92722515e27ee3f4f"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/verify-fixtures.py",
+      "before_sha256": null,
+      "after_sha256": "e6ab3a00c6d4227897e7c332b680fce50a235f2821ab763d747bedfeeaaddf81"
+    },
+    {
+      "owner": "core",
+      "path": "delivery/browser-ownership-r3r4/verify-source.py",
+      "before_sha256": null,
+      "after_sha256": "2f12c9080754bd34c3411efb56677348bc4964fc80f5064cde8d1a32ab8f1446"
+    },
+    {
+      "owner": "core",
+      "path": "docs/adr/2026/10/0001-core-chrome-safari-ownership.md",
+      "before_sha256": "5370981faa53e055e347cbbf86b8ece00cc0f008b868bb5b8fcee3bddb04bdbb",
+      "after_sha256": "5370981faa53e055e347cbbf86b8ece00cc0f008b868bb5b8fcee3bddb04bdbb"
+    },
+    {
+      "owner": "core",
+      "path": "docs/adr/2026/10/0002-browser-role-ownership-r3.md",
+      "before_sha256": "074631de6448c75cbd0367f049d84b7d77d21cdff7afc5feeacd5555890c16bb",
+      "after_sha256": "3228203ed0be44e43f67c9346d998bf1e5e56ae7f782e7fb7335f21024ed1440"
+    },
+    {
+      "owner": "core",
+      "path": "docs/architecture/domain-migrations/browser-ux_dinas-inventory.md",
+      "before_sha256": "bcd8e614a4f1056a07b26b62376c8750ab9e6fd1b5e9a18e809ceee7015d7ada",
+      "after_sha256": "bcd8e614a4f1056a07b26b62376c8750ab9e6fd1b5e9a18e809ceee7015d7ada"
+    },
+    {
+      "owner": "core",
+      "path": "flake.nix",
+      "before_sha256": "a6cf09b9eba38a2a11bf787117d612490e30fe4566e259540d53aa753e6b5840",
+      "after_sha256": "a6cf09b9eba38a2a11bf787117d612490e30fe4566e259540d53aa753e6b5840"
+    },
+    {
+      "owner": "core",
+      "path": "lib/browser-extension-ownership.nix",
+      "before_sha256": "4a3caf425f03845665c4ac9623e04b229ccb98cbea5320d9f4ce189255133cc5",
+      "after_sha256": "4a3caf425f03845665c4ac9623e04b229ccb98cbea5320d9f4ce189255133cc5"
+    },
+    {
+      "owner": "core",
+      "path": "lib/core-application-inventory.nix",
+      "before_sha256": "0bd69fe1741d3cf029a08848c234889f9bac5a3252d48d17c5847fc79362902b",
+      "after_sha256": "0bd69fe1741d3cf029a08848c234889f9bac5a3252d48d17c5847fc79362902b"
+    },
+    {
+      "owner": "core",
+      "path": "libexec/browser-automation/launch.py",
+      "before_sha256": "4ca08a5902b01645736de24a4e6211feb56ce4808258c312c9e8ea12f10e6451",
+      "after_sha256": "4ca08a5902b01645736de24a4e6211feb56ce4808258c312c9e8ea12f10e6451"
+    },
+    {
+      "owner": "core",
+      "path": "libexec/browser-extension-delivery/readback.py",
+      "before_sha256": "b626aa182545e4ae5e90d3449d708f708c00f4e32883c6e1571d96b16ddaed0e",
+      "after_sha256": "b626aa182545e4ae5e90d3449d708f708c00f4e32883c6e1571d96b16ddaed0e"
+    },
+    {
+      "owner": "core",
+      "path": "modules/browsers.nix",
+      "before_sha256": "80f0ceba17211e49daef547a454c958ef1495af080b6a2fc35c4389f24cc84ab",
+      "after_sha256": "0d6040719ab6120e63cc8497a184edac460235ff7f757c7ab44f72e85a6f926f"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/int/nix/application-claims.int.test.nix",
+      "before_sha256": "442e30e5a3268d6e7909d0814ba0dba41be949f461b074a18a5583ea62504bd7",
+      "after_sha256": "442e30e5a3268d6e7909d0814ba0dba41be949f461b074a18a5583ea62504bd7"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/int/nix/browser-baseline.int.test.nix",
+      "before_sha256": "3aae9f0727954f351fae1358d56b0f27ef146bf3ce2784c4caaf435641e0f382",
+      "after_sha256": "3aae9f0727954f351fae1358d56b0f27ef146bf3ce2784c4caaf435641e0f382"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/unit/bash/browser-config.unit.test.bats",
+      "before_sha256": "d6b10b4904910f90bf6b4eb5fc57705d16514b75a5e59868ab73b260d611199d",
+      "after_sha256": "d6b10b4904910f90bf6b4eb5fc57705d16514b75a5e59868ab73b260d611199d"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/unit/nix/application-claims.unit.test.nix",
+      "before_sha256": "aa2d8a0702a35b6c50cfa4b78a518de74f258f5dbbb161824818e01d134dbedf",
+      "after_sha256": "aa2d8a0702a35b6c50cfa4b78a518de74f258f5dbbb161824818e01d134dbedf"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/unit/nix/browser-baseline.unit.test.nix",
+      "before_sha256": "328daec8e5c9704bb8078780de21c2d0d4233a29de43cf5d30fd7069f579fcf0",
+      "after_sha256": "328daec8e5c9704bb8078780de21c2d0d4233a29de43cf5d30fd7069f579fcf0"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/unit/nix/core-browser-ownership.unit.test.nix",
+      "before_sha256": "0f7fd857e0090bc8de6a9b59a67b421edc6dedf8445cb790cfcde2c102ec6db8",
+      "after_sha256": "9995b43ac726baf53bdf33c172ec7765c83ed87f723b467f030a95a209e6cebc"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/unit/python/browser_automation_roles_r3.unit.test.py",
+      "before_sha256": "e99015f21d58d71250b295d662993fa437a3c552b0443e5c3bcfe496349467bf",
+      "after_sha256": "e99015f21d58d71250b295d662993fa437a3c552b0443e5c3bcfe496349467bf"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/unit/python/browser_host_qualification.unit.test.py",
+      "before_sha256": "f2063563db0599ddcf868bf9d1a2efc206852a013e53e0dc30cced3ca2606cc7",
+      "after_sha256": "f2063563db0599ddcf868bf9d1a2efc206852a013e53e0dc30cced3ca2606cc7"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/unit/python/browser_proton_vpn_r3r2.unit.test.py",
+      "before_sha256": "d09226222e1e8257bee01a3c3622428f43c3f2fe22a506e9126de94c1b83d719",
+      "after_sha256": "d09226222e1e8257bee01a3c3622428f43c3f2fe22a506e9126de94c1b83d719"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/unit/python/browser_proton_vpn_r3r3.unit.test.py",
+      "before_sha256": "cd6441a0fa0a56a043f085d19f4c4660a263eea65845c447c2bd66d1a0cd7588",
+      "after_sha256": "cd6441a0fa0a56a043f085d19f4c4660a263eea65845c447c2bd66d1a0cd7588"
+    },
+    {
+      "owner": "core",
+      "path": "src/test/unit/python/browser_roles_r3_host_kit.unit.test.py",
+      "before_sha256": "beb179817a307fc07fd20f632a8d38bbc7c92e902dccfe29659f209b3b492b35",
+      "after_sha256": "beb179817a307fc07fd20f632a8d38bbc7c92e902dccfe29659f209b3b492b35"
+    }
+  ],
+  "sourceCandidateDigest": "9b8d6a2722d658e830023f8fe660734606a51649100b7f4f9b27457b4e897393",
+  "digestEncoding": "sha256 UTF-8 canonical sorted compact JSON of records",
+  "historicalR3R3Digest": "f784382e937897b1a0f4c795b8846aa739a025a5f8e1bd6a6a5104f45ed9404b",
+  "derivedEvidenceExcludedFromSourceDigest": [
+    "HELPER-TESTS.json",
+    "NATIVE-READBACK.json",
+    "PATCH-VERIFICATION.json",
+    "PRESERVATION.json",
+    "PROFILE-SIGNALS.json",
+    "SHA256SUMS",
+    "SHA256SUMS.sha256",
+    "SOURCE-BINDINGS.json",
+    "SOURCE-REVISION-LEDGER.json",
+    "TEST-RESULTS.json"
+  ],
+  "selected": false,
+  "nativeGraphQualified": false,
+  "review": "PENDING_FINAL_INDEPENDENT_REVIEW"
+}

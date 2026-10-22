@@ -1,0 +1,57 @@
+{
+  "scope": "connected current source and exact owner patch; inert package/artifact boundaries",
+  "checks": {
+    "active": {
+      "activeActivationUnchanged": true,
+      "actualCoreProcedure": true,
+      "actualFloorpProcedure": true,
+      "autoConnectRejected": true,
+      "automaticInstallRejected": true,
+      "automaticSignInRejected": true,
+      "automationNotApplicable": true,
+      "conflictingPolicyLeafRejected": true,
+      "coreSecurityAndUxConvenienceMerge": true,
+      "duplicateIdRejected": true,
+      "duplicatePhysicalWriterRejected": true,
+      "existingActiveOutputsPreserved": true,
+      "existingPolicyLeavesPreserved": true,
+      "floorpCredentialIntentPreserved": true,
+      "floorpSettingsPreserved": true,
+      "floorpSoleSemanticOwner": true,
+      "floorpSuitePreserved": true,
+      "forcedListIdCannotBeOverridden": true,
+      "geckoLockedIdCannotBeOverridden": true,
+      "invalidIdRejected": true,
+      "noSemanticCollisions": true,
+      "onePlanWriterNoPolicyWriter": true,
+      "onlyExpectedDeploymentAssertion": true,
+      "policyDuplicateIdRejected": true,
+      "policyWildcardRejected": true,
+      "priorityOverrideRejected": true,
+      "securityIdCannotBeRelabelledConvenience": true,
+      "unidentifiedLegacyInstallPolicyHeld": true,
+      "wrongFloorpOwnerRejected": true
+    },
+    "predecessor": {
+      "activation": true,
+      "assertionsPass": true,
+      "casks": true,
+      "defaults": true,
+      "deliveryAbsent": true,
+      "inactiveNoGlobalFreeze": true,
+      "packages": true,
+      "policyAndStorageOutputs": true
+    },
+    "target": {
+      "activation": true,
+      "assertionsPass": true,
+      "casks": true,
+      "defaults": true,
+      "deliveryAbsent": true,
+      "inactiveNoGlobalFreeze": true,
+      "packages": true,
+      "policyAndStorageOutputs": true
+    }
+  },
+  "nativeGraphQualified": false
+}

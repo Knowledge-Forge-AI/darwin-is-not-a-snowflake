@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>ExtensionSettings</key>
+	<dict>
+		<key>*</key>
+		<dict>
+			<key>installation_mode</key>
+			<string>allowed</string>
+		</dict>
+		<key>ddkjiahejlhfcafbddmgiahcphecmpfh</key>
+		<dict>
+			<key>installation_mode</key>
+			<string>force_installed</string>
+			<key>update_url</key>
+			<string>https://clients2.google.com/service/update2/crx</string>
+		</dict>
+	</dict>
+	<key>HttpsOnlyMode</key>
+	<string>force_balanced_enabled</string>
+	<key>NetworkPredictionOptions</key>
+	<integer>2</integer>
+	<key>SafeBrowsingProtectionLevel</key>
+	<integer>1</integer>
+	<key>SearchSuggestEnabled</key>
+	<false/>
+	<key>UrlKeyedAnonymizedDataCollectionEnabled</key>
+	<false/>
+</dict>
+</plist>

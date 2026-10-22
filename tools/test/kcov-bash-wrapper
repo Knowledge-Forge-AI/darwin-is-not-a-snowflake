@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+: "${NIX_DARWIN_KCOV_REAL_BASH:?managed Bash path is required}"
+real_bash="$NIX_DARWIN_KCOV_REAL_BASH"
+
+case "${1:-}" in
+  ""|-c|-n)
+    exec "$real_bash" "$@"
+    ;;
+esac
+
+script_path="$1"
+case "$script_path" in
+  "$NIX_DARWIN_TEST_ROOT"/*)
+    ;;
+  *)
+    exec "$real_bash" "$@"
+    ;;
+esac
+
+case "$script_path" in
+  "$NIX_DARWIN_TEST_ROOT"/tools/test/*|"$NIX_DARWIN_TEST_REPORT_ROOT"/*)
+    exec "$real_bash" "$@"
+    ;;
+esac
+
+[ -n "${NIX_DARWIN_KCOV_RUN_DIR:-}" ] || exec "$real_bash" "$@"
+[ -n "${NIX_DARWIN_KCOV_PARSE_DIRS:-}" ] || exec "$real_bash" "$@"
+[ -n "${NIX_DARWIN_KCOV_INCLUDE_PATTERNS:-}" ] || exec "$real_bash" "$@"
+[ -n "${NIX_DARWIN_KCOV_EXCLUDE_PATHS:-}" ] || exec "$real_bash" "$@"
+command -v kcov >/dev/null 2>&1 || exec "$real_bash" "$@"
+
+# kcov chooses its xtrace descriptor from RLIMIT_NOFILE. Darwin's unusually
+# large soft limit produces a descriptor that dup2 cannot open.
+open_file_limit="$(ulimit -Sn)"
+case "$open_file_limit" in
+  unlimited)
+    ulimit -Sn 1024
+    ;;
+  ''|*[!0-9]*)
+    ;;
+  *)
+    if [ "$open_file_limit" -gt 1024 ]; then
+      ulimit -Sn 1024
+    fi
+    ;;
+esac
+
+run_dir="$(mktemp -d "$NIX_DARWIN_KCOV_RUN_DIR/run.XXXXXX")"
+shift
+kcov_args=(
+  --clean \
+  --bash-parser="$real_bash" \
+  --bash-parse-files-in-dir="$NIX_DARWIN_KCOV_PARSE_DIRS" \
+  --include-pattern="$NIX_DARWIN_KCOV_INCLUDE_PATTERNS" \
+  --exclude-path="$NIX_DARWIN_KCOV_EXCLUDE_PATHS" \
+  "$run_dir" \
+  "$script_path" \
+  "$@"
+)
+
+if [ -r "${NIX_DARWIN_KCOV_STDERR_FILTER:-}" ]; then
+  stderr_file="$(mktemp "$run_dir/kcov-stderr.XXXXXX")"
+  set +e
+  kcov "${kcov_args[@]}" 2>"$stderr_file"
+  status="$?"
+  set -e
+  /usr/bin/awk -f "$NIX_DARWIN_KCOV_STDERR_FILTER" "$stderr_file" >&2
+  rm -f "$stderr_file"
+  exit "$status"
+fi
+
+exec kcov "${kcov_args[@]}"
