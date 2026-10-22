@@ -541,7 +541,15 @@ def test_renderer_refuses_collisions_and_linked_output(fixture, kind):
         target.write_text('# DINAS stock Kitty palette collision\n' if kind == 'prefix-collision' else 'user colors\n')
     before = target.lstat()
     assert reason in run("render-kitty", "--apply", expected=2).stderr
-    assert target.lstat() == before
+    after = target.lstat()
+    # Reading an ownership marker may update atime. Refusal must preserve
+    # identity, ownership, permissions, content and modification metadata.
+    for field in ("st_mode", "st_ino", "st_dev", "st_nlink", "st_uid", "st_gid",
+                  "st_size", "st_mtime_ns", "st_ctime_ns"):
+        assert getattr(after, field) == getattr(before, field), field
+    if kind in {'unmanaged', 'prefix-collision'}:
+        expected = '# DINAS stock Kitty palette collision\n' if kind == 'prefix-collision' else 'user colors\n'
+        assert target.read_text() == expected
     assert external.read_text() == 'untouched'
 
 
